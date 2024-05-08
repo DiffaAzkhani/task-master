@@ -1,5 +1,7 @@
 package com.taskmaster.taskmaster.entity;
 
+import com.taskmaster.taskmaster.listener.CreatedAtListener;
+import com.taskmaster.taskmaster.listener.UpdatedAtListener;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,11 +29,15 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EntityListeners({
+    CreatedAtListener.class,
+    UpdatedAtListener.class
+})
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
     private String username;
@@ -42,10 +49,10 @@ public class User {
     private String email;
 
     @Column(name = "created_at")
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 
     @Column(name = "enabled")
     private boolean enabled;
@@ -57,5 +64,13 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
     Set<Role> roles = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+        name = "user_study",
+        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "study_id", referencedColumnName = "id")
+    )
+    private Set<Study> studies = new HashSet<>();
 
 }
