@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +23,7 @@ public class StudyController {
     private final StudyService studyService;
 
     @PostMapping(
-        path = "add-study",
+        path = "/add-study",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<StudyResponse>> addStudy(@RequestBody AddStudyRequest request) {
@@ -33,6 +35,20 @@ public class StudyController {
                 .message(HttpStatus.OK.getReasonPhrase())
                 .data(studyResponse)
                 .build());
+    }
+
+    @GetMapping(
+        path = "/{studyCode}",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<StudyResponse> getStudy(@PathVariable("studyCode") String studyCode){
+        StudyResponse studyResponse = studyService.getStudy(studyCode);
+
+        return WebResponse.<StudyResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message(HttpStatus.OK.getReasonPhrase())
+                .data(studyResponse)
+                .build();
     }
 
 }

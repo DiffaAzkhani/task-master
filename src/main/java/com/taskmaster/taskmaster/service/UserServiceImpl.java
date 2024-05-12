@@ -15,8 +15,8 @@ public class UserServiceImpl implements UserService {
         return UserResponse.builder()
             .username(user.getUsername())
             .email(user.getEmail())
-            .createdAt(TimeUtil.formatToString(user.getCreated_at()))
-            .updatedAt(TimeUtil.formatToString(user.getCreated_at()))
+            .createdAt(TimeUtil.formatToString(user.getCreatedAt()))
+            .updatedAt(TimeUtil.formatToString(user.getUpdatedAt()))
             .build();
     }
 }
