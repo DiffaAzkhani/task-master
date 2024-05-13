@@ -11,4 +11,6 @@ public interface StudyService {
 
     Page<StudyResponse> getAllStudyMaterial(int page, int size);
 
+    void deleteStudy(String code);
+
 }
