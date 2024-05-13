@@ -95,6 +95,21 @@ public class StudyServiceImpl implements StudyService {
         return new PageImpl<>(studyResponses, request, studyPage.getTotalElements());
     }
 
+    @Override
+    public void deleteStudy(String code) {
+        Study study = studyRepository.findByCode(code)
+            .orElseThrow(() -> {
+                log.warn("Study with code : {}, not found!", code);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
+            });
+
+        log.info("found study code : {}", study);
+
+        studyRepository.delete(study);
+
+        log.info("Study deleted successfully!");
+    }
+
     public static StudyResponse toStudyResponse(Study study) {
         return StudyResponse.builder()
             .code(study.getCode())
