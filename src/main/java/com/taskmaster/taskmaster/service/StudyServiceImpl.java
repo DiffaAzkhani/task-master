@@ -8,9 +8,15 @@ import com.taskmaster.taskmaster.model.response.StudyResponse;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
@@ -75,6 +81,20 @@ public class StudyServiceImpl implements StudyService {
         return toStudyResponse(study);
     }
 
+    @Override
+    public Page<StudyResponse> getAllStudyMaterial(int page, int size) {
+        log.info("Fetching all available courses. Page: {}, Size: {}", page, size);
+
+        PageRequest request = PageRequest.of(page, size);
+        Page<Study> studyPage = studyRepository.findAll(request);
+
+        List<StudyResponse> studyResponses = studyPage.getContent().stream()
+            .map(StudyServiceImpl::toStudyResponse)
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(studyResponses, request, studyPage.getTotalElements());
+    }
+
     public static StudyResponse toStudyResponse(Study study) {
         return StudyResponse.builder()
             .code(study.getCode())
@@ -89,4 +109,5 @@ public class StudyServiceImpl implements StudyService {
             .updatedAt(TimeUtil.formatToString(study.getCreatedAt()))
             .build();
     }
+
 }
