@@ -1,6 +1,7 @@
 package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.AddStudyRequest;
+import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.StudyResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -89,6 +91,24 @@ public class StudyController {
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
+            .build();
+    }
+
+    @PatchMapping(
+        path = "/{studyCode}",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<StudyResponse> updateStudy(
+        @PathVariable("studyCode") String studyCode,
+        @RequestBody UpdateStudyRequest request
+    ) {
+        StudyResponse studyResponse = studyService.updateStudy(studyCode, request);
+
+        return WebResponse.<StudyResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(studyResponse)
             .build();
     }
 
