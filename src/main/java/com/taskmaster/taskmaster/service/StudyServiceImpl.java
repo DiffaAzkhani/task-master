@@ -4,6 +4,7 @@ import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.enums.StudyType;
 import com.taskmaster.taskmaster.model.request.AddStudyRequest;
+import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
 import com.taskmaster.taskmaster.model.response.StudyResponse;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -108,6 +110,59 @@ public class StudyServiceImpl implements StudyService {
         studyRepository.delete(study);
 
         log.info("Study deleted successfully!");
+    }
+
+    @Override
+    public StudyResponse updateStudy(String code, UpdateStudyRequest request) {
+        Study study = studyRepository.findByCode(code)
+            .orElseThrow(() -> {
+                log.warn("Study with code : {}, not found!", code);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND,"Study not found!");
+            });
+
+        updateStudyProperties(study, request);
+
+        studyRepository.save(study);
+        log.info("Study successfully updated!");
+
+        return toStudyResponse(study);
+    }
+
+    private void updateStudyProperties(Study study, UpdateStudyRequest request) {
+        if (Objects.nonNull(request.getName())) {
+            study.setName(request.getName());
+            log.info("Updated course name to : {}", request.getName());
+        }
+
+        if (Objects.nonNull(request.getPrice())) {
+            study.setPrice(request.getPrice());
+            log.info("Updated course price to : {}", request.getPrice());
+        }
+
+        if (Objects.nonNull(request.getDescription())) {
+            study.setDescription(request.getDescription());
+            log.info("Updated course description to : {}", request.getDescription());
+        }
+
+        if (Objects.nonNull(request.getLink())) {
+            study.setLink(request.getLink());
+            log.info("Updated course link to : {}", request.getLink());
+        }
+
+        if (Objects.nonNull(request.getLevel())) {
+            study.setLevel(request.getLevel());
+            log.info("Updated course level to : {}", request.getLevel());
+        }
+
+        if (Objects.nonNull(request.getCategory())) {
+            study.setCategory(request.getCategory());
+            log.info("Updated course category to : {}", request.getCategory());
+        }
+
+        if (Objects.nonNull(request.getType())) {
+            study.setType(request.getType());
+            log.info("Updated course type to : {}", request.getType());
+        }
     }
 
     public static StudyResponse toStudyResponse(Study study) {
