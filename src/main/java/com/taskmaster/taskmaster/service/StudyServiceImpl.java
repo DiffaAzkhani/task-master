@@ -65,7 +65,7 @@ public class StudyServiceImpl implements StudyService {
             .build();
 
         studyRepository.save(study);
-        log.info("learning material saved successfully");
+        log.info("learning material saved successfully in data : {}", study);
 
         return toStudyResponse(study);
     }
