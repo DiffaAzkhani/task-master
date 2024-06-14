@@ -176,7 +176,7 @@ public class StudyServiceImpl implements StudyService {
             .type(study.getType())
             .level(study.getLevel())
             .createdAt(TimeUtil.formatToString(study.getCreatedAt()))
-            .updatedAt(TimeUtil.formatToString(study.getCreatedAt()))
+            .updatedAt(TimeUtil.formatToString(study.getUpdatedAt()))
             .build();
     }
 

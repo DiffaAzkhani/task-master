@@ -1,5 +1,7 @@
 package com.taskmaster.taskmaster.entity;
 
+import com.taskmaster.taskmaster.event.CreatedAtAware;
+import com.taskmaster.taskmaster.event.UpdatedAtAware;
 import com.taskmaster.taskmaster.listener.CreatedAtListener;
 import com.taskmaster.taskmaster.listener.UpdatedAtListener;
 import lombok.AllArgsConstructor;
@@ -33,7 +35,7 @@ import java.util.Set;
     CreatedAtListener.class,
     UpdatedAtListener.class
 })
-public class User {
+public class User implements CreatedAtAware, UpdatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
