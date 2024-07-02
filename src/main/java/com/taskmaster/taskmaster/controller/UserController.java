@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/users")
@@ -25,7 +27,9 @@ public class UserController {
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<WebResponse<RegisterResponse>> registerUser(@RequestBody RegisterRequest request) {
+    public ResponseEntity<WebResponse<RegisterResponse>> registerUser(
+        @Valid @RequestBody RegisterRequest request
+    ) {
         RegisterResponse response = userService.register(request);
 
         return ResponseEntity.status(HttpStatus.OK)

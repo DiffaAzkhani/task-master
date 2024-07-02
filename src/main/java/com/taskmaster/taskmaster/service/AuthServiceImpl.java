@@ -31,29 +31,29 @@ public class AuthServiceImpl implements AuthService {
     public UserResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
+                loginRequest.getUsernameOrEmail(),
                 loginRequest.getPassword()
             )
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User user = userRepository.findByUsernameOrEmail(loginRequest.getUsername(), loginRequest.getEmail())
+        User user = userRepository.findByUsernameOrEmail(loginRequest.getUsernameOrEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User Not Found!"));
 
         if (!user.isEnabled()) {
-            log.warn("login attempt from disabled user: {}", loginRequest.getUsername());
+            log.warn("login attempt from disabled user: {}", loginRequest.getUsernameOrEmail());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Please verify your email first!");
         }
 
-        log.info("Successfull login for user: {}", loginRequest.getUsername());
+        log.info("Successfull login for user: {}", loginRequest.getUsernameOrEmail());
 
         return UserServiceImpl.toUserResponse(user);
     }
 
     @Override
-    public String createToken(String username, String email) {
-        User user = userRepository.findByUsernameOrEmail(username, email)
+    public String createToken(String usernameOrEmail) {
+        User user = userRepository.findByUsernameOrEmail(usernameOrEmail)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found!"));
 
         return jwtService.generateToken(user);
