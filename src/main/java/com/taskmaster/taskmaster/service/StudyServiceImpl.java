@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class StudyServiceImpl implements StudyService {
     private final StudyRepository studyRepository;
 
     @Override
+    @Transactional
     public StudyResponse addStudy(AddStudyRequest request) {
         if (Boolean.TRUE.equals(studyRepository.existsByCode(request.getCode()))){
             log.info("Study with code : {}, already exists",request.getCode());
@@ -71,6 +73,7 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
+    @Transactional
     public StudyResponse getStudy(String code) {
         Study study = studyRepository.findByCode(code)
             .orElseThrow(() -> {
@@ -84,6 +87,7 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
+    @Transactional
     public Page<StudyResponse> getAllStudyMaterial(int page, int size) {
         log.info("Fetching all available courses. Page: {}, Size: {}", page, size);
 
@@ -94,10 +98,13 @@ public class StudyServiceImpl implements StudyService {
             .map(StudyServiceImpl::toStudyResponse)
             .collect(Collectors.toList());
 
+        log.info("Fetched {} study materials successfully.", studyResponses.size());
+
         return new PageImpl<>(studyResponses, request, studyPage.getTotalElements());
     }
 
     @Override
+    @Transactional
     public void deleteStudy(String code) {
         Study study = studyRepository.findByCode(code)
             .orElseThrow(() -> {
@@ -113,6 +120,7 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
+    @Transactional
     public StudyResponse updateStudy(String code, UpdateStudyRequest request) {
         Study study = studyRepository.findByCode(code)
             .orElseThrow(() -> {
