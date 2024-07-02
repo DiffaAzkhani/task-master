@@ -24,8 +24,8 @@ public class SecurityBeanConfiguration {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> {
-             User user = userRepository.findByUsernameOrEmail(username, username)
+        return usernameOrEmail -> {
+             User user = userRepository.findByUsernameOrEmail(usernameOrEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
 
             return org.springframework.security.core.userdetails.User

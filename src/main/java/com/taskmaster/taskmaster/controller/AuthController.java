@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/auth")
@@ -26,9 +28,11 @@ public class AuthController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<WebResponse<UserResponse>> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<WebResponse<UserResponse>> login(
+        @Valid @RequestBody LoginRequest request
+    ) {
         UserResponse response = authService.login(request);
-        String token = authService.createToken(response.getUsername(), response.getEmail());
+        String token = authService.createToken(response.getUsernameOrEmail());
 
         return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
