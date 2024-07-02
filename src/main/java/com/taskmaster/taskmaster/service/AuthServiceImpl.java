@@ -1,23 +1,19 @@
 package com.taskmaster.taskmaster.service;
 
-import com.taskmaster.taskmaster.entity.Role;
 import com.taskmaster.taskmaster.entity.User;
-import com.taskmaster.taskmaster.enums.UserRole;
 import com.taskmaster.taskmaster.model.request.LoginRequest;
-import com.taskmaster.taskmaster.model.request.RegisterRequest;
-import com.taskmaster.taskmaster.model.response.RegisterResponse;
 import com.taskmaster.taskmaster.model.response.UserResponse;
-import com.taskmaster.taskmaster.repository.RoleRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Slf4j
 @AllArgsConstructor
@@ -26,50 +22,41 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
 
-    private final RoleRepository roleRepository;
+    private final JwtService jwtService;
+
+    private final AuthenticationManager authenticationManager;
 
     @Override
     @Transactional(readOnly = true)
     public UserResponse login(LoginRequest loginRequest) {
-        User user = userRepository.findByUsernameAndPassword(loginRequest.getUsername(), loginRequest.getPassword())
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(),
+                loginRequest.getPassword()
+            )
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        User user = userRepository.findByUsernameOrEmail(loginRequest.getUsername(), loginRequest.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User Not Found!"));
 
         if (!user.isEnabled()) {
+            log.warn("login attempt from disabled user: {}", loginRequest.getUsername());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Please verify your email first!");
         }
+
+        log.info("Successfull login for user: {}", loginRequest.getUsername());
 
         return UserServiceImpl.toUserResponse(user);
     }
 
     @Override
-    public RegisterResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsernameAndEmail(request.getUsername(), request.getEmail())) {
-            log.warn("User with username: {} and email: {} already exist", request.getUsername(), request.getEmail());
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User Already Exists!");
-        }
+    public String createToken(String username, String email) {
+        User user = userRepository.findByUsernameOrEmail(username, email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found!"));
 
-        User user = User.builder()
-            .username(request.getUsername())
-            .password(request.getPassword())
-            .email(request.getEmail())
-            .enabled(true)
-            .build();
-
-        Set<Role> roleSet = new HashSet<>();
-        Role userRole = roleRepository.findByName(UserRole.USER);
-        roleSet.add(userRole);
-        user.setRoles(roleSet);
-
-        userRepository.save(user);
-        log.info("Success to register user with username : {}", request.getUsername());
-
-        return toRegisterResponse(user);
+        return jwtService.generateToken(user);
     }
 
-    private RegisterResponse toRegisterResponse(User user) {
-        return RegisterResponse.builder()
-            .email(user.getEmail())
-            .username(user.getUsername())
-            .build();
-    }
 }
