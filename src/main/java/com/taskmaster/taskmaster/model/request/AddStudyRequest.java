@@ -19,31 +19,31 @@ import javax.validation.constraints.Size;
 @Builder
 public class AddStudyRequest {
 
-    @NotBlank
-    @Size(max = 13)
+    @NotBlank(message = "Code is required")
+    @Size(max = 13, message = "Study Code should be 13 characters")
     private String code;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Name is required")
+    @Size(min = 3, max = 100, message = "Study Name should be between 3 and 100 characters")
     private String name;
 
-    @NotNull
-    @Min(0)
+    @NotNull(message = "Price is required")
+    @Min(value = 0, message = "price must be at least 0")
     private Double price;
 
     private String description;
 
-    @NotBlank
-    @Size(max = 200)
+    @NotBlank(message = "link is required")
+    @Size(max = 200, message = "Link should be 200 characters or less")
     private String link;
 
-    @NotNull
+    @NotNull(message = "Category cannot be null")
     private StudyCategory category;
 
-    @NotNull
+    @NotNull(message = "Type cannot be null")
     private StudyType type;
 
-    @NotNull
+    @NotNull(message = "Level cannot be null")
     private StudyLevel level;
 
 }

@@ -1,11 +1,10 @@
 package com.taskmaster.taskmaster.controller;
 
-import com.taskmaster.taskmaster.model.request.LoginRequest;
-import com.taskmaster.taskmaster.model.response.UserResponse;
+import com.taskmaster.taskmaster.model.request.RegisterRequest;
+import com.taskmaster.taskmaster.model.response.RegisterResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
-import com.taskmaster.taskmaster.service.AuthService;
+import com.taskmaster.taskmaster.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,25 +17,23 @@ import javax.validation.Valid;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/auth")
-public class AuthController {
+@RequestMapping("/api/v1/users")
+public class UserController {
 
-    private final AuthService authService;
+    private final UserService userService;
 
     @PostMapping(
-            path = "/login",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
+        path = "/register",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<WebResponse<UserResponse>> login(
-        @Valid @RequestBody LoginRequest request
+    public ResponseEntity<WebResponse<RegisterResponse>> registerUser(
+        @Valid @RequestBody RegisterRequest request
     ) {
-        UserResponse response = authService.login(request);
-        String token = authService.createToken(response.getUsernameOrEmail());
+        RegisterResponse response = userService.register(request);
 
         return ResponseEntity.status(HttpStatus.OK)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-            .body(WebResponse.<UserResponse>builder()
+            .body(WebResponse.<RegisterResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.getReasonPhrase())
                 .data(response)

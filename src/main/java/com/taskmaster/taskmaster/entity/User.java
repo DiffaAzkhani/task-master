@@ -1,11 +1,16 @@
 package com.taskmaster.taskmaster.entity;
 
+import com.taskmaster.taskmaster.event.CreatedAtAware;
+import com.taskmaster.taskmaster.event.UpdatedAtAware;
 import com.taskmaster.taskmaster.listener.CreatedAtListener;
 import com.taskmaster.taskmaster.listener.UpdatedAtListener;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,8 +25,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -33,7 +40,7 @@ import java.util.Set;
     CreatedAtListener.class,
     UpdatedAtListener.class
 })
-public class User {
+public class User implements UserDetails, CreatedAtAware, UpdatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,5 +79,27 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "study_id", referencedColumnName = "id")
     )
     private Set<Study> studies = new HashSet<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().name()))
+            .collect(Collectors.toSet());
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
 }
