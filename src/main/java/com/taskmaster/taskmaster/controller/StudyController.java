@@ -1,10 +1,13 @@
 package com.taskmaster.taskmaster.controller;
 
+import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AddStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
+import com.taskmaster.taskmaster.model.response.QuestionResponse;
 import com.taskmaster.taskmaster.model.response.StudyResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
+import com.taskmaster.taskmaster.service.QuestionService;
 import com.taskmaster.taskmaster.service.StudyService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +33,8 @@ import java.util.List;
 public class StudyController {
 
     private final StudyService studyService;
+
+    private final QuestionService questionService;
 
     @PostMapping(
         path = "/add-study",
@@ -116,6 +121,21 @@ public class StudyController {
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(studyResponse)
+            .build();
+    }
+
+    @PostMapping(
+        path = "/add-question",
+        produces = MediaType.APPLICATION_JSON_VALUE
+
+    )
+    public WebResponse<List<QuestionResponse>> addQuestionAndAnswer(@RequestBody AddQuestionRequest request) {
+        List<QuestionResponse> questionResponses = questionService.addQuestionAndAnswer(request);
+
+        return WebResponse.<List<QuestionResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(questionResponses)
             .build();
     }
 
