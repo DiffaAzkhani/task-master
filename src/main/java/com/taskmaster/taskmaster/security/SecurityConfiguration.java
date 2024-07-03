@@ -36,6 +36,7 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.DELETE,"/api/v1/studies/delete/{studyCode}").hasRole(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/studies/add-study").hasRole(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.PATCH,"/api/v1/studies/{studyCode}").hasRole(UserRole.ADMIN.name())
+                .antMatchers(HttpMethod.POST,"/api/v1/studies/add-question").hasRole(UserRole.ADMIN.name())
                 .anyRequest().authenticated()
                 .and()
             .exceptionHandling()
