@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
 
     public static UserResponse toUserResponse(User user) {
         return UserResponse.builder()
-            .username(user.getUsername())
+            .usernameOrEmail(user.getUsername())
             .email(user.getEmail())
             .build();
     }

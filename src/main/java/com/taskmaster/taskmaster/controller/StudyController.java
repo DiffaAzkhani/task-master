@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -34,7 +35,9 @@ public class StudyController {
         path = "/add-study",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<WebResponse<StudyResponse>> addStudy(@RequestBody AddStudyRequest request) {
+    public ResponseEntity<WebResponse<StudyResponse>> addStudy(
+        @Valid @RequestBody AddStudyRequest request
+    ) {
         StudyResponse studyResponse = studyService.addStudy(request);
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -49,7 +52,9 @@ public class StudyController {
         path = "/{studyCode}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<StudyResponse> getStudy(@PathVariable("studyCode") String studyCode){
+    public WebResponse<StudyResponse> getStudy(
+        @PathVariable("studyCode") String studyCode
+    ){
         StudyResponse studyResponse = studyService.getStudy(studyCode);
 
         return WebResponse.<StudyResponse>builder()
@@ -85,7 +90,9 @@ public class StudyController {
         path = "/delete/{studyCode}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<String> deleteStudy(@PathVariable("studyCode") String studyCode) {
+    public WebResponse<String> deleteStudy(
+        @PathVariable("studyCode") String studyCode
+    ) {
         studyService.deleteStudy(studyCode);
 
         return WebResponse.<String>builder()
@@ -101,7 +108,7 @@ public class StudyController {
     )
     public WebResponse<StudyResponse> updateStudy(
         @PathVariable("studyCode") String studyCode,
-        @RequestBody UpdateStudyRequest request
+        @Valid @RequestBody UpdateStudyRequest request
     ) {
         StudyResponse studyResponse = studyService.updateStudy(studyCode, request);
 

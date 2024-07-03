@@ -14,16 +14,12 @@ import javax.validation.constraints.Size;
 @Builder
 public class LoginRequest {
 
-    @NotBlank
-    @Size(max = 100)
-    private String username;
+    @NotBlank(message = "Username or Email is required")
+    @Size(max = 100, message = "Username or Email should not be more than 100 characters")
+    private String usernameOrEmail;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, max = 20, message = "Password should be between 8 and 20 characters")
     private String password;
-
-    @NotBlank
-    @Size(max = 100)
-    private String email;
 
 }
