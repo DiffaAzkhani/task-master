@@ -1,5 +1,9 @@
 package com.taskmaster.taskmaster.controller;
 
+import com.taskmaster.taskmaster.enums.StudyCategory;
+import com.taskmaster.taskmaster.enums.StudyFilter;
+import com.taskmaster.taskmaster.enums.StudyLevel;
+import com.taskmaster.taskmaster.enums.StudyType;
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AddStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
@@ -26,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @AllArgsConstructor
@@ -73,10 +78,16 @@ public class StudyController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<List<StudyResponse>> getAllStudy(
+        @RequestParam(name = "type", required = false) StudyType studyType,
+        @RequestParam(name = "categories", required = false) Set<StudyCategory> categories,
+        @RequestParam(name = "levels", required = false) Set<StudyLevel> levels,
+        @RequestParam(name = "study-filter", required = false) StudyFilter studyFilters,
+        @RequestParam(name = "min-price", required = false) Double minPrice,
+        @RequestParam(name = "max-price", required = false) Double maxPrice,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<StudyResponse> studyResponsePage = studyService.getAllStudyMaterial(page, size);
+        Page<StudyResponse> studyResponsePage = studyService.getAllStudy(studyType, categories, levels, studyFilters, minPrice, maxPrice, page, size);
         List<StudyResponse> studyResponses = studyResponsePage.getContent();
 
         return WebResponse.<List<StudyResponse>>builder()
@@ -85,8 +96,12 @@ public class StudyController {
             .data(studyResponses)
             .paging(PagingResponse.builder()
                 .currentPage(page)
-                .totalPage(studyResponsePage.getTotalPages())
                 .size(size)
+                .totalPage(studyResponsePage.getTotalPages())
+                .totalElement(studyResponsePage.getTotalElements())
+                .empty(studyResponsePage.isEmpty())
+                .first(studyResponsePage.isFirst())
+                .last(studyResponsePage.isLast())
                 .build())
             .build();
     }
