@@ -15,6 +15,14 @@ public class PagingResponse {
 
     private Integer totalPage;
 
+    private Long totalElement;
+
     private Integer size;
+
+    private boolean empty;
+
+    private boolean first;
+
+    private boolean last;
 
 }
