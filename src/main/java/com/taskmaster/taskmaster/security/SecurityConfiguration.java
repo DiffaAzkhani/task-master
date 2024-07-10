@@ -23,12 +23,20 @@ public class SecurityConfiguration {
 
     private final AuthenticationProvider authenticationProvider;
 
+    private static final String[] AUTH_WHITE_LIST = {
+        "/v3/api-docs/**",
+        "/swagger-ui/**",
+        "/v2/api-docs/**",
+        "/swagger-resources/**"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
             .csrf()
             .disable()
             .authorizeRequests()
+                .antMatchers(AUTH_WHITE_LIST).permitAll()
                 .antMatchers(HttpMethod.POST,"/api/v1/users/register").permitAll()
                 .antMatchers(HttpMethod.POST,"/api/v1/auth/login").permitAll()
                 .antMatchers(HttpMethod.GET,"/api/v1/studies/{studyCode}").permitAll()
