@@ -9,16 +9,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -50,5 +46,8 @@ public class Coupon implements CreatedAtAware, UpdatedAtAware {
 
     @Column(name = "expired_at")
     private LocalDateTime expiredAt;
+
+    @ManyToMany(mappedBy = "coupons")
+    private Set<Study> studies = new HashSet<>();
 
 }
