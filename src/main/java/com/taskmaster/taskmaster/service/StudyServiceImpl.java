@@ -212,7 +212,7 @@ public class StudyServiceImpl implements StudyService {
                                           List<Study> filteredStudy,
                                           StudyFilter studyFilters) {
         if (studyFilters == null) {
-            log.info("No popular or recentlyAdded filter applied");
+            log.info("No enum filter applied");
             return filteredStudy;
         }
 
@@ -221,9 +221,20 @@ public class StudyServiceImpl implements StudyService {
                 return applyFilterByPopular(studies, filteredStudy);
             case RECENTLY_ADDED :
                 return applyFilterByRecentlyAdded(studies, filteredStudy);
+            case DISCOUNT:
+                return applyFilterByDiscount(studies, filteredStudy);
             default:
                 return filteredStudy;
         }
+    }
+
+    private List<Study> applyFilterByDiscount(List<Study> studies, List<Study> filteredStudy) {
+        List<Study> studyList = filteredStudy.isEmpty() ? studies : filteredStudy;
+
+        log.info("Applying discount filter");
+        return studyList.stream()
+            .filter(study -> study.getCoupons() != null && !study.getCoupons().isEmpty())
+            .collect(Collectors.toList());
     }
 
     private List<Study> applyFilterByPopular(List<Study> studies,
