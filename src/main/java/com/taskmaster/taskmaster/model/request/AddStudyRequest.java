@@ -31,6 +31,10 @@ public class AddStudyRequest {
     @Min(value = 0, message = "price must be at least 0")
     private Double price;
 
+    @NotNull(message = "Discount is required")
+    @Min(value = 0, message = "discount must be at least 0")
+    private Integer discount;
+
     private String description;
 
     @NotBlank(message = "link is required")

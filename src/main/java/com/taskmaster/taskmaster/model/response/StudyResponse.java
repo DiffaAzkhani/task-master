@@ -20,6 +20,8 @@ public class StudyResponse {
 
     private Double price;
 
+    private Integer discount;
+
     private String description;
 
     private String link;
@@ -33,4 +35,5 @@ public class StudyResponse {
     private String createdAt;
 
     private String updatedAt;
+
 }
