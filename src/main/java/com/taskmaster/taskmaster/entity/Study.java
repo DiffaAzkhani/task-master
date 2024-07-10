@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -20,6 +21,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
@@ -73,5 +76,13 @@ public class Study implements CreatedAtAware, UpdatedAtAware {
 
     @ManyToMany(mappedBy = "studies")
     private Set<User> users = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+        name = "study_coupon",
+        joinColumns = @JoinColumn(name = "study_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "coupon_id", referencedColumnName = "id")
+    )
+    private Set<Coupon> coupons;
 
 }
