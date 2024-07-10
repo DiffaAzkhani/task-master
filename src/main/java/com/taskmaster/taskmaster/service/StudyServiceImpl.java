@@ -234,7 +234,7 @@ public class StudyServiceImpl implements StudyService {
 
         log.info("Applying discount filter");
         return studyList.stream()
-            .filter(study -> study.getCoupons() != null && !study.getCoupons().isEmpty())
+            .filter(study -> study.getDiscount() != null && study.getDiscount() > 0)
             .collect(Collectors.toList());
     }
 
