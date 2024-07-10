@@ -54,6 +54,9 @@ public class Study implements CreatedAtAware, UpdatedAtAware {
     @Column(nullable = false)
     private Double price;
 
+    @Column(nullable = false)
+    private Integer discount;
+
     private String description;
 
     @Column(unique = true, nullable = false, length = 200)
