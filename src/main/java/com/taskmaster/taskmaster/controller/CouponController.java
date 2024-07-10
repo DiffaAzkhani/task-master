@@ -1,0 +1,42 @@
+package com.taskmaster.taskmaster.controller;
+
+import com.taskmaster.taskmaster.model.request.AddCouponRequest;
+import com.taskmaster.taskmaster.model.response.CouponResponse;
+import com.taskmaster.taskmaster.model.response.WebResponse;
+import com.taskmaster.taskmaster.service.CouponService;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+
+@RestController
+@AllArgsConstructor
+@RequestMapping("/api/v1/coupon")
+public class CouponController {
+
+    private final CouponService couponService;
+
+    @PostMapping(
+        path = "/add-coupon",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<WebResponse<CouponResponse>> addCoupon(
+        @Valid @RequestBody AddCouponRequest request
+    ) {
+        CouponResponse couponResponse = couponService.addCoupon(request);
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(WebResponse.<CouponResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message(HttpStatus.OK.getReasonPhrase())
+                .data(couponResponse)
+                .build());
+    }
+
+}
