@@ -322,6 +322,11 @@ public class StudyServiceImpl implements StudyService {
             log.info("Updated course price to : {}", request.getPrice());
         }
 
+        if (Objects.nonNull(request.getDiscount())) {
+            study.setDiscount(request.getDiscount());
+            log.info("Updated course discount to : {}", request.getDiscount());
+        }
+
         if (Objects.nonNull(request.getDescription())) {
             study.setDescription(request.getDescription());
             log.info("Updated course description to : {}", request.getDescription());
