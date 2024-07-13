@@ -1,6 +1,7 @@
 package com.taskmaster.taskmaster.service;
 
 import com.taskmaster.taskmaster.entity.User;
+import com.taskmaster.taskmaster.mapper.UserMapper;
 import com.taskmaster.taskmaster.model.request.LoginRequest;
 import com.taskmaster.taskmaster.model.response.UserResponse;
 import com.taskmaster.taskmaster.repository.UserRepository;
@@ -26,6 +27,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final UserMapper userMapper;
+
     @Override
     @Transactional(readOnly = true)
     public UserResponse login(LoginRequest loginRequest) {
@@ -38,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User user = userRepository.findByUsernameOrEmail(loginRequest.getUsernameOrEmail())
+        User user = userRepository.findByUsernameOrEmail(loginRequest.getUsernameOrEmail(), loginRequest.getUsernameOrEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User Not Found!"));
 
         if (!user.isEnabled()) {
@@ -48,12 +51,12 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Successfull login for user: {}", loginRequest.getUsernameOrEmail());
 
-        return UserServiceImpl.toUserResponse(user);
+        return userMapper.toUserResponse(user);
     }
 
     @Override
-    public String createToken(String usernameOrEmail) {
-        User user = userRepository.findByUsernameOrEmail(usernameOrEmail)
+    public String createToken(String username, String email) {
+        User user = userRepository.findByUsernameOrEmail(username, email)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found!"));
 
         return jwtService.generateToken(user);

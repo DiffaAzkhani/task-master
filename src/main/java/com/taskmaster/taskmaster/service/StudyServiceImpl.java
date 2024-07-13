@@ -1,11 +1,11 @@
 package com.taskmaster.taskmaster.service;
 
-import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.enums.StudyCategory;
 import com.taskmaster.taskmaster.enums.StudyFilter;
 import com.taskmaster.taskmaster.enums.StudyLevel;
 import com.taskmaster.taskmaster.enums.StudyType;
+import com.taskmaster.taskmaster.mapper.StudyMapper;
 import com.taskmaster.taskmaster.model.request.AddStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
 import com.taskmaster.taskmaster.model.response.StudyResponse;
@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
 public class StudyServiceImpl implements StudyService {
 
     private final StudyRepository studyRepository;
+
+    private final StudyMapper studyMapper;
+
 
     @Override
     @Transactional
@@ -76,7 +79,7 @@ public class StudyServiceImpl implements StudyService {
         studyRepository.save(study);
         log.info("learning material saved successfully in data : {}", study);
 
-        return toStudyResponse(study);
+        return studyMapper.toStudyResponse(study);
     }
 
     @Override
@@ -90,7 +93,7 @@ public class StudyServiceImpl implements StudyService {
 
         log.info("found study code : {}", study);
 
-        return toStudyResponse(study);
+        return studyMapper.toStudyResponse(study);
     }
 
     @Override
@@ -131,7 +134,7 @@ public class StudyServiceImpl implements StudyService {
 
         List<Study> pageContent = filteredStudies.subList(start, end);
         return pageContent.stream()
-            .map(StudyServiceImpl::toStudyResponse)
+            .map(studyMapper::toStudyResponse)
             .collect(Collectors.toList());
     }
 
@@ -308,7 +311,7 @@ public class StudyServiceImpl implements StudyService {
         studyRepository.save(study);
         log.info("Study successfully updated!");
 
-        return toStudyResponse(study);
+        return studyMapper.toStudyResponse(study);
     }
 
     private void updateStudyProperties(Study study, UpdateStudyRequest request) {
@@ -351,22 +354,6 @@ public class StudyServiceImpl implements StudyService {
             study.setType(request.getType());
             log.info("Updated course type to : {}", request.getType());
         }
-    }
-
-    public static StudyResponse toStudyResponse(Study study) {
-        return StudyResponse.builder()
-            .code(study.getCode())
-            .name(study.getName())
-            .price(study.getPrice())
-            .discount(study.getDiscount())
-            .description(study.getDescription())
-            .link(study.getLink())
-            .category(study.getCategory())
-            .type(study.getType())
-            .level(study.getLevel())
-            .createdAt(TimeUtil.formatToString(study.getCreatedAt()))
-            .updatedAt(TimeUtil.formatToString(study.getCreatedAt()))
-            .build();
     }
 
 }
