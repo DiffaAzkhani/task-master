@@ -32,7 +32,7 @@ public class AuthController {
         @Valid @RequestBody LoginRequest request
     ) {
         UserResponse response = authService.login(request);
-        String token = authService.createToken(response.getUsernameOrEmail());
+        String token = authService.createToken(response.getUsername(), response.getEmail());
 
         return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)

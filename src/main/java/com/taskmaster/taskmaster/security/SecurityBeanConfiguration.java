@@ -25,7 +25,7 @@ public class SecurityBeanConfiguration {
     @Bean
     public UserDetailsService userDetailsService() {
         return usernameOrEmail -> {
-             User user = userRepository.findByUsernameOrEmail(usernameOrEmail)
+             User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
 
             return org.springframework.security.core.userdetails.User
@@ -41,6 +41,7 @@ public class SecurityBeanConfiguration {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
+
         return authenticationProvider;
     }
 

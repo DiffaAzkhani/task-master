@@ -3,9 +3,8 @@ package com.taskmaster.taskmaster.service;
 import com.taskmaster.taskmaster.entity.Answer;
 import com.taskmaster.taskmaster.entity.Question;
 import com.taskmaster.taskmaster.entity.Study;
+import com.taskmaster.taskmaster.mapper.QuestionMapper;
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
-import com.taskmaster.taskmaster.model.response.AnswerOptionResponse;
-import com.taskmaster.taskmaster.model.response.AnswerResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionResponse;
 import com.taskmaster.taskmaster.model.response.QuestionResponse;
 import com.taskmaster.taskmaster.repository.AnswerRepository;
@@ -34,6 +33,8 @@ public class QuestionServiceImpl implements QuestionService{
     private final QuestionRepository questionRepository;
 
     private final AnswerRepository answerRepository;
+
+    private final QuestionMapper questionMapper;
 
     @Override
     public List<QuestionResponse> addQuestionAndAnswer(AddQuestionRequest request) {
@@ -69,7 +70,7 @@ public class QuestionServiceImpl implements QuestionService{
         question.setAnswers(answerList);
         log.info("success to set answer list in question");
 
-        return Collections.singletonList(toQuestionResponse(question));
+        return Collections.singletonList(questionMapper.toQuestionResponse(question));
     }
 
     @Override
@@ -95,48 +96,8 @@ public class QuestionServiceImpl implements QuestionService{
 
         List<Question> pageContent = questionList.subList(start, end);
         return pageContent.stream()
-            .map(this::toGetQuestionResponse)
+            .map(questionMapper::toGetQuestionResponse)
             .collect(Collectors.toList());
-    }
-
-    private QuestionResponse toQuestionResponse(Question question) {
-        return QuestionResponse.builder()
-            .studyId(question.getStudy().getId())
-            .id(question.getId())
-            .questionText(question.getQuestionText())
-            .imageUrl(question.getImageUrl())
-            .explanation(question.getExplanation())
-            .answers(question.getAnswers().stream()
-                .map(this::toAnswerResponse)
-                .collect(Collectors.toList()))
-            .build();
-    }
-
-    private AnswerResponse toAnswerResponse(Answer answer) {
-        return AnswerResponse.builder()
-            .id(answer.getId())
-            .answerText(answer.getAnswerText())
-            .isCorrect(answer.getIsCorrect())
-            .build();
-    }
-
-    private GetQuestionResponse toGetQuestionResponse(Question question) {
-        return GetQuestionResponse.builder()
-            .studyId(question.getStudy().getId())
-            .id(question.getId())
-            .questionText(question.getQuestionText())
-            .imageUrl(question.getImageUrl())
-            .answers(question.getAnswers().stream()
-                .map(this::toAnswerOptionResponse)
-                .collect(Collectors.toList()))
-            .build();
-    }
-
-    private AnswerOptionResponse toAnswerOptionResponse(Answer answer) {
-        return AnswerOptionResponse.builder()
-            .id(answer.getId())
-            .answerText(answer.getAnswerText())
-            .build();
     }
 
 }

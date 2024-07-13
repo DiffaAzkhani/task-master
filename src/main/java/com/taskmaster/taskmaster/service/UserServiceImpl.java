@@ -3,9 +3,9 @@ package com.taskmaster.taskmaster.service;
 import com.taskmaster.taskmaster.entity.Role;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.enums.UserRole;
+import com.taskmaster.taskmaster.mapper.UserMapper;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
-import com.taskmaster.taskmaster.model.response.UserResponse;
 import com.taskmaster.taskmaster.repository.RoleRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -30,6 +30,8 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final UserMapper userMapper;
+
     @Override
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
@@ -53,21 +55,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         log.info("Success to register user with username : {}", request.getUsername());
 
-        return toRegisterResponse(user);
-    }
-
-    private RegisterResponse toRegisterResponse(User user) {
-        return RegisterResponse.builder()
-            .email(user.getEmail())
-            .username(user.getUsername())
-            .build();
-    }
-
-    public static UserResponse toUserResponse(User user) {
-        return UserResponse.builder()
-            .usernameOrEmail(user.getUsername())
-            .email(user.getEmail())
-            .build();
+        return userMapper.toRegisterResponse(user);
     }
 
 }

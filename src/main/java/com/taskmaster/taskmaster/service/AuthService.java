@@ -7,6 +7,6 @@ public interface AuthService {
 
     UserResponse login (LoginRequest loginRequest);
 
-    String createToken(String usernameOrEmail);
+    String createToken(String username, String email);
 
 }
