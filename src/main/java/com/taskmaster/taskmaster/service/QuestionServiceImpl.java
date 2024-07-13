@@ -4,13 +4,18 @@ import com.taskmaster.taskmaster.entity.Answer;
 import com.taskmaster.taskmaster.entity.Question;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
+import com.taskmaster.taskmaster.model.response.AnswerOptionResponse;
 import com.taskmaster.taskmaster.model.response.AnswerResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionResponse;
 import com.taskmaster.taskmaster.model.response.QuestionResponse;
 import com.taskmaster.taskmaster.repository.AnswerRepository;
 import com.taskmaster.taskmaster.repository.QuestionRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -67,9 +72,37 @@ public class QuestionServiceImpl implements QuestionService{
         return Collections.singletonList(toQuestionResponse(question));
     }
 
+    @Override
+    public Page<GetQuestionResponse> getQuestionForStudy(Long studyId, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        List<Question> questionList = questionRepository.findByStudyId(studyId);
+
+        Collections.shuffle(questionList);
+
+        return pagingQuestion(pageRequest, questionList);
+    }
+
+    private Page<GetQuestionResponse> pagingQuestion(PageRequest pageRequest, List<Question> question) {
+
+        List<GetQuestionResponse> questionResponse = paginateAndConvertToResponse(pageRequest, question);
+
+        return new PageImpl<>(questionResponse, pageRequest, questionResponse.size());
+    }
+
+    private List<GetQuestionResponse> paginateAndConvertToResponse(PageRequest pageRequest, List<Question> questionList) {
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min(start + pageRequest.getPageSize(), questionList.size());
+
+        List<Question> pageContent = questionList.subList(start, end);
+        return pageContent.stream()
+            .map(this::toGetQuestionResponse)
+            .collect(Collectors.toList());
+    }
+
     private QuestionResponse toQuestionResponse(Question question) {
         return QuestionResponse.builder()
-            .studyId(question.getId())
+            .studyId(question.getStudy().getId())
+            .id(question.getId())
             .questionText(question.getQuestionText())
             .imageUrl(question.getImageUrl())
             .explanation(question.getExplanation())
@@ -81,9 +114,29 @@ public class QuestionServiceImpl implements QuestionService{
 
     private AnswerResponse toAnswerResponse(Answer answer) {
         return AnswerResponse.builder()
-            .studyId(answer.getId())
+            .id(answer.getId())
             .answerText(answer.getAnswerText())
             .isCorrect(answer.getIsCorrect())
             .build();
     }
+
+    private GetQuestionResponse toGetQuestionResponse(Question question) {
+        return GetQuestionResponse.builder()
+            .studyId(question.getStudy().getId())
+            .id(question.getId())
+            .questionText(question.getQuestionText())
+            .imageUrl(question.getImageUrl())
+            .answers(question.getAnswers().stream()
+                .map(this::toAnswerOptionResponse)
+                .collect(Collectors.toList()))
+            .build();
+    }
+
+    private AnswerOptionResponse toAnswerOptionResponse(Answer answer) {
+        return AnswerOptionResponse.builder()
+            .id(answer.getId())
+            .answerText(answer.getAnswerText())
+            .build();
+    }
+
 }

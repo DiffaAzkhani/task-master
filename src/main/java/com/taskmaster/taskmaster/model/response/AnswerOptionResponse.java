@@ -5,24 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class QuestionResponse {
-
-    private Long studyId;
+public class AnswerOptionResponse {
 
     private Long id;
 
-    private String questionText;
-
-    private String imageUrl;
-
-    private String explanation;
-
-    private List<AnswerResponse> answers;
+    private String answerText;
 
 }
