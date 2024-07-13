@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class QuestionResponse {
+public class GetQuestionResponse {
 
     private Long studyId;
 
@@ -21,8 +21,6 @@ public class QuestionResponse {
 
     private String imageUrl;
 
-    private String explanation;
-
-    private List<AnswerResponse> answers;
+    private List<AnswerOptionResponse> answers;
 
 }
