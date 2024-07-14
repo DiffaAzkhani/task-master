@@ -1,14 +1,17 @@
 package com.taskmaster.taskmaster.service;
 
-import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.enums.StudyCategory;
 import com.taskmaster.taskmaster.enums.StudyFilter;
 import com.taskmaster.taskmaster.enums.StudyLevel;
 import com.taskmaster.taskmaster.enums.StudyType;
+import com.taskmaster.taskmaster.mapper.StudyMapper;
 import com.taskmaster.taskmaster.model.request.AddStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
-import com.taskmaster.taskmaster.model.response.StudyResponse;
+import com.taskmaster.taskmaster.model.response.AddStudyResponse;
+import com.taskmaster.taskmaster.model.response.GetAllStudyResponse;
+import com.taskmaster.taskmaster.model.response.GetStudyResponse;
+import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +37,12 @@ public class StudyServiceImpl implements StudyService {
 
     private final StudyRepository studyRepository;
 
+    private final StudyMapper studyMapper;
+
+
     @Override
     @Transactional
-    public StudyResponse addStudy(AddStudyRequest request) {
+    public AddStudyResponse addStudy(AddStudyRequest request) {
         if (Boolean.TRUE.equals(studyRepository.existsByCode(request.getCode()))){
             log.info("Study with code : {}, already exists",request.getCode());
             throw new ResponseStatusException(
@@ -76,12 +82,12 @@ public class StudyServiceImpl implements StudyService {
         studyRepository.save(study);
         log.info("learning material saved successfully in data : {}", study);
 
-        return toStudyResponse(study);
+        return studyMapper.toAddStudyResponse(study);
     }
 
     @Override
     @Transactional
-    public StudyResponse getStudy(String code) {
+    public GetStudyResponse getStudy(String code) {
         Study study = studyRepository.findByCode(code)
             .orElseThrow(() -> {
                 log.warn("Study with code : {}, not found!", code);
@@ -90,19 +96,19 @@ public class StudyServiceImpl implements StudyService {
 
         log.info("found study code : {}", study);
 
-        return toStudyResponse(study);
+        return studyMapper.toGetStudyResponse(study);
     }
 
     @Override
     @Transactional
-    public Page<StudyResponse> getAllStudy(StudyType studyType,
-                                           Set<StudyCategory> studyCategories,
-                                           Set<StudyLevel> studyLevels,
-                                           StudyFilter studyFilters,
-                                           Double minPrice,
-                                           Double maxPrice,
-                                           int page,
-                                           int size) {
+    public Page<GetAllStudyResponse> getAllStudy(StudyType studyType,
+                                                 Set<StudyCategory> studyCategories,
+                                                 Set<StudyLevel> studyLevels,
+                                                 StudyFilter studyFilters,
+                                                 Double minPrice,
+                                                 Double maxPrice,
+                                                 int page,
+                                                 int size) {
         log.info("Fetching all available study. Page: {}, Size: {}", page, size);
 
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -111,7 +117,7 @@ public class StudyServiceImpl implements StudyService {
         return filteringAndPagingStudy(studyType, studyCategories, studyLevels, pageRequest, studyFilters, minPrice, maxPrice, studies);
     }
 
-    private Page<StudyResponse> filteringAndPagingStudy(StudyType studyType,
+    private Page<GetAllStudyResponse> filteringAndPagingStudy(StudyType studyType,
                                                 Set<StudyCategory> studyCategories,
                                                 Set<StudyLevel> studyLevels,
                                                 PageRequest pageRequest,
@@ -120,18 +126,18 @@ public class StudyServiceImpl implements StudyService {
                                                 Double maxPrice,
                                                 List<Study> studies) {
         List<Study> filteredStudies = filterStudies(studyType, studyCategories, studyLevels, studyFilters, minPrice, maxPrice, studies);
-        List<StudyResponse> studyResponse = paginateAndConvertToResponse(pageRequest, filteredStudies);
+        List<GetAllStudyResponse> getStudyResponse = paginateAndConvertToResponse(pageRequest, filteredStudies);
 
-        return new PageImpl<>(studyResponse, pageRequest, filteredStudies.size());
+        return new PageImpl<>(getStudyResponse, pageRequest, filteredStudies.size());
     }
 
-    private List<StudyResponse> paginateAndConvertToResponse(PageRequest pageRequest, List<Study> filteredStudies) {
+    private List<GetAllStudyResponse> paginateAndConvertToResponse(PageRequest pageRequest, List<Study> filteredStudies) {
         int start = (int) pageRequest.getOffset();
         int end = Math.min(start + pageRequest.getPageSize(), filteredStudies.size());
 
         List<Study> pageContent = filteredStudies.subList(start, end);
         return pageContent.stream()
-            .map(StudyServiceImpl::toStudyResponse)
+            .map(studyMapper::toGetAllStudyResponse)
             .collect(Collectors.toList());
     }
 
@@ -296,7 +302,7 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional
-    public StudyResponse updateStudy(String code, UpdateStudyRequest request) {
+    public UpdateStudyResponse updateStudy(String code, UpdateStudyRequest request) {
         Study study = studyRepository.findByCode(code)
             .orElseThrow(() -> {
                 log.warn("Study with code : {}, not found!", code);
@@ -308,7 +314,7 @@ public class StudyServiceImpl implements StudyService {
         studyRepository.save(study);
         log.info("Study successfully updated!");
 
-        return toStudyResponse(study);
+        return studyMapper.toUpdateStudyResponse(study);
     }
 
     private void updateStudyProperties(Study study, UpdateStudyRequest request) {
@@ -351,22 +357,6 @@ public class StudyServiceImpl implements StudyService {
             study.setType(request.getType());
             log.info("Updated course type to : {}", request.getType());
         }
-    }
-
-    public static StudyResponse toStudyResponse(Study study) {
-        return StudyResponse.builder()
-            .code(study.getCode())
-            .name(study.getName())
-            .price(study.getPrice())
-            .discount(study.getDiscount())
-            .description(study.getDescription())
-            .link(study.getLink())
-            .category(study.getCategory())
-            .type(study.getType())
-            .level(study.getLevel())
-            .createdAt(TimeUtil.formatToString(study.getCreatedAt()))
-            .updatedAt(TimeUtil.formatToString(study.getCreatedAt()))
-            .build();
     }
 
 }

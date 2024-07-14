@@ -1,7 +1,7 @@
 package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.LoginRequest;
-import com.taskmaster.taskmaster.model.response.UserResponse;
+import com.taskmaster.taskmaster.model.response.LoginResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.AuthService;
 import lombok.AllArgsConstructor;
@@ -28,15 +28,15 @@ public class AuthController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<WebResponse<UserResponse>> login(
+    public ResponseEntity<WebResponse<LoginResponse>> login(
         @Valid @RequestBody LoginRequest request
     ) {
-        UserResponse response = authService.login(request);
-        String token = authService.createToken(response.getUsernameOrEmail());
+        LoginResponse response = authService.login(request);
+        String token = authService.createToken(response.getUsername(), response.getEmail());
 
         return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-            .body(WebResponse.<UserResponse>builder()
+            .body(WebResponse.<LoginResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.getReasonPhrase())
                 .data(response)

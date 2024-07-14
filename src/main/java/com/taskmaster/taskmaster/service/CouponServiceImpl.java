@@ -1,9 +1,9 @@
 package com.taskmaster.taskmaster.service;
 
-import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.Coupon;
+import com.taskmaster.taskmaster.mapper.CouponMapper;
 import com.taskmaster.taskmaster.model.request.AddCouponRequest;
-import com.taskmaster.taskmaster.model.response.CouponResponse;
+import com.taskmaster.taskmaster.model.response.AddCouponResponse;
 import com.taskmaster.taskmaster.repository.CouponRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +19,11 @@ public class CouponServiceImpl implements CouponService {
 
     private CouponRepository couponRepository;
 
+    private final CouponMapper couponMapper;
+
     @Override
     @Transactional
-    public CouponResponse addCoupon(AddCouponRequest request) {
+    public AddCouponResponse addCoupon(AddCouponRequest request) {
         log.info("Recived add coupon request: {}", request);
 
         if (Boolean.TRUE.equals(couponRepository.existsByCode(request.getCode()))) {
@@ -38,16 +40,7 @@ public class CouponServiceImpl implements CouponService {
         log.info("Success to save coupon with code: {}", request.getCode());
         couponRepository.save(coupon);
 
-        return toCourseResponse(coupon);
+        return couponMapper.toAddCouponResponse(coupon);
     }
 
-    private CouponResponse toCourseResponse(Coupon coupon) {
-        return CouponResponse.builder()
-            .code(coupon.getCode())
-            .discount(coupon.getDiscount())
-            .expiredAt(TimeUtil.formatToString(coupon.getExpiredAt()))
-            .createdAt(TimeUtil.formatToString(coupon.getCreatedAt()))
-            .updatedAt(TimeUtil.formatToString(coupon.getUpdatedAt()))
-            .build();
-    }
 }
