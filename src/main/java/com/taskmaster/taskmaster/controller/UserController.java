@@ -1,5 +1,6 @@
 package com.taskmaster.taskmaster.controller;
 
+import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
@@ -8,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +40,22 @@ public class UserController {
                 .message(HttpStatus.OK.getReasonPhrase())
                 .data(response)
                 .build());
+    }
+
+    @DeleteMapping(
+        path = "/delete-user",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<String> deleteUser(
+        @Valid @RequestBody DeleteUserRequest deleteUserRequest
+    ) {
+        userService.deleteUserAccount(deleteUserRequest);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .build();
     }
 
 }
