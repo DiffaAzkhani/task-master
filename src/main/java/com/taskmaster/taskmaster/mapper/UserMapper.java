@@ -1,15 +1,15 @@
 package com.taskmaster.taskmaster.mapper;
 
 import com.taskmaster.taskmaster.entity.User;
+import com.taskmaster.taskmaster.model.response.LoginResponse;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
-import com.taskmaster.taskmaster.model.response.UserResponse;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
 
-    public UserResponse toUserResponse(User user) {
-        return UserResponse.builder()
+    public LoginResponse toLoginResponse(User user) {
+        return LoginResponse.builder()
             .username(user.getUsername())
             .email(user.getEmail())
             .build();

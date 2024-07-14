@@ -1,9 +1,9 @@
 package com.taskmaster.taskmaster.service;
 
 import com.taskmaster.taskmaster.model.request.AddCouponRequest;
-import com.taskmaster.taskmaster.model.response.CouponResponse;
+import com.taskmaster.taskmaster.model.response.AddCouponResponse;
 
 public interface CouponService {
-    CouponResponse addCoupon(AddCouponRequest request);
+    AddCouponResponse addCoupon(AddCouponRequest request);
 
 }

@@ -3,7 +3,7 @@ package com.taskmaster.taskmaster.service;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.mapper.UserMapper;
 import com.taskmaster.taskmaster.model.request.LoginRequest;
-import com.taskmaster.taskmaster.model.response.UserResponse;
+import com.taskmaster.taskmaster.model.response.LoginResponse;
 import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponse login(LoginRequest loginRequest) {
+    public LoginResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.getUsernameOrEmail(),
@@ -51,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Successfull login for user: {}", loginRequest.getUsernameOrEmail());
 
-        return userMapper.toUserResponse(user);
+        return userMapper.toLoginResponse(user);
     }
 
     @Override

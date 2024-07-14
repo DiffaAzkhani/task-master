@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class QuestionResponse {
+public class AddQuestionResponse {
 
     private Long studyId;
 

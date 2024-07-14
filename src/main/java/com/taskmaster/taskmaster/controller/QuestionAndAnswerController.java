@@ -1,10 +1,7 @@
 package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
-import com.taskmaster.taskmaster.model.response.GetQuestionResponse;
-import com.taskmaster.taskmaster.model.response.PagingResponse;
-import com.taskmaster.taskmaster.model.response.QuestionResponse;
-import com.taskmaster.taskmaster.model.response.WebResponse;
+import com.taskmaster.taskmaster.model.response.*;
 import com.taskmaster.taskmaster.service.QuestionService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,12 +29,12 @@ public class QuestionAndAnswerController {
         produces = MediaType.APPLICATION_JSON_VALUE
 
     )
-    public WebResponse<List<QuestionResponse>> addQuestionAndAnswer(
+    public WebResponse<List<AddQuestionResponse>> addQuestionAndAnswer(
         @Valid @RequestBody AddQuestionRequest request
     ) {
-        List<QuestionResponse> questionResponses = questionService.addQuestionAndAnswer(request);
+        List<AddQuestionResponse> questionResponses = questionService.addQuestionAndAnswer(request);
 
-        return WebResponse.<List<QuestionResponse>>builder()
+        return WebResponse.<List<AddQuestionResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(questionResponses)
@@ -47,15 +44,15 @@ public class QuestionAndAnswerController {
     @GetMapping(
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<List<GetQuestionResponse>> getQuestionAndAnswer(
+    public WebResponse<List<GetAllQuestionResponse>> getQuestionAndAnswer(
         @RequestParam(name = "studyId") Long studyId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "1") int size
     ) {
-        Page<GetQuestionResponse> questionResponsePage = questionService.getQuestionForStudy(studyId, page, size);
-        List<GetQuestionResponse> questionResponses = questionResponsePage.getContent();
+        Page<GetAllQuestionResponse> questionResponsePage = questionService.getQuestionForStudy(studyId, page, size);
+        List<GetAllQuestionResponse> questionResponses = questionResponsePage.getContent();
 
-        return WebResponse.<List<GetQuestionResponse>>builder()
+        return WebResponse.<List<GetAllQuestionResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(questionResponses)

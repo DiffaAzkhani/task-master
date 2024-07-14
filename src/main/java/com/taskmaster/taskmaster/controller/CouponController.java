@@ -1,7 +1,7 @@
 package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.AddCouponRequest;
-import com.taskmaster.taskmaster.model.response.CouponResponse;
+import com.taskmaster.taskmaster.model.response.AddCouponResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.CouponService;
 import lombok.AllArgsConstructor;
@@ -26,13 +26,13 @@ public class CouponController {
         path = "/add-coupon",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<WebResponse<CouponResponse>> addCoupon(
+    public ResponseEntity<WebResponse<AddCouponResponse>> addCoupon(
         @Valid @RequestBody AddCouponRequest request
     ) {
-        CouponResponse couponResponse = couponService.addCoupon(request);
+        AddCouponResponse couponResponse = couponService.addCoupon(request);
 
         return ResponseEntity.status(HttpStatus.OK)
-            .body(WebResponse.<CouponResponse>builder()
+            .body(WebResponse.<AddCouponResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.getReasonPhrase())
                 .data(couponResponse)

@@ -5,22 +5,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetQuestionResponse {
+public class AddCouponResponse {
 
-    private Long studyId;
+    private String code;
 
-    private Long id;
+    private BigDecimal discount;
 
-    private String questionText;
+    private String createdAt;
 
-    private String imageUrl;
-
-    private List<AnswerOptionResponse> answers;
+    private String expiredAt;
 
 }
