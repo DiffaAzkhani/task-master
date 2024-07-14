@@ -1,8 +1,8 @@
 package com.taskmaster.taskmaster.mapper;
 
 import com.taskmaster.taskmaster.entity.Question;
-import com.taskmaster.taskmaster.model.response.GetQuestionResponse;
-import com.taskmaster.taskmaster.model.response.QuestionResponse;
+import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
+import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
@@ -12,8 +12,8 @@ public class QuestionMapper {
 
     private final AnswerMapper answerMapper = new AnswerMapper();
 
-    public QuestionResponse toQuestionResponse(Question question) {
-        return QuestionResponse.builder()
+    public AddQuestionResponse toAddQuestionResponse(Question question) {
+        return AddQuestionResponse.builder()
             .studyId(question.getStudy().getId())
             .id(question.getId())
             .questionText(question.getQuestionText())
@@ -25,8 +25,8 @@ public class QuestionMapper {
             .build();
     }
 
-    public GetQuestionResponse toGetQuestionResponse(Question question) {
-        return GetQuestionResponse.builder()
+    public GetAllQuestionResponse toGetQuestionResponse(Question question) {
+        return GetAllQuestionResponse.builder()
             .studyId(question.getStudy().getId())
             .id(question.getId())
             .questionText(question.getQuestionText())

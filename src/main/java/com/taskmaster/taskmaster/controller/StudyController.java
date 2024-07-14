@@ -6,8 +6,11 @@ import com.taskmaster.taskmaster.enums.StudyLevel;
 import com.taskmaster.taskmaster.enums.StudyType;
 import com.taskmaster.taskmaster.model.request.AddStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
+import com.taskmaster.taskmaster.model.response.AddStudyResponse;
+import com.taskmaster.taskmaster.model.response.GetAllStudyResponse;
+import com.taskmaster.taskmaster.model.response.GetStudyResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
-import com.taskmaster.taskmaster.model.response.StudyResponse;
+import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.StudyService;
 import lombok.AllArgsConstructor;
@@ -40,13 +43,13 @@ public class StudyController {
         path = "/add-study",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<WebResponse<StudyResponse>> addStudy(
+    public ResponseEntity<WebResponse<AddStudyResponse>> addStudy(
         @Valid @RequestBody AddStudyRequest request
     ) {
-        StudyResponse studyResponse = studyService.addStudy(request);
+        AddStudyResponse studyResponse = studyService.addStudy(request);
 
         return ResponseEntity.status(HttpStatus.OK)
-            .body(WebResponse.<StudyResponse>builder()
+            .body(WebResponse.<AddStudyResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.getReasonPhrase())
                 .data(studyResponse)
@@ -57,12 +60,12 @@ public class StudyController {
         path = "/{studyCode}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<StudyResponse> getStudy(
+    public WebResponse<GetStudyResponse> getStudy(
         @PathVariable("studyCode") String studyCode
     ){
-        StudyResponse studyResponse = studyService.getStudy(studyCode);
+        GetStudyResponse studyResponse = studyService.getStudy(studyCode);
 
-        return WebResponse.<StudyResponse>builder()
+        return WebResponse.<GetStudyResponse>builder()
                 .code(HttpStatus.OK.value())
                 .message(HttpStatus.OK.getReasonPhrase())
                 .data(studyResponse)
@@ -72,7 +75,7 @@ public class StudyController {
     @GetMapping(
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<List<StudyResponse>> getAllStudy(
+    public WebResponse<List<GetAllStudyResponse>> getAllStudy(
         @RequestParam(name = "type", required = false) StudyType studyType,
         @RequestParam(name = "categories", required = false) Set<StudyCategory> categories,
         @RequestParam(name = "levels", required = false) Set<StudyLevel> levels,
@@ -82,10 +85,10 @@ public class StudyController {
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<StudyResponse> studyResponsePage = studyService.getAllStudy(studyType, categories, levels, studyFilters, minPrice, maxPrice, page, size);
-        List<StudyResponse> studyResponses = studyResponsePage.getContent();
+        Page<GetAllStudyResponse> studyResponsePage = studyService.getAllStudy(studyType, categories, levels, studyFilters, minPrice, maxPrice, page, size);
+        List<GetAllStudyResponse> studyResponses = studyResponsePage.getContent();
 
-        return WebResponse.<List<StudyResponse>>builder()
+        return WebResponse.<List<GetAllStudyResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(studyResponses)
@@ -121,16 +124,16 @@ public class StudyController {
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<StudyResponse> updateStudy(
+    public WebResponse<UpdateStudyResponse> updateStudy(
         @PathVariable("studyCode") String studyCode,
         @Valid @RequestBody UpdateStudyRequest request
     ) {
-        StudyResponse studyResponse = studyService.updateStudy(studyCode, request);
+        UpdateStudyResponse updateStudyResponse = studyService.updateStudy(studyCode, request);
 
-        return WebResponse.<StudyResponse>builder()
+        return WebResponse.<UpdateStudyResponse>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
-            .data(studyResponse)
+            .data(updateStudyResponse)
             .build();
     }
 
