@@ -4,6 +4,7 @@ import com.taskmaster.taskmaster.entity.Role;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.enums.UserRole;
 import com.taskmaster.taskmaster.mapper.UserMapper;
+import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
 import com.taskmaster.taskmaster.repository.RoleRepository;
@@ -56,6 +57,24 @@ public class UserServiceImpl implements UserService {
         log.info("Success to register user with username : {}", request.getUsername());
 
         return userMapper.toRegisterResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserAccount(DeleteUserRequest request) {
+        log.info(String.valueOf(request));
+        User user = userRepository.findByUsernameOrEmail(request.getUsernameOrEmail(), request.getUsernameOrEmail())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User or email not found"));
+
+        if (!"DELETE".equals(request.getConfirmationWord())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Confirmation password is invalid");
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
+        }
+
+        userRepository.delete(user);
     }
 
 }
