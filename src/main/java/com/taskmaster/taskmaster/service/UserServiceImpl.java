@@ -62,7 +62,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUserAccount(DeleteUserRequest request) {
-        log.info(String.valueOf(request));
         User user = userRepository.findByUsernameOrEmail(request.getUsernameOrEmail(), request.getUsernameOrEmail())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User or email not found"));
 
