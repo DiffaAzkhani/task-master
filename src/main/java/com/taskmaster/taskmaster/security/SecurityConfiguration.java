@@ -5,13 +5,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -22,6 +22,10 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private final AuthenticationProvider authenticationProvider;
+
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+
+    private final AccessDeniedHandler accessDeniedHandler;
 
     private static final String[] AUTH_WHITE_LIST = {
         "/v3/api-docs/**",
@@ -51,8 +55,11 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.POST,"/api/v1/qna/add-question").hasRole(UserRole.ADMIN.name())
                 .anyRequest().authenticated()
                 .and()
-            .exceptionHandling()
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .exceptionHandling()
+                    .authenticationEntryPoint(authenticationEntryPoint)
+                    .and()
+                .exceptionHandling()
+                    .accessDeniedHandler(accessDeniedHandler)
                 .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
