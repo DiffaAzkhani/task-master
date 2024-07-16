@@ -1,7 +1,10 @@
 package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
-import com.taskmaster.taskmaster.model.response.*;
+import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
+import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
+import com.taskmaster.taskmaster.model.response.PagingResponse;
+import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.QuestionService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
