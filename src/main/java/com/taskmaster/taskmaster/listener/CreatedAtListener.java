@@ -7,6 +7,7 @@ import javax.persistence.PrePersist;
 import java.time.LocalDateTime;
 
 public class CreatedAtListener {
+
     @PrePersist
     public void setCreatedAt(Object entity){
         LocalDateTime localDateTime = TimeUtil.getFormattedLocalDateTimeNow();
@@ -15,4 +16,5 @@ public class CreatedAtListener {
             createdAtAware.setCreatedAt(localDateTime);
         }
     }
+
 }

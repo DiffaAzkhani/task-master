@@ -8,6 +8,7 @@ import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
 
 public class UpdatedAtListener {
+
     @PrePersist
     @PreUpdate
     public void setUpdatedAt(Object entity){
@@ -17,4 +18,5 @@ public class UpdatedAtListener {
             updatedAtAware.setUpdatedAt(localDateTime);
         }
     }
+
 }
