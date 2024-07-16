@@ -95,6 +95,7 @@ public class QuestionServiceImpl implements QuestionService{
         int end = Math.min(start + pageRequest.getPageSize(), questionList.size());
 
         List<Question> pageContent = questionList.subList(start, end);
+
         return pageContent.stream()
             .map(questionMapper::toGetQuestionResponse)
             .collect(Collectors.toList());

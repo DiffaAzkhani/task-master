@@ -136,6 +136,7 @@ public class StudyServiceImpl implements StudyService {
         int end = Math.min(start + pageRequest.getPageSize(), filteredStudies.size());
 
         List<Study> pageContent = filteredStudies.subList(start, end);
+
         return pageContent.stream()
             .map(studyMapper::toGetAllStudyResponse)
             .collect(Collectors.toList());
