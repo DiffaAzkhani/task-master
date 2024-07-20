@@ -6,7 +6,9 @@ import com.taskmaster.taskmaster.enums.UserRole;
 import com.taskmaster.taskmaster.mapper.UserMapper;
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
+import com.taskmaster.taskmaster.model.request.UpdateUserRequest;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
+import com.taskmaster.taskmaster.model.response.UpdateUserResponse;
 import com.taskmaster.taskmaster.repository.RoleRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Slf4j
@@ -74,6 +77,39 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.delete(user);
+    }
+
+    @Override
+    @Transactional
+    public UpdateUserResponse updateUser(String username, UpdateUserRequest request) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> {
+                log.info("User with username: {} not found!", username);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "username not found!");
+            });
+
+        updateUserProperties(user, request);
+
+        userRepository.save(user);
+        log.info("Success to update user!");
+
+
+        return userMapper.toUpdateUserResponse(user);
+    }
+
+    private void updateUserProperties(User user, UpdateUserRequest request) {
+        if (Objects.nonNull(request.getUsername())) {
+            user.setUsername(request.getUsername());
+        }
+
+        if (Objects.nonNull(request.getEmail())) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists!");
+            }
+
+            user.setEmail(request.getEmail());
+        }
+
     }
 
 }
