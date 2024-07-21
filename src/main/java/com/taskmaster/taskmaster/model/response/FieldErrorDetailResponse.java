@@ -1,0 +1,16 @@
+package com.taskmaster.taskmaster.model.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class FieldErrorDetailResponse {
+
+    private String field;
+
+    private String error;
+
+}
