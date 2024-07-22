@@ -1,5 +1,6 @@
 package com.taskmaster.taskmaster.controller;
 
+import com.taskmaster.taskmaster.model.request.CancelOrderRequest;
 import com.taskmaster.taskmaster.model.request.CreateOrderRequest;
 import com.taskmaster.taskmaster.model.response.OrderResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
@@ -35,6 +36,22 @@ public class OrderController {
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(orderResponse)
+            .build();
+    }
+
+    @PostMapping(
+        path = "/cancel-order",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<String> cancelOrder(
+        @Valid @RequestBody CancelOrderRequest request
+    ) {
+        orderService.cancelOrder(request);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
             .build();
     }
 
