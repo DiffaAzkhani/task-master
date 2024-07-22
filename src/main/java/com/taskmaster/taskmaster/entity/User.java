@@ -23,10 +23,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -82,6 +85,9 @@ public class User implements UserDetails, CreatedAtAware, UpdatedAtAware {
         inverseJoinColumns = @JoinColumn(name = "study_id", referencedColumnName = "id")
     )
     private Set<Study> studies = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders = new LinkedList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
