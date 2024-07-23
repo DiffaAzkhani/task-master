@@ -3,6 +3,7 @@ package com.taskmaster.taskmaster.mapper;
 import com.taskmaster.taskmaster.Util.TaxUtil;
 import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.Order;
+import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
 import com.taskmaster.taskmaster.model.response.OrderResponse;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,19 @@ public class OrderMapper {
             .createdAt(TimeUtil.formatToString(order.getCreatedAt()))
             .completedAt(TimeUtil.formatToString(order.getCompletedAt()))
             .paymentDue(TimeUtil.formatToString(TimeUtil.generatePaymentDue(order.getPaymentMethod())))
+            .paymentMethod(order.getPaymentMethod())
+            .status(order.getStatus())
+            .totalPrice(order.getStudy().getPrice())
+            .ppn(TaxUtil.countPPN(order.getStudy()))
+            .totalTransfer(order.getTotalTransfer())
+            .build();
+    }
+
+    public GetAllOrderResponse toGetAllUserOrdersResponse(Order order) {
+        return GetAllOrderResponse.builder()
+            .orderCode(order.getId())
+            .courseName(order.getStudy().getName())
+            .completedAt(TimeUtil.formatToString(order.getCompletedAt()))
             .paymentMethod(order.getPaymentMethod())
             .status(order.getStatus())
             .totalPrice(order.getStudy().getPrice())
