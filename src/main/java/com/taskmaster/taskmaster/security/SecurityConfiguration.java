@@ -50,6 +50,7 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.POST,"/api/v1/orders/create-order").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/orders/cancel-order").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.PATCH,"/api/v1/users/update-user/{username}").hasRole(UserRole.USER.name())
+                .antMatchers(HttpMethod.GET,"/api/v1/orders").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.DELETE,"/api/v1/studies/delete/{studyCode}").hasRole(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/studies/add-study").hasRole(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.PATCH,"/api/v1/studies/{studyCode}").hasRole(UserRole.ADMIN.name())
