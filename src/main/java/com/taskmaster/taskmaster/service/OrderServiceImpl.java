@@ -10,18 +10,24 @@ import com.taskmaster.taskmaster.enums.OrderStatus;
 import com.taskmaster.taskmaster.mapper.OrderMapper;
 import com.taskmaster.taskmaster.model.request.CancelOrderRequest;
 import com.taskmaster.taskmaster.model.request.CreateOrderRequest;
+import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
 import com.taskmaster.taskmaster.model.response.OrderResponse;
 import com.taskmaster.taskmaster.repository.OrderRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -103,6 +109,27 @@ public class OrderServiceImpl implements OrderService{
 
         orderRepository.save(userOrder);
         log.info("Success to cancel order!");
+    }
+
+    @Override
+    @Transactional
+    public Page<GetAllOrderResponse> getAllOrders(String username, int page, int size) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> {
+               log.info("User with username:{}, not found!", username);
+               return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+            });
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Order> orderPage = orderRepository.findByUser(user, pageRequest);
+
+        List<GetAllOrderResponse> getAllOrderResponses = orderPage.getContent().stream()
+            .map(orderMapper::toGetAllUserOrdersResponse)
+            .collect(Collectors.toList());
+
+        log.info("Success to get all user orders!");
+
+        return new PageImpl<>(getAllOrderResponses, pageRequest, orderPage.getTotalElements());
     }
 
 }

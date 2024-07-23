@@ -26,6 +26,12 @@ Task Master is a web backend application providing services/API endpoint for pra
 ### Authentication
 - Login User
 
+### Order
+- Create Order
+- Cancel Order
+- Get All Orders in specific User
+
+  
 ## Tech Stack
 
 - [Java 8] - Main programming language for backend development.
