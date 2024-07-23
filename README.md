@@ -28,6 +28,8 @@ Task Master is a web backend application providing services/API endpoint for pra
 
 ### Order
 - Create Order
+- Cancel Order
+- Get All Orders in specific User
 
   
 ## Tech Stack
