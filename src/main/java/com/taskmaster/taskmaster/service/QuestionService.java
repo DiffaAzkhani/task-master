@@ -1,6 +1,7 @@
 package com.taskmaster.taskmaster.service;
 
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
+import com.taskmaster.taskmaster.model.request.answerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
 import org.springframework.data.domain.Page;
@@ -14,5 +15,7 @@ public interface QuestionService {
     List<AddQuestionResponse> addQuestionAndAnswer(AddQuestionRequest request);
 
     Page<GetAllQuestionResponse> getQuestionForStudy(Long studyId, int page, int size);
+
+    void answerSubmission(answerSubmissionRequest request);
 
 }
