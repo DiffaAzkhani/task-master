@@ -1,6 +1,7 @@
 package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
+import com.taskmaster.taskmaster.model.request.answerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
@@ -68,6 +69,22 @@ public class QuestionAndAnswerController {
                 .first(questionResponsePage.isFirst())
                 .last(questionResponsePage.isLast())
                 .build())
+            .build();
+    }
+
+    @PostMapping(
+        path = "/answer-submission",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<String> answerSubmission(
+        @Valid @RequestBody answerSubmissionRequest request
+    ) {
+        questionService.answerSubmission(request);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
             .build();
     }
 
