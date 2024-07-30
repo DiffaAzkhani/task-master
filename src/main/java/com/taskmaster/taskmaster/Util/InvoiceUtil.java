@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @UtilityClass
 public class InvoiceUtil {
 
-    private static final AtomicLong orderCounter = new AtomicLong(29);
+    private static final AtomicLong orderCounter = new AtomicLong(1);
 
     private static LocalDate lastUpdatedDate = LocalDate.now();
 
