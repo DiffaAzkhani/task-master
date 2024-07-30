@@ -4,38 +4,48 @@ import com.taskmaster.taskmaster.Util.TaxUtil;
 import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.Order;
 import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
-import com.taskmaster.taskmaster.model.response.OrderResponse;
+import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
+import com.taskmaster.taskmaster.model.response.OrderItemResponse;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class OrderMapper {
 
-    public OrderResponse toOrderResponse(Order order) {
-        return OrderResponse.builder()
-            .orderCode(order.getId())
-            .username(order.getUser().getUsername())
-            .courseName(order.getStudy().getName())
-            .createdAt(TimeUtil.formatToString(order.getCreatedAt()))
+    public GetAllOrderResponse toGetAllUserOrdersResponse(Order order) {
+        List<OrderItemResponse> orderItemResponses = order.getOrderItems()
+            .stream()
+            .map(items -> OrderItemResponse.builder()
+                .studyName(items.getStudy().getName())
+                .price(items.getPrice())
+                .quantity(items.getQuantity())
+                .build())
+            .collect(Collectors.toList());
+
+        return GetAllOrderResponse.builder()
+            .orderId(order.getId())
             .completedAt(TimeUtil.formatToString(order.getCompletedAt()))
-            .paymentDue(TimeUtil.formatToString(TimeUtil.generatePaymentDue(order.getPaymentMethod())))
             .paymentMethod(order.getPaymentMethod())
             .status(order.getStatus())
-            .totalPrice(order.getStudy().getPrice())
-            .ppn(TaxUtil.countPPN(order.getStudy()))
+            .totalPrice(order.getOrderItems()
+                .stream()
+                .mapToInt(item -> item.getPrice() * item.getQuantity())
+                .sum())
+            .ppn(order.getOrderItems()
+                .stream()
+                .mapToDouble(item -> TaxUtil.countPPN(item.getStudy()))
+                .sum())
             .totalTransfer(order.getTotalTransfer())
+            .orderItems(orderItemResponses)
             .build();
     }
 
-    public GetAllOrderResponse toGetAllUserOrdersResponse(Order order) {
-        return GetAllOrderResponse.builder()
-            .orderCode(order.getId())
-            .courseName(order.getStudy().getName())
-            .completedAt(TimeUtil.formatToString(order.getCompletedAt()))
-            .paymentMethod(order.getPaymentMethod())
-            .status(order.getStatus())
-            .totalPrice(order.getStudy().getPrice())
-            .ppn(TaxUtil.countPPN(order.getStudy()))
-            .totalTransfer(order.getTotalTransfer())
+    public CheckoutMidtransResponse toMidtransTransactionResponse(CheckoutMidtransResponse createdToken) {
+        return CheckoutMidtransResponse.builder()
+            .token(String.valueOf(createdToken.getToken()))
+            .redirectUrl(String.valueOf(createdToken.getRedirectUrl()))
             .build();
     }
 

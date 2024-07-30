@@ -1,16 +1,21 @@
 package com.taskmaster.taskmaster.controller;
 
+import com.midtrans.httpclient.error.MidtransError;
+import com.taskmaster.taskmaster.configuration.midtrans.MidtransConfiguration;
+import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
 import com.taskmaster.taskmaster.model.request.CancelOrderRequest;
-import com.taskmaster.taskmaster.model.request.CreateOrderRequest;
+import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
+import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
 import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
-import com.taskmaster.taskmaster.model.response.OrderResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,21 +33,26 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    private final MidtransConfiguration midtransConfig;
+
     @PostMapping(
-        path = "/create-order",
+        path = "/checkout",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<OrderResponse> createOrder(
-        @Valid @RequestBody CreateOrderRequest request
-    ) {
-        OrderResponse orderResponse = orderService.createOrder(request);
+    public ResponseEntity<WebResponse<CheckoutMidtransResponse>> completeCheckout(
+        @Valid @RequestBody MidtransTransactionRequest request
+    ) throws MidtransError {
+        String encodedServerKey = midtransConfig.getEncodeServerKey();
+        CheckoutMidtransResponse transactionResponse = orderService.completeCheckout(request);
 
-        return WebResponse.<OrderResponse>builder()
-            .code(HttpStatus.OK.value())
-            .message(HttpStatus.OK.getReasonPhrase())
-            .data(orderResponse)
-            .build();
+        return ResponseEntity.status(HttpStatus.OK)
+            .header(HttpHeaders.AUTHORIZATION, "Basic " + encodedServerKey)
+            .body(WebResponse.<CheckoutMidtransResponse>builder()
+                .code(HttpStatus.CREATED.value())
+                .message(HttpStatus.CREATED.getReasonPhrase())
+                .data(transactionResponse)
+                .build());
     }
 
     @PostMapping(
@@ -86,6 +96,25 @@ public class OrderController {
                 .last(orderResponsePage.isLast())
                 .build())
             .build();
+    }
+
+    @PostMapping(
+        path = "/midtrans-callback",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<WebResponse<String>> handleAfterPayments(
+        @Valid @RequestBody AfterPaymentsRequest request
+    ) {
+        String encodedServerKey = midtransConfig.getEncodeServerKey();
+        orderService.handleAfterPayments(request);
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .header(HttpHeaders.AUTHORIZATION, "Basic " + encodedServerKey)
+            .body(WebResponse.<String>builder()
+                .code(HttpStatus.CREATED.value())
+                .message(HttpStatus.CREATED.getReasonPhrase())
+                .build());
     }
 
 }

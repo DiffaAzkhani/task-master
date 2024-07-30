@@ -277,7 +277,7 @@ public class StudyServiceImpl implements StudyService {
         log.info("Applying price range filter, maxPrice: {} and minPrice: {}", maxPrice, minPrice);
         return studies.stream()
             .filter(study -> {
-                Double price = study.getPrice();
+                Integer price = study.getPrice();
                 boolean min = (minPrice == null) || price >= minPrice;
                 boolean max = (maxPrice == null) || price <= maxPrice;
                 return min && max;

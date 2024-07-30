@@ -18,7 +18,7 @@ public class UpdateStudyResponse {
 
     private String name;
 
-    private Double price;
+    private Integer price;
 
     private Integer discount;
 
