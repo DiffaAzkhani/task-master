@@ -10,7 +10,9 @@ import com.taskmaster.taskmaster.listener.UpdatedAtListener;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -24,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -52,7 +55,7 @@ public class Study implements CreatedAtAware, UpdatedAtAware {
     private String name;
 
     @Column(nullable = false)
-    private Double price;
+    private Integer price;
 
     @Column(nullable = false)
     private Integer discount;
@@ -87,5 +90,10 @@ public class Study implements CreatedAtAware, UpdatedAtAware {
         inverseJoinColumns = @JoinColumn(name = "coupon_id", referencedColumnName = "id")
     )
     private Set<Coupon> coupons;
+
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<OrderItem> orderItems;
 
 }

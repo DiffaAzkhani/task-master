@@ -8,11 +8,13 @@ import java.util.concurrent.atomic.AtomicLong;
 @UtilityClass
 public class InvoiceUtil {
 
-    private final AtomicLong orderCounter = new AtomicLong(1);
+    private static final AtomicLong orderCounter = new AtomicLong(1);
 
-    private LocalDate lastUpdatedDate = LocalDate.now();
+    private static LocalDate lastUpdatedDate = LocalDate.now();
 
     public static String invoiceGenerator() {
+        resetNumberIfDaysChange();
+
         long orderNumber = orderCounter.getAndIncrement();
         String formattedOrderNumber = String.format("%05d",orderNumber);
 
@@ -23,7 +25,7 @@ public class InvoiceUtil {
             formattedOrderNumber);
     }
 
-    private void resetNumberIfDaysChange() {
+    private synchronized void resetNumberIfDaysChange() {
         boolean isYesterday = lastUpdatedDate.isBefore(LocalDate.now());
 
         if (isYesterday) {

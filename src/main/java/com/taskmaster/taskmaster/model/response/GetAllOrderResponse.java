@@ -7,13 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class GetAllOrderResponse {
 
-    private String orderCode;
+    private String orderId;
 
     private String courseName;
 
@@ -23,10 +25,12 @@ public class GetAllOrderResponse {
 
     private OrderStatus status;
 
-    private Double totalPrice;
+    private int totalPrice;
 
     private Double ppn;
 
-    private Double totalTransfer;
+    private int totalTransfer;
+
+    private List<OrderItemResponse> orderItems;
 
 }

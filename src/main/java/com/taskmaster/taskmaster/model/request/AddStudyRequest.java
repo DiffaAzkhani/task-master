@@ -29,7 +29,7 @@ public class AddStudyRequest {
 
     @NotNull(message = "Price is required")
     @Min(value = 0, message = "price must be at least 0")
-    private Double price;
+    private int price;
 
     @NotNull(message = "Discount is required")
     @Min(value = 0, message = "discount must be at least 0")
