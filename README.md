@@ -36,6 +36,7 @@ Task Master is a web backend application providing services/API endpoint for pra
 ### Cart
 - Add Cart
 - Delete Cart
+- Get All User Cart Items
 
   
 ## Tech Stack
