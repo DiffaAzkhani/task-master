@@ -6,6 +6,7 @@ import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.model.request.AddCartRequest;
 import com.taskmaster.taskmaster.model.request.CartItemRequest;
+import com.taskmaster.taskmaster.repository.CartItemRepository;
 import com.taskmaster.taskmaster.repository.CartRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
@@ -29,6 +30,9 @@ public class CartServiceImpl implements CartService{
 
     private StudyRepository studyRepository;
 
+    private CartItemRepository cartItemRepository;
+
+
     @Override
     public void addCart(AddCartRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
@@ -37,9 +41,14 @@ public class CartServiceImpl implements CartService{
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
-        Cart cart = Cart.builder()
-            .user(user)
-            .build();
+        Cart cart = cartRepository.findByUser(user)
+            .orElseGet(() -> {
+                Cart newCart = Cart.builder()
+                    .user(user)
+                    .build();
+
+                return cartRepository.save(newCart);
+            });
 
         List<CartItem> cartItems = new ArrayList<>();
 
@@ -63,10 +72,40 @@ public class CartServiceImpl implements CartService{
             cartItems.add(cartItem);
         }
 
-        cart.setItems(cartItems);
+        cart.getItems().addAll(cartItems);
 
         cartRepository.save(cart);
         log.info("Success to save cart!");
+    }
+
+    @Override
+    public void deleteCartItem(String username, String studyCode) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> {
+                log.info("User with username:{}, user not found!", username);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+            });
+
+        Study study = studyRepository.findByCode(studyCode)
+            .orElseThrow(() -> {
+                log.info("Study with code:{}, not found!", studyCode);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
+            });
+
+        Cart cart = cartRepository.findByUser(user)
+            .orElseThrow(() -> {
+                log.info("Cart with user:{}, not found!", user.getUsername());
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found in cart!");
+            });
+
+        CartItem cartItem = cartItemRepository.findByCartAndStudy(cart, study)
+            .orElseThrow(() -> {
+                log.info("Cart item with cartId:{}, and study:{}, not found!", cart.getId(), study.getCode());
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart items not found!");
+            });
+
+        cartItemRepository.delete(cartItem);
+        log.info("Success to delete chosen study in user cart!");
     }
 
 }
