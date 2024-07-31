@@ -13,27 +13,25 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RegisterRequest {
-
-    @NotBlank(message = "Username is required")
-    @Size(max = 100, message = "Username should not be more than 100 characters")
-    private String username;
-
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, max = 20, message = "Password should be between 8 and 20 characters")
-    private String password;
+public class CustomerDetailsRequest {
 
     @NotBlank(message = "First name is required")
-    @Size(max = 25, message = "Last name should not be more than 25 characters")
-    private String firstName;
+    @Size(max = 15, message = "Username should not be more than 15 characters")
+    private String first_name;
 
     @NotBlank(message = "Last name is required")
-    @Size(max = 25, message = "Last name should not be more than 25 characters")
-    private String lastName;
+    @Size(max = 15, message = "Username should not be more than 15 characters")
+    private String last_name;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email is invalid")
     @Size(max = 100, message = "Email should not be more than 100 characters")
     private String email;
+
+    @NotBlank(message = "Phone is required")
+    @Size(max = 15, message = "Phone number should not be more than 15 characters")
+    private String phone;
+
+    private String notes;
 
 }

@@ -6,8 +6,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class TaxUtil {
 
-    public static Double countPPN(Study study) {
-        Double ppnRate = 11.0;
+    public static int countPPN(Study study) {
+        int ppnRate = 11;
 
         return (study.getPrice() * ppnRate) / 100;
     }

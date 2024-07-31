@@ -1,17 +1,24 @@
 package com.taskmaster.taskmaster.service;
 
+import com.midtrans.Config;
+import com.midtrans.httpclient.error.MidtransError;
 import com.taskmaster.taskmaster.Util.InvoiceUtil;
+import com.taskmaster.taskmaster.Util.SignatureUtil;
 import com.taskmaster.taskmaster.Util.TaxUtil;
 import com.taskmaster.taskmaster.Util.TimeUtil;
+import com.taskmaster.taskmaster.configuration.midtrans.MidtransConfiguration;
 import com.taskmaster.taskmaster.entity.Order;
+import com.taskmaster.taskmaster.entity.OrderItem;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.enums.OrderStatus;
 import com.taskmaster.taskmaster.mapper.OrderMapper;
+import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
 import com.taskmaster.taskmaster.model.request.CancelOrderRequest;
-import com.taskmaster.taskmaster.model.request.CreateOrderRequest;
+import com.taskmaster.taskmaster.model.request.ItemDetailsRequest;
+import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
+import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
 import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
-import com.taskmaster.taskmaster.model.response.OrderResponse;
 import com.taskmaster.taskmaster.repository.OrderRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
@@ -25,6 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -42,43 +51,75 @@ public class OrderServiceImpl implements OrderService{
 
     private final OrderMapper orderMapper;
 
+    private final MidtransConfiguration midtransConfiguration;
+
     @Override
     @Transactional
-    public OrderResponse createOrder(CreateOrderRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
+    public CheckoutMidtransResponse completeCheckout(MidtransTransactionRequest request) throws MidtransError {
+        User user = userRepository.findByEmail(request.getCustomer_details().getEmail())
             .orElseThrow(() -> {
-                log.info("User with username:{}, not found!", request.getUsername());
-                return new ResponseStatusException(HttpStatus.NOT_FOUND, "username not found!");
+                log.info("User with email:{}, not found!", request.getCustomer_details().getEmail());
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
-
-        Study study = studyRepository.findByCode(request.getStudyCode())
-            .orElseThrow(() -> {
-                log.info("Study with code:{}, not found!", request.getStudyCode());
-                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study code not found!");
-            });
-
-        if (orderRepository.existsByUserAndStudy(user, study)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User has already ordered this study!");
-        }
-
-        Double ppn = TaxUtil.countPPN(study);
-        Double totalTransfer = study.getPrice() + ppn;
 
         Order order = Order.builder()
             .id(InvoiceUtil.invoiceGenerator())
             .status(OrderStatus.PROCESSING)
             .createdAt(TimeUtil.getFormattedLocalDateTimeNow())
-            .paymentMethod(request.getPaymentMethod())
-            .paymentDue(TimeUtil.generatePaymentDue(request.getPaymentMethod()))
             .user(user)
-            .study(study)
-            .totalTransfer(totalTransfer)
             .build();
 
-        orderRepository.save(order);
-        log.info("Success to create new order!");
+        List<OrderItem> orderItems = createOrderItems(request, user, order);
 
-        return orderMapper.toOrderResponse(order);
+        order.setOrderItems(new HashSet<>(orderItems));
+
+        int totalTransfer = calculateTotalTransfer(orderItems);
+        order.setTotalTransfer(totalTransfer);
+
+        orderRepository.save(order);
+        log.info("Order saved with ID: {}", order.getId());
+
+        CheckoutMidtransResponse createdToken = midtransConfiguration.createTransactionToken(order, request);
+        return orderMapper.toMidtransTransactionResponse(createdToken);
+    }
+
+    private List<OrderItem> createOrderItems(MidtransTransactionRequest request, User user, Order order) {
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        for (ItemDetailsRequest itemDetailsRequest : request.getItem_details()) {
+            Study study = studyRepository.findByCode(itemDetailsRequest.getId())
+                .orElseThrow(() -> {
+                    log.info("Study with code:{}, not found!", itemDetailsRequest.getId());
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study code not found!");
+                });
+
+            if (userRepository.existsByUsernameAndStudies(user.getUsername(), study)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "User has already ordered this study!");
+            }
+
+            OrderItem orderItem = OrderItem.builder()
+                .quantity(itemDetailsRequest.getQuantity())
+                .price(study.getPrice())
+                .study(study)
+                .build();
+
+            orderItem.setOrder(order);
+            orderItems.add(orderItem);
+        }
+
+        return orderItems;
+    }
+
+    private int calculateTotalTransfer(List<OrderItem> orderItems) {
+        int totalTransfer = 0;
+
+        for (OrderItem item : orderItems) {
+            int ppn = TaxUtil.countPPN(item.getStudy());
+            int totalPrice = item.getPrice() + ppn;
+            totalTransfer += totalPrice * item.getQuantity();
+        }
+
+        return totalTransfer;
     }
 
     @Override
@@ -105,7 +146,6 @@ public class OrderServiceImpl implements OrderService{
         }
 
         userOrder.setStatus(OrderStatus.CANCELED);
-        userOrder.setPaymentDue(null);
 
         orderRepository.save(userOrder);
         log.info("Success to cancel order!");
@@ -130,6 +170,32 @@ public class OrderServiceImpl implements OrderService{
         log.info("Success to get all user orders!");
 
         return new PageImpl<>(getAllOrderResponses, pageRequest, orderPage.getTotalElements());
+    }
+
+    @Override
+    public void handleAfterPayments(AfterPaymentsRequest request) {
+        String midtransServerKey = Config.getGlobalConfig().getServerKey();
+        String signatureKey = SignatureUtil.generateSHA512Signature(request.getOrder_id(), request.getStatus_code(), request.getGross_amount(), midtransServerKey);
+
+        if (!signatureKey.equals(request.getSignature_key())) {
+            log.warn("Invalid signature key for orderId: {}", request.getOrder_id());
+            throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid signature key!");
+        }
+
+        if (!request.getTransaction_status().equals("CAPTURE")) {
+            log.warn("Transaction not captured for orderId: {}", request.getOrder_id());
+            throw  new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED,"Transaction not captured!");
+        }
+
+        Order order = orderRepository.findById(request.getOrder_id())
+            .orElseThrow(() -> {
+                log.info("Order for orderId:{}, not found!", request.getOrder_id());
+                return new ResponseStatusException(HttpStatus.NOT_FOUND,"Orderid not found!");
+            });
+
+        order.setStatus(OrderStatus.COMPLETED);
+        order.setCompletedAt(TimeUtil.getFormattedLocalDateTimeNow());
+        log.info("Success to update order after callback!");
     }
 
 }

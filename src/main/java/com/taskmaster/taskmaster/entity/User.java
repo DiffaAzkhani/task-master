@@ -52,14 +52,23 @@ public class User implements UserDetails, CreatedAtAware, UpdatedAtAware {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
     @Column(nullable = false, length = 250)
     private String password;
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(unique = true, length = 15)
+    private String phone;
+
     @Column(name = "profile_image")
-    String profileImage;
+    private String profileImage;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
