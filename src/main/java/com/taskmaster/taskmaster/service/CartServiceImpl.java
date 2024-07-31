@@ -4,20 +4,26 @@ import com.taskmaster.taskmaster.entity.Cart;
 import com.taskmaster.taskmaster.entity.CartItem;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.entity.User;
+import com.taskmaster.taskmaster.mapper.CartMapper;
 import com.taskmaster.taskmaster.model.request.AddCartRequest;
 import com.taskmaster.taskmaster.model.request.CartItemRequest;
+import com.taskmaster.taskmaster.model.response.GetCartItemsResponse;
 import com.taskmaster.taskmaster.repository.CartItemRepository;
 import com.taskmaster.taskmaster.repository.CartRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -32,6 +38,7 @@ public class CartServiceImpl implements CartService{
 
     private CartItemRepository cartItemRepository;
 
+    private CartMapper cartMapper;
 
     @Override
     public void addCart(AddCartRequest request) {
@@ -106,6 +113,25 @@ public class CartServiceImpl implements CartService{
 
         cartItemRepository.delete(cartItem);
         log.info("Success to delete chosen study in user cart!");
+    }
+
+    @Override
+    public Page<GetCartItemsResponse> getAllCartItems(String username, int page, int size) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> {
+                log.info("User with username:{}, not found!", username);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+            });
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<CartItem> cartItemPage = cartItemRepository.findByCart_User(user, pageRequest);
+
+        List<GetCartItemsResponse> getCartItemsResponses = cartItemPage.getContent()
+            .stream()
+            .map(cartMapper::toCartItemsResponse)
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(getCartItemsResponses, pageRequest, cartItemPage.getTotalElements());
     }
 
 }
