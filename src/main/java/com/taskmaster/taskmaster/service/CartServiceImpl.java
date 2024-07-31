@@ -41,9 +41,14 @@ public class CartServiceImpl implements CartService{
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
-        Cart cart = Cart.builder()
-            .user(user)
-            .build();
+        Cart cart = cartRepository.findByUser(user)
+            .orElseGet(() -> {
+                Cart newCart = Cart.builder()
+                    .user(user)
+                    .build();
+
+                return cartRepository.save(newCart);
+            });
 
         List<CartItem> cartItems = new ArrayList<>();
 
@@ -67,7 +72,7 @@ public class CartServiceImpl implements CartService{
             cartItems.add(cartItem);
         }
 
-        cart.setItems(cartItems);
+        cart.getItems().addAll(cartItems);
 
         cartRepository.save(cart);
         log.info("Success to save cart!");
