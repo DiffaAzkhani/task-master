@@ -6,4 +6,6 @@ public interface CartService {
 
     void addCart(AddCartRequest request);
 
+    void deleteCartItem(String username, String studyCode);
+
 }

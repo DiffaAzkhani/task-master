@@ -6,6 +6,8 @@ import com.taskmaster.taskmaster.service.CartService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,22 @@ public class CartController {
         @Valid @RequestBody AddCartRequest request
     ) {
         cartService.addCart(request);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .build();
+    }
+
+    @DeleteMapping(
+        path = "/{username}/{studyCode}",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<String> deleteCartItem(
+        @PathVariable(name = "username") String username,
+        @PathVariable(name = "studyCode") String studyCode
+    ) {
+        cartService.deleteCartItem(username, studyCode);
 
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
