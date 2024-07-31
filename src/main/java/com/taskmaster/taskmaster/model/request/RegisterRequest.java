@@ -36,4 +36,8 @@ public class RegisterRequest {
     @Size(max = 100, message = "Email should not be more than 100 characters")
     private String email;
 
+    @NotBlank(message = "Phone is required")
+    @Size(max = 15, message = "Phone number should not be more than 15 characters")
+    private String phone;
+
 }

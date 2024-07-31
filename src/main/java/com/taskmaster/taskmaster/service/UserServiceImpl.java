@@ -46,8 +46,11 @@ public class UserServiceImpl implements UserService {
 
         User user = User.builder()
             .username(request.getUsername())
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
             .password(passwordEncoder.encode(request.getPassword()))
             .email(request.getEmail())
+            .phone(request.getPhone())
             .enabled(true)
             .build();
 

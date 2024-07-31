@@ -64,7 +64,7 @@ public class User implements UserDetails, CreatedAtAware, UpdatedAtAware {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(unique = true, length = 15)
+    @Column(nullable = false, unique = true, length = 15)
     private String phone;
 
     @Column(name = "profile_image")
