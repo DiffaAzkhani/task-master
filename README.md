@@ -33,6 +33,10 @@ Task Master is a web backend application providing services/API endpoint for pra
 - Get All Orders in specific User
 - Handle After Payments (Midtrans - Webhook) -> "Unfinished"
 
+### Cart
+- Add Cart
+- Delete Cart
+
   
 ## Tech Stack
 
