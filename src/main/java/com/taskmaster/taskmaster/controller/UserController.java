@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @PatchMapping(
-        path = "update-user/{username}",
+        path = "/update-user/{username}",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )

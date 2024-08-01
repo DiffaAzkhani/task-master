@@ -81,6 +81,8 @@ public class Study implements CreatedAtAware, UpdatedAtAware {
     private LocalDateTime updatedAt;
 
     @ManyToMany(mappedBy = "studies")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<User> users = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.PERSIST)
