@@ -28,10 +28,11 @@ Task Master is a web backend application providing services/API endpoint for pra
 - Login User
 
 ### Order
-- Checkout
+- Checkout (For premium studies)
 - Cancel Order
 - Get All Orders in specific User
 - Handle After Payments (Midtrans - Webhook) -> "Unfinished"
+- Enroll Free Study (Use this path to enroll free studies)
 
 ### Cart
 - Add Cart

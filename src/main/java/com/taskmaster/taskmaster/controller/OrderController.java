@@ -4,6 +4,7 @@ import com.midtrans.httpclient.error.MidtransError;
 import com.taskmaster.taskmaster.configuration.midtrans.MidtransConfiguration;
 import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
 import com.taskmaster.taskmaster.model.request.CancelOrderRequest;
+import com.taskmaster.taskmaster.model.request.EnrollFreeStudiesRequest;
 import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
 import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
 import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
@@ -115,6 +116,21 @@ public class OrderController {
                 .code(HttpStatus.CREATED.value())
                 .message(HttpStatus.CREATED.getReasonPhrase())
                 .build());
+    }
+
+    @PostMapping(
+        path = "/enroll-free",
+        consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<String> enrollFreeStudies(
+        @Valid @RequestBody EnrollFreeStudiesRequest request
+    ) {
+        orderService.enrollFreeStudies(request);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .build();
     }
 
 }

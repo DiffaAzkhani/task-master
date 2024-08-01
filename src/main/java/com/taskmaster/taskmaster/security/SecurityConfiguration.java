@@ -53,6 +53,7 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.POST,"/api/v1/orders/midtrans-callback").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.PATCH,"/api/v1/users/update-user/{username}").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.GET,"/api/v1/orders").hasRole(UserRole.USER.name())
+                .antMatchers(HttpMethod.POST,"/api/v1/orders/enroll-free").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/cart/add-cart").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.GET,"/api/v1/cart").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.DELETE,"/api/v1/cart/delete/{username}/{orderCode}").hasRole(UserRole.USER.name())

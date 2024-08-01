@@ -12,9 +12,12 @@ import com.taskmaster.taskmaster.entity.OrderItem;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.enums.OrderStatus;
+import com.taskmaster.taskmaster.enums.StudyType;
 import com.taskmaster.taskmaster.mapper.OrderMapper;
 import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
 import com.taskmaster.taskmaster.model.request.CancelOrderRequest;
+import com.taskmaster.taskmaster.model.request.EnrollFreeStudiesRequest;
+import com.taskmaster.taskmaster.model.request.FreeItemsDetailRequest;
 import com.taskmaster.taskmaster.model.request.ItemDetailsRequest;
 import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
 import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
@@ -173,6 +176,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    @Transactional
     public void handleAfterPayments(AfterPaymentsRequest request) {
         String midtransServerKey = Config.getGlobalConfig().getServerKey();
         String signatureKey = SignatureUtil.generateSHA512Signature(request.getOrder_id(), request.getStatus_code(), request.getGross_amount(), midtransServerKey);
@@ -196,6 +200,36 @@ public class OrderServiceImpl implements OrderService{
         order.setStatus(OrderStatus.COMPLETED);
         order.setCompletedAt(TimeUtil.getFormattedLocalDateTimeNow());
         log.info("Success to update order after callback!");
+    }
+
+    @Override
+    @Transactional
+    public void enrollFreeStudies(EnrollFreeStudiesRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+            .orElseThrow(() -> {
+                log.info("User with username:{}, not found!", request.getUsername());
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+            });
+
+        for (FreeItemsDetailRequest studyList : request.getFreeItemsDetailRequestList()) {
+            Study study = studyRepository.findByCode(studyList.getStudyCode())
+                .orElseThrow(() -> {
+                    log.info("Study with studyCode:{}, not found!", studyList.getStudyCode());
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
+                });
+
+            if (userRepository.existsByUsernameAndStudies(user.getUsername(), study)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "User has already enroll this study!");
+            }
+
+            if (!study.getType().equals(StudyType.FREE)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Study type must be Free!");
+            }
+
+            user.getStudies().add(study);
+        }
+
+        userRepository.save(user);
     }
 
 }
