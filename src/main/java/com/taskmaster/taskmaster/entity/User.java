@@ -7,7 +7,9 @@ import com.taskmaster.taskmaster.listener.UpdatedAtListener;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -88,6 +90,8 @@ public class User implements UserDetails, CreatedAtAware, UpdatedAtAware {
     Set<Role> roles = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.PERSIST)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @JoinTable(
         name = "user_study",
         joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
