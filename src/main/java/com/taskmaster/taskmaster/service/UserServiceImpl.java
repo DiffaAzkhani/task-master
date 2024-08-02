@@ -36,6 +36,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
 
+    private final ValidationService validationService;
+
     @Override
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
@@ -71,6 +73,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsernameOrEmail(request.getUsernameOrEmail(), request.getUsernameOrEmail())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User or email not found"));
 
+        validationService.validateUser(user.getUsername());
+
         if (!"DELETE".equals(request.getConfirmationWord())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Confirmation password is invalid");
         }
@@ -85,6 +89,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UpdateUserResponse updateUser(String username, UpdateUserRequest request) {
+        validationService.validateUser(username);
+
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> {
                 log.info("User with username: {} not found!", username);
@@ -95,7 +101,6 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         log.info("Success to update user!");
-
 
         return userMapper.toUpdateUserResponse(user);
     }
@@ -112,7 +117,6 @@ public class UserServiceImpl implements UserService {
 
             user.setEmail(request.getEmail());
         }
-
     }
 
 }
