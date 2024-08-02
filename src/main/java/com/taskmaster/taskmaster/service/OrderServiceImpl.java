@@ -56,6 +56,8 @@ public class OrderServiceImpl implements OrderService{
 
     private final MidtransConfiguration midtransConfiguration;
 
+    private final ValidationService validationService;
+
     @Override
     @Transactional
     public CheckoutMidtransResponse completeCheckout(MidtransTransactionRequest request) throws MidtransError {
@@ -64,6 +66,8 @@ public class OrderServiceImpl implements OrderService{
                 log.info("User with email:{}, not found!", request.getCustomer_details().getEmail());
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
+
+        validationService.validateUser(user.getUsername());
 
         Order order = Order.builder()
             .id(InvoiceUtil.invoiceGenerator())
@@ -128,6 +132,8 @@ public class OrderServiceImpl implements OrderService{
     @Override
     @Transactional
     public void cancelOrder(CancelOrderRequest request) {
+        validationService.validateUser(request.getUsername());
+
         User user = userRepository.findByUsername(request.getUsername())
             .orElseThrow(() -> {
                log.info("User with username:{}, not found!", request.getUsername());
@@ -157,6 +163,8 @@ public class OrderServiceImpl implements OrderService{
     @Override
     @Transactional
     public Page<GetAllOrderResponse> getAllOrders(String username, int page, int size) {
+        validationService.validateUser(username);
+
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> {
                log.info("User with username:{}, not found!", username);
@@ -205,6 +213,8 @@ public class OrderServiceImpl implements OrderService{
     @Override
     @Transactional
     public void enrollFreeStudies(EnrollFreeStudiesRequest request) {
+        validationService.validateUser(request.getUsername());
+
         User user = userRepository.findByUsername(request.getUsername())
             .orElseThrow(() -> {
                 log.info("User with username:{}, not found!", request.getUsername());
