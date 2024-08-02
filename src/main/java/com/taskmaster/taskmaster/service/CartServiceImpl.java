@@ -40,8 +40,12 @@ public class CartServiceImpl implements CartService{
 
     private CartMapper cartMapper;
 
+    private ValidationService validationService;
+
     @Override
     public void addCart(AddCartRequest request) {
+        validationService.validateUser(request.getUsername());
+
         User user = userRepository.findByUsername(request.getUsername())
             .orElseThrow(() -> {
                 log.info("User with username:{}, not found!", request.getUsername());
@@ -87,6 +91,8 @@ public class CartServiceImpl implements CartService{
 
     @Override
     public void deleteCartItem(String username, String studyCode) {
+        validationService.validateUser(username);
+
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> {
                 log.info("User with username:{}, user not found!", username);
@@ -117,6 +123,8 @@ public class CartServiceImpl implements CartService{
 
     @Override
     public Page<GetCartItemsResponse> getAllCartItems(String username, int page, int size) {
+        validationService.validateUser(username);
+
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> {
                 log.info("User with username:{}, not found!", username);

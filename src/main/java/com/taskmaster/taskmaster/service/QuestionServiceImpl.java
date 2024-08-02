@@ -47,6 +47,8 @@ public class QuestionServiceImpl implements QuestionService{
 
     private final QuestionMapper questionMapper;
 
+    private final ValidationService validationService;
+
     @Override
     public List<AddQuestionResponse> addQuestionAndAnswer(AddQuestionRequest request) {
         Study study = studyRepository.findById(request.getStudyId())
@@ -96,6 +98,8 @@ public class QuestionServiceImpl implements QuestionService{
 
     @Override
     public void answerSubmission(answerSubmissionRequest request) {
+        validationService.validateUser(request.getUsername());
+
         User user = userRepository.findByUsername(request.getUsername())
             .orElseThrow(() -> {
                log.info("User with username:{}, not found!", request.getUsername());
