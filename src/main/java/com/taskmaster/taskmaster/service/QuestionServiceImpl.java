@@ -6,16 +6,21 @@ import com.taskmaster.taskmaster.entity.Question;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.entity.UserAnswer;
+import com.taskmaster.taskmaster.entity.UserGrade;
 import com.taskmaster.taskmaster.mapper.QuestionMapper;
+import com.taskmaster.taskmaster.mapper.UserGradeMapper;
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AnswerSubmission;
+import com.taskmaster.taskmaster.model.request.GradeSubmissionRequest;
 import com.taskmaster.taskmaster.model.request.answerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
+import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.repository.AnswerRepository;
 import com.taskmaster.taskmaster.repository.QuestionRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import com.taskmaster.taskmaster.repository.UserAnswerRepository;
+import com.taskmaster.taskmaster.repository.UserGradeRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +50,11 @@ public class QuestionServiceImpl implements QuestionService{
 
     private final UserAnswerRepository userAnswerRepository;
 
+    private final UserGradeRepository userGradeRepository;
+
     private final QuestionMapper questionMapper;
+
+    private final UserGradeMapper userGradeMapper;
 
     private final ValidationService validationService;
 
@@ -143,6 +152,67 @@ public class QuestionServiceImpl implements QuestionService{
             userAnswerRepository.save(userAnswer);
             log.info("Success to save user answer");
         }
+    }
+
+    @Override
+    public GradeSubmissionResponse gradeSubmission(GradeSubmissionRequest request) {
+        validationService.validateUser(request.getUsername());
+
+        User user = userRepository.findByUsername(request.getUsername())
+            .orElseThrow(() -> {
+                log.info("User with username:{}, not found!", request.getUsername());
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+            });
+
+        Study study = studyRepository.findByCode(request.getStudyCode())
+            .orElseThrow(() -> {
+                log.info("Study with studyCode:{}, not found!", request.getStudyCode());
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
+            });
+
+        List<Question> questionList = questionRepository.findByStudy(study);
+
+        if (questionList.isEmpty()) {
+            log.info("Study didn't have question!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Study didn't have any question!");
+        }
+
+        List<UserAnswer> userAnswerList = userAnswerRepository.findByUserAndQuestionIn(user, questionList);
+
+        if (userAnswerList.isEmpty()) {
+            log.info("Question didn't have any answer!");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Question didn't have any answer!");
+        }
+
+        int scoreGrade = countUserSubmission(userAnswerList, questionList);
+
+        UserGrade userGrade = UserGrade.builder()
+            .user(user)
+            .study(study)
+            .score(scoreGrade)
+            .gradedAt(TimeUtil.getFormattedLocalDateTimeNow())
+            .build();
+
+        userGradeRepository.save(userGrade);
+        log.info("Success to save user grade!");
+
+        return userGradeMapper.toUserGradeResponse(userGrade);
+    }
+
+    private int countUserSubmission(List<UserAnswer> userAnswerList, List<Question> questionList) {
+        int totalQuestion = questionList.size();
+        int correctAnswers = 0;
+
+        for (UserAnswer userAnswer : userAnswerList) {
+            Answer correctAnswer =  answerRepository.findByQuestionAndIsCorrectTrue(userAnswer.getQuestion())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Correct answer not found in user!"));
+
+            if (correctAnswer.getId().equals(userAnswer.getAnswer().getId())) {
+                correctAnswers++;
+            }
+        }
+
+        return (correctAnswers / totalQuestion) * 100;
     }
 
     private Page<GetAllQuestionResponse> pagingQuestion(PageRequest pageRequest, List<Question> question) {

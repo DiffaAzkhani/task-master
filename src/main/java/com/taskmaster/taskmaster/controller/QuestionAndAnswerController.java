@@ -1,9 +1,11 @@
 package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
+import com.taskmaster.taskmaster.model.request.GradeSubmissionRequest;
 import com.taskmaster.taskmaster.model.request.answerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
+import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.QuestionService;
@@ -85,6 +87,23 @@ public class QuestionAndAnswerController {
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
+            .build();
+    }
+
+    @PostMapping(
+        path = "/grade-submission",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<GradeSubmissionResponse> gradeSubmission(
+        @Valid @RequestBody GradeSubmissionRequest request
+    ) {
+        GradeSubmissionResponse gradeSubmissionResponse = questionService.gradeSubmission(request);
+
+        return WebResponse.<GradeSubmissionResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(gradeSubmissionResponse)
             .build();
     }
 
