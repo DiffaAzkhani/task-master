@@ -15,4 +15,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     Optional<Question> findByIdAndStudy(Long questionId, Study study);
 
+    List<Question> findByStudy(Study study);
+
 }
