@@ -5,6 +5,7 @@ import com.taskmaster.taskmaster.model.request.GradeSubmissionRequest;
 import com.taskmaster.taskmaster.model.request.answerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionExplanationResponse;
 import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
@@ -104,6 +105,23 @@ public class QuestionAndAnswerController {
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(gradeSubmissionResponse)
+            .build();
+    }
+
+    @GetMapping(
+        path = "/explanation",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<GetQuestionExplanationResponse> getExplanationAndUserAnswer(
+        @RequestParam(name = "username") String username,
+        @RequestParam(name = "studyCode") String studyCode
+    ) {
+        GetQuestionExplanationResponse explanationResponses = questionService.getExplanationAndUserAnswer(username, studyCode);
+
+        return WebResponse.<GetQuestionExplanationResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(explanationResponses)
             .build();
     }
 
