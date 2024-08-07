@@ -48,6 +48,7 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.GET,"/api/v1/qna").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/qna/save-user-answer").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/qna/grade-submission").hasRole(UserRole.USER.name())
+                .antMatchers(HttpMethod.GET,"/api/v1/qna/explanation").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.DELETE,"/api/v1/users/delete-user").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/orders/checkout").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/orders/cancel-order").hasRole(UserRole.USER.name())

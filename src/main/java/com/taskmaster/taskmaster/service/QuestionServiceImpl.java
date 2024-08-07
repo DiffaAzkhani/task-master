@@ -15,6 +15,7 @@ import com.taskmaster.taskmaster.model.request.GradeSubmissionRequest;
 import com.taskmaster.taskmaster.model.request.answerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionExplanationResponse;
 import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.repository.AnswerRepository;
 import com.taskmaster.taskmaster.repository.QuestionRepository;
@@ -29,6 +30,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
@@ -197,6 +199,29 @@ public class QuestionServiceImpl implements QuestionService{
         log.info("Success to save user grade!");
 
         return userGradeMapper.toUserGradeResponse(userGrade);
+    }
+
+    @Override
+    @Transactional
+    public GetQuestionExplanationResponse getExplanationAndUserAnswer(String username, String studyCode) {
+        validationService.validateUser(username);
+
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> {
+                log.info("User with username:{}, not found!", username);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+            });
+
+        Study study = studyRepository.findByCode(studyCode)
+            .orElseThrow(() -> {
+                log.info("Study with studyCode:{}, not found!", studyCode);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
+            });
+
+        List<UserAnswer> userAnswerList = userAnswerRepository.findByUserAndQuestionStudy(user, study);
+        UserGrade userGrade = userGradeRepository.findByUserAndStudy(user, study);
+
+        return questionMapper.toGetAllQuestionExplanationResponse(userAnswerList, userGrade);
     }
 
     private int countUserSubmission(List<UserAnswer> userAnswerList, List<Question> questionList) {
