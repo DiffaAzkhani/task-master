@@ -6,11 +6,11 @@ import com.taskmaster.taskmaster.enums.StudyFilter;
 import com.taskmaster.taskmaster.enums.StudyLevel;
 import com.taskmaster.taskmaster.enums.StudyType;
 import com.taskmaster.taskmaster.mapper.StudyMapper;
-import com.taskmaster.taskmaster.model.request.AddStudyRequest;
+import com.taskmaster.taskmaster.model.request.CreateNewStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
-import com.taskmaster.taskmaster.model.response.AddStudyResponse;
-import com.taskmaster.taskmaster.model.response.GetAllStudyResponse;
-import com.taskmaster.taskmaster.model.response.GetStudyResponse;
+import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
+import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
+import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import lombok.AllArgsConstructor;
@@ -42,7 +42,7 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional
-    public AddStudyResponse addStudy(AddStudyRequest request) {
+    public CreateNewStudyResponse createNewStudy(CreateNewStudyRequest request) {
         if (Boolean.TRUE.equals(studyRepository.existsByCode(request.getCode()))){
             log.info("Study with code : {}, already exists",request.getCode());
             throw new ResponseStatusException(
@@ -87,7 +87,7 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional
-    public GetStudyResponse getStudy(String code) {
+    public GetStudyByCodeResponse getStudyByCode(String code) {
         Study study = studyRepository.findByCode(code)
             .orElseThrow(() -> {
                 log.warn("Study with code : {}, not found!", code);
@@ -101,14 +101,14 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional
-    public Page<GetAllStudyResponse> getAllStudy(StudyType studyType,
-                                                 Set<StudyCategory> studyCategories,
-                                                 Set<StudyLevel> studyLevels,
-                                                 StudyFilter studyFilters,
-                                                 Double minPrice,
-                                                 Double maxPrice,
-                                                 int page,
-                                                 int size) {
+    public Page<GetAllStudiesResponse> getAllStudies(StudyType studyType,
+                                                     Set<StudyCategory> studyCategories,
+                                                     Set<StudyLevel> studyLevels,
+                                                     StudyFilter studyFilters,
+                                                     Double minPrice,
+                                                     Double maxPrice,
+                                                     int page,
+                                                     int size) {
         log.info("Fetching all available study. Page: {}, Size: {}", page, size);
 
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -117,21 +117,21 @@ public class StudyServiceImpl implements StudyService {
         return filteringAndPagingStudy(studyType, studyCategories, studyLevels, pageRequest, studyFilters, minPrice, maxPrice, studies);
     }
 
-    private Page<GetAllStudyResponse> filteringAndPagingStudy(StudyType studyType,
-                                                Set<StudyCategory> studyCategories,
-                                                Set<StudyLevel> studyLevels,
-                                                PageRequest pageRequest,
-                                                StudyFilter studyFilters,
-                                                Double minPrice,
-                                                Double maxPrice,
-                                                List<Study> studies) {
+    private Page<GetAllStudiesResponse> filteringAndPagingStudy(StudyType studyType,
+                                                                Set<StudyCategory> studyCategories,
+                                                                Set<StudyLevel> studyLevels,
+                                                                PageRequest pageRequest,
+                                                                StudyFilter studyFilters,
+                                                                Double minPrice,
+                                                                Double maxPrice,
+                                                                List<Study> studies) {
         List<Study> filteredStudies = filterStudies(studyType, studyCategories, studyLevels, studyFilters, minPrice, maxPrice, studies);
-        List<GetAllStudyResponse> getStudyResponse = paginateAndConvertToResponse(pageRequest, filteredStudies);
+        List<GetAllStudiesResponse> getStudyResponse = paginateAndConvertToResponse(pageRequest, filteredStudies);
 
         return new PageImpl<>(getStudyResponse, pageRequest, filteredStudies.size());
     }
 
-    private List<GetAllStudyResponse> paginateAndConvertToResponse(PageRequest pageRequest, List<Study> filteredStudies) {
+    private List<GetAllStudiesResponse> paginateAndConvertToResponse(PageRequest pageRequest, List<Study> filteredStudies) {
         int start = (int) pageRequest.getOffset();
         int end = Math.min(start + pageRequest.getPageSize(), filteredStudies.size());
 

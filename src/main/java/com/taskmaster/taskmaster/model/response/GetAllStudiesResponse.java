@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetStudyResponse {
+public class GetAllStudiesResponse {
 
     private String code;
 

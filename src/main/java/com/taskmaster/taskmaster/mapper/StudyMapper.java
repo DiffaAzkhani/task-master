@@ -2,17 +2,17 @@ package com.taskmaster.taskmaster.mapper;
 
 import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.Study;
-import com.taskmaster.taskmaster.model.response.AddStudyResponse;
-import com.taskmaster.taskmaster.model.response.GetAllStudyResponse;
-import com.taskmaster.taskmaster.model.response.GetStudyResponse;
+import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
+import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
+import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StudyMapper {
 
-    public AddStudyResponse toAddStudyResponse(Study study) {
-        return AddStudyResponse.builder()
+    public CreateNewStudyResponse toAddStudyResponse(Study study) {
+        return CreateNewStudyResponse.builder()
             .code(study.getCode())
             .name(study.getName())
             .price(study.getPrice())
@@ -27,8 +27,8 @@ public class StudyMapper {
             .build();
     }
 
-    public GetStudyResponse toGetStudyResponse(Study study) {
-        return GetStudyResponse.builder()
+    public GetStudyByCodeResponse toGetStudyResponse(Study study) {
+        return GetStudyByCodeResponse.builder()
             .code(study.getCode())
             .name(study.getName())
             .price(study.getPrice())
@@ -41,8 +41,8 @@ public class StudyMapper {
             .build();
     }
 
-    public GetAllStudyResponse toGetAllStudyResponse(Study study) {
-        return GetAllStudyResponse.builder()
+    public GetAllStudiesResponse toGetAllStudyResponse(Study study) {
+        return GetAllStudiesResponse.builder()
             .code(study.getCode())
             .name(study.getName())
             .price(study.getPrice())

@@ -2,9 +2,9 @@ package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
-import com.taskmaster.taskmaster.model.request.UpdateUserRequest;
+import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
-import com.taskmaster.taskmaster.model.response.UpdateUserResponse;
+import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.UserService;
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ import javax.validation.Valid;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/user")
 public class UserController {
 
     private final UserService userService;
@@ -47,7 +47,6 @@ public class UserController {
     }
 
     @DeleteMapping(
-        path = "/delete-user",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -63,17 +62,17 @@ public class UserController {
     }
 
     @PatchMapping(
-        path = "/update-user/{username}",
+        path = "/profile/{username}",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<UpdateUserResponse> updateUser(
-        @PathVariable("username") String username,
-        @Valid @RequestBody UpdateUserRequest request
+    public WebResponse<UpdateUserProfileResponse> updateUserProfile(
+        @PathVariable(name = "username") String username,
+        @Valid @RequestBody UpdateUserProfileRequest request
     ) {
-        UpdateUserResponse userResponse = userService.updateUser(username, request);
+        UpdateUserProfileResponse userResponse = userService.updateUser(username, request);
 
-        return WebResponse.<UpdateUserResponse>builder()
+        return WebResponse.<UpdateUserProfileResponse>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(userResponse)
