@@ -53,6 +53,7 @@ public class CartController {
     }
 
     @GetMapping(
+        path = "/users",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<List<GetCartItemsResponse>> getAllCartItems(

@@ -29,7 +29,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/orders")
+@RequestMapping("/api/v1/order")
 public class OrderController {
 
     private final OrderService orderService;
@@ -73,6 +73,7 @@ public class OrderController {
     }
 
     @GetMapping(
+        path = "/users",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<List<GetAllOrderResponse>> getAllORderResponse(

@@ -2,9 +2,9 @@ package com.taskmaster.taskmaster.service;
 
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
-import com.taskmaster.taskmaster.model.request.UpdateUserRequest;
+import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
-import com.taskmaster.taskmaster.model.response.UpdateUserResponse;
+import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
 
 public interface UserService {
 
@@ -12,6 +12,6 @@ public interface UserService {
 
     void deleteUserAccount(DeleteUserRequest request);
 
-    UpdateUserResponse updateUser(String username, UpdateUserRequest request);
+    UpdateUserProfileResponse updateUser(String username, UpdateUserProfileRequest request);
 
 }

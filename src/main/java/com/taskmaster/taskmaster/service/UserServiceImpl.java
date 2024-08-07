@@ -6,9 +6,9 @@ import com.taskmaster.taskmaster.enums.UserRole;
 import com.taskmaster.taskmaster.mapper.UserMapper;
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
-import com.taskmaster.taskmaster.model.request.UpdateUserRequest;
+import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
-import com.taskmaster.taskmaster.model.response.UpdateUserResponse;
+import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
 import com.taskmaster.taskmaster.repository.RoleRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UpdateUserResponse updateUser(String username, UpdateUserRequest request) {
+    public UpdateUserProfileResponse updateUser(String username, UpdateUserProfileRequest request) {
         validationService.validateUser(username);
 
         User user = userRepository.findByUsername(username)
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUpdateUserResponse(user);
     }
 
-    private void updateUserProperties(User user, UpdateUserRequest request) {
+    private void updateUserProperties(User user, UpdateUserProfileRequest request) {
         if (Objects.nonNull(request.getUsername())) {
             user.setUsername(request.getUsername());
         }
