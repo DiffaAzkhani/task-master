@@ -21,6 +21,7 @@ Task Master is a web backend application providing services/API endpoint for pra
 - Get All Question and Answer in specific study
 - Save User Submission
 - Grade User Submission
+- Get Explanation and User Answer
 
 ### Coupon
 - Add Coupon
