@@ -17,7 +17,7 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AddStudyRequest {
+public class CreateNewStudyRequest {
 
     @NotBlank(message = "Code is required")
     @Size(max = 13, message = "Study Code should be 13 characters")

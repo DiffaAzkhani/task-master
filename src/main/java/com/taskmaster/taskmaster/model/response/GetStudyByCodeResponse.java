@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AddStudyResponse {
+public class GetStudyByCodeResponse {
 
     private String code;
 
@@ -31,9 +31,5 @@ public class AddStudyResponse {
     private StudyType type;
 
     private StudyLevel level;
-
-    private String createdAt;
-
-    private String updatedAt;
 
 }

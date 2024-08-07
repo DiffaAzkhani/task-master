@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateUserRequest {
+public class UpdateUserProfileRequest {
 
     @NotBlank(message = "Username is required")
     @Size(max = 100, message = "Username should not be more than 100 characters")
