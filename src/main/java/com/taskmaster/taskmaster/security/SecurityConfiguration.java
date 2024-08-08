@@ -70,6 +70,7 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.DELETE,"/api/v1/admin/studies/delete/{studyCode}").hasRole(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/admin/studies/add-study").hasRole(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.GET,"/api/v1/admin/all-users").hasRole(UserRole.ADMIN.name())
+                .antMatchers(HttpMethod.GET,"/api/v1/admin//users/{username}").hasRole(UserRole.ADMIN.name())
                 // API COUPON
                 .antMatchers(HttpMethod.POST,"/api/v1/coupon/add-coupon").hasRole(UserRole.ADMIN.name())
                 .anyRequest().authenticated()

@@ -8,6 +8,7 @@ import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
 import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
+import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
 import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
 import com.taskmaster.taskmaster.repository.RoleRepository;
@@ -123,6 +124,17 @@ public class UserServiceImpl implements UserService {
         log.info("Success to get all users!");
 
         return new PageImpl<>(getAllUsersResponses, pageRequest, userPage.getTotalElements());
+    }
+
+    @Override
+    public GetUserForAdminResponse getUser(String username) {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> {
+                log.info("User with username:{}, not found!", username);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+            });
+
+        return userMapper.toGetUserForAdminResponse(user);
     }
 
     private void updateUserProperties(User user, UpdateUserProfileRequest request) {
