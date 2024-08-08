@@ -3,6 +3,7 @@ package com.taskmaster.taskmaster.service;
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
+import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
 import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
@@ -20,5 +21,7 @@ public interface UserService {
     Page<GetAllUsersResponse> getAllUsers(int page, int size);
 
     GetUserForAdminResponse getUser(String username);
+
+    Page<GetAllEnrolledUSerStudyResponse> getEnrolledUserStudy(String username, int page, int size);
 
 }
