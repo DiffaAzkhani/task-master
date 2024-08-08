@@ -12,7 +12,7 @@ public interface UserService {
 
     void deleteUserAccount(DeleteUserRequest request);
 
-    UpdateUserProfileResponse updateUser(String username, UpdateUserProfileRequest request);
+    UpdateUserProfileResponse updateUserProfile(String username, UpdateUserProfileRequest request);
 
     Page<GetAllUsersResponse> getAllUsers(int page, int size);
 

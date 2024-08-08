@@ -25,7 +25,11 @@ public class UserMapper {
     public UpdateUserProfileResponse toUpdateUserResponse(User user) {
         return UpdateUserProfileResponse.builder()
             .username(user.getUsername())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
             .email(user.getEmail())
+            .phone(user.getPhone())
+            .profileImage(user.getProfileImage())
             .build();
     }
 

@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UpdateUserProfileResponse updateUser(String username, UpdateUserProfileRequest request) {
+    public UpdateUserProfileResponse updateUserProfile(String username, UpdateUserProfileRequest request) {
         validationService.validateUser(username);
 
         User user = userRepository.findByUsername(username)
@@ -177,16 +177,36 @@ public class UserServiceImpl implements UserService {
     }
 
     private void updateUserProperties(User user, UpdateUserProfileRequest request) {
-        if (Objects.nonNull(request.getUsername())) {
-            user.setUsername(request.getUsername());
-        }
-
         if (Objects.nonNull(request.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists!");
             }
 
             user.setEmail(request.getEmail());
+        }
+
+        if (Objects.nonNull(request.getFirstName())) {
+            user.setFirstName(request.getFirstName());
+        }
+
+        if (Objects.nonNull(request.getLastName())) {
+            user.setLastName(request.getLastName());
+        }
+
+        if (Objects.nonNull(request.getPhone())) {
+            if (user.getPhone().equals(request.getPhone())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number cannot be the same as before!");
+            }
+
+            if (userRepository.existsByPhone(request.getPhone())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already exists!");
+            }
+
+            user.setPhone(request.getPhone());
+        }
+
+        if (Objects.nonNull(request.getProfileImage())) {
+            user.setProfileImage(request.getProfileImage());
         }
     }
 
