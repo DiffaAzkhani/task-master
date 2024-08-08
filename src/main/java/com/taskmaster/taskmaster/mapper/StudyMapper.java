@@ -3,6 +3,7 @@ package com.taskmaster.taskmaster.mapper;
 import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
+import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
 import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
@@ -68,6 +69,16 @@ public class StudyMapper {
             .level(study.getLevel())
             .createdAt(TimeUtil.formatToString(study.getCreatedAt()))
             .updatedAt(TimeUtil.formatToString(study.getCreatedAt()))
+            .build();
+    }
+
+    public GetAllEnrolledUSerStudyResponse toGetEnrolledUserStudyResponse(Study study) {
+        return GetAllEnrolledUSerStudyResponse.builder()
+            .code(study.getCode())
+            .name(study.getName())
+            .type(study.getType())
+            .level(study.getLevel())
+            .category(study.getCategory())
             .build();
     }
 
