@@ -9,6 +9,7 @@ import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
 import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
 import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
+import com.taskmaster.taskmaster.model.response.PagingWebResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.OrderService;
 import lombok.AllArgsConstructor;
@@ -76,7 +77,7 @@ public class OrderController {
         path = "/users",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<List<GetAllOrderResponse>> getAllORderResponse(
+    public PagingWebResponse<List<GetAllOrderResponse>> getAllORderResponse(
         @RequestParam(name = "username") String username,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
@@ -84,7 +85,7 @@ public class OrderController {
         Page<GetAllOrderResponse> orderResponsePage = orderService.getAllOrders(username, page, size);
         List<GetAllOrderResponse> orderResponses = orderResponsePage.getContent();
 
-        return WebResponse.<List<GetAllOrderResponse>>builder()
+        return PagingWebResponse.<List<GetAllOrderResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(orderResponses)

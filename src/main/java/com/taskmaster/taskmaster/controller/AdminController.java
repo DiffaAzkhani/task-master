@@ -14,6 +14,7 @@ import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
 import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
 import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
+import com.taskmaster.taskmaster.model.response.PagingWebResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
@@ -86,14 +87,14 @@ public class AdminController {
         path = "/all-users",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<List<GetAllUsersResponse>> getAllUsers(
+    public PagingWebResponse<List<GetAllUsersResponse>> getAllUsers(
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
         Page<GetAllUsersResponse> allUsersResponsePage = userService.getAllUsers(page, size);
         List<GetAllUsersResponse> usersResponses = allUsersResponsePage.getContent();
 
-        return WebResponse.<List<GetAllUsersResponse>>builder()
+        return PagingWebResponse.<List<GetAllUsersResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(usersResponses)
@@ -131,7 +132,7 @@ public class AdminController {
         path = "/studies",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<List<GetAllStudiesResponse>> getAllStudies(
+    public PagingWebResponse<List<GetAllStudiesResponse>> getAllStudies(
         @RequestParam(name = "type", required = false) StudyType studyType,
         @RequestParam(name = "categories", required = false) Set<StudyCategory> categories,
         @RequestParam(name = "levels", required = false) Set<StudyLevel> levels,
@@ -144,7 +145,7 @@ public class AdminController {
         Page<GetAllStudiesResponse> studyResponsePage = studyService.getAllStudies(studyType, categories, levels, studyFilters, minPrice, maxPrice, page, size);
         List<GetAllStudiesResponse> studyResponses = studyResponsePage.getContent();
 
-        return WebResponse.<List<GetAllStudiesResponse>>builder()
+        return PagingWebResponse.<List<GetAllStudiesResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(studyResponses)
