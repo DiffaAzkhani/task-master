@@ -11,6 +11,7 @@ Task Master is a web backend application providing services/API endpoint for pra
 
 ### Admin
 - Get All User
+- Get User By Username
 - Delete User
 - Update User
 - Get All Study
