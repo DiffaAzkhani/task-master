@@ -3,6 +3,7 @@ package com.taskmaster.taskmaster.mapper;
 import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
+import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
 import com.taskmaster.taskmaster.model.response.LoginResponse;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
 import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
@@ -34,6 +35,19 @@ public class UserMapper {
 
     public GetAllUsersResponse toGetAllUsersResponse(User user){
         return GetAllUsersResponse.builder()
+            .id(user.getId())
+            .username(user.getUsername())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .email(user.getEmail())
+            .phone(user.getPhone())
+            .createdAt(TimeUtil.formatToString(user.getCreatedAt()))
+            .updatedAt(TimeUtil.formatToString(user.getUpdatedAt()))
+            .build();
+    }
+
+    public GetUserForAdminResponse toGetUserForAdminResponse(User user) {
+        return GetUserForAdminResponse.builder()
             .id(user.getId())
             .username(user.getUsername())
             .firstName(user.getFirstName())
