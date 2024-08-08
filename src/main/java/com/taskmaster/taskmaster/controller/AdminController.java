@@ -10,6 +10,7 @@ import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
 import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
+import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
 import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
@@ -77,6 +78,33 @@ public class AdminController {
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(userResponse)
+            .build();
+    }
+
+    @GetMapping(
+        path = "/all-users",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<List<GetAllUsersResponse>> getAllUsers(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        Page<GetAllUsersResponse> allUsersResponsePage = userService.getAllUsers(page, size);
+        List<GetAllUsersResponse> usersResponses = allUsersResponsePage.getContent();
+
+        return WebResponse.<List<GetAllUsersResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(usersResponses)
+            .paging(PagingResponse.builder()
+                .currentPage(page)
+                .size(size)
+                .totalPage(allUsersResponsePage.getTotalPages())
+                .totalElement(allUsersResponsePage.getTotalElements())
+                .empty(allUsersResponsePage.isEmpty())
+                .first(allUsersResponsePage.isFirst())
+                .last(allUsersResponsePage.isLast())
+                .build())
             .build();
     }
 

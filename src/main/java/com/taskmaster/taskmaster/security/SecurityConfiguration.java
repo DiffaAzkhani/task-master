@@ -67,8 +67,9 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.GET,"/api/v1/cart/users").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.DELETE,"/api/v1/cart/delete/{username}/{orderCode}").hasRole(UserRole.USER.name())
                 // API ADMIN PANEL
-                .antMatchers(HttpMethod.DELETE,"/api/v1/studies/delete/{studyCode}").hasRole(UserRole.ADMIN.name())
-                .antMatchers(HttpMethod.POST,"/api/v1/studies/add-study").hasRole(UserRole.ADMIN.name())
+                .antMatchers(HttpMethod.DELETE,"/api/v1/admin/studies/delete/{studyCode}").hasRole(UserRole.ADMIN.name())
+                .antMatchers(HttpMethod.POST,"/api/v1/admin/studies/add-study").hasRole(UserRole.ADMIN.name())
+                .antMatchers(HttpMethod.GET,"/api/v1/admin/all-users").hasRole(UserRole.ADMIN.name())
                 // API COUPON
                 .antMatchers(HttpMethod.POST,"/api/v1/coupon/add-coupon").hasRole(UserRole.ADMIN.name())
                 .anyRequest().authenticated()
