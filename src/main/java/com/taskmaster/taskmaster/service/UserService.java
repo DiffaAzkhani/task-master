@@ -3,11 +3,7 @@ package com.taskmaster.taskmaster.service;
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
-import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
-import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
-import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
-import com.taskmaster.taskmaster.model.response.RegisterResponse;
-import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
+import com.taskmaster.taskmaster.model.response.*;
 import org.springframework.data.domain.Page;
 
 public interface UserService {
@@ -23,5 +19,7 @@ public interface UserService {
     GetUserForAdminResponse getUser(String username);
 
     Page<GetAllEnrolledUSerStudyResponse> getEnrolledUserStudy(String username, int page, int size);
+
+    GetUserProfileResponse getUserProfile(String username);
 
 }

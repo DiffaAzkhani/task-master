@@ -3,12 +3,7 @@ package com.taskmaster.taskmaster.controller;
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
-import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
-import com.taskmaster.taskmaster.model.response.PagingResponse;
-import com.taskmaster.taskmaster.model.response.PagingWebResponse;
-import com.taskmaster.taskmaster.model.response.RegisterResponse;
-import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
-import com.taskmaster.taskmaster.model.response.WebResponse;
+import com.taskmaster.taskmaster.model.response.*;
 import com.taskmaster.taskmaster.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -111,6 +106,22 @@ public class UserController {
                 .first(responsePage.isFirst())
                 .last(responsePage.isLast())
                 .build())
+            .build();
+    }
+
+    @GetMapping(
+        path = "/profile",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<GetUserProfileResponse> getUserProfile(
+        @RequestParam String username
+    ) {
+        GetUserProfileResponse userProfileResponse = userService.getUserProfile(username);
+
+        return WebResponse.<GetUserProfileResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(userProfileResponse)
             .build();
     }
 

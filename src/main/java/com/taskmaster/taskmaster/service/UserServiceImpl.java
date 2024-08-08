@@ -9,11 +9,7 @@ import com.taskmaster.taskmaster.mapper.UserMapper;
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
-import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
-import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
-import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
-import com.taskmaster.taskmaster.model.response.RegisterResponse;
-import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
+import com.taskmaster.taskmaster.model.response.*;
 import com.taskmaster.taskmaster.repository.RoleRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
@@ -146,6 +142,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<GetAllEnrolledUSerStudyResponse> getEnrolledUserStudy(String username, int page, int size) {
         validationService.validateUser(username);
 
@@ -163,6 +160,20 @@ public class UserServiceImpl implements UserService {
         log.info("Success to get all user enrolled study!");
 
         return new PageImpl<>(allEnrolledUSerStudyList, pageRequest, studyPage.getTotalElements());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GetUserProfileResponse getUserProfile(String username) {
+        validationService.validateUser(username);
+
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> {
+                log.info("User with username:{}, not found!", username);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+            });
+
+        return userMapper.toGetUserProfile(user);
     }
 
     private void updateUserProperties(User user, UpdateUserProfileRequest request) {
