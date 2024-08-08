@@ -48,6 +48,7 @@ public class SecurityConfiguration {
                 // API USER
                 .antMatchers(HttpMethod.DELETE,"/api/v1/user").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.PATCH,"/api/v1/user/profile/{username}").hasRole(UserRole.USER.name())
+                .antMatchers(HttpMethod.GET,"/api/v1/user/my-studies").hasRole(UserRole.USER.name())
                 // API STUDY
                 .antMatchers(HttpMethod.PATCH,"/api/v1/study/{studyCode}").hasRole(UserRole.ADMIN.name())
                 // API QUESTION AND ANSWER

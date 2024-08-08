@@ -1,17 +1,21 @@
 package com.taskmaster.taskmaster.service;
 
 import com.taskmaster.taskmaster.entity.Role;
+import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.enums.UserRole;
+import com.taskmaster.taskmaster.mapper.StudyMapper;
 import com.taskmaster.taskmaster.mapper.UserMapper;
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
+import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
 import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
 import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
 import com.taskmaster.taskmaster.repository.RoleRepository;
+import com.taskmaster.taskmaster.repository.StudyRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,11 +41,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final StudyRepository studyRepository;
+
     private final RoleRepository roleRepository;
 
     private final PasswordEncoder passwordEncoder;
 
     private final UserMapper userMapper;
+
+    private final StudyMapper studyMapper;
 
     private final ValidationService validationService;
 
@@ -135,6 +143,26 @@ public class UserServiceImpl implements UserService {
             });
 
         return userMapper.toGetUserForAdminResponse(user);
+    }
+
+    @Override
+    public Page<GetAllEnrolledUSerStudyResponse> getEnrolledUserStudy(String username, int page, int size) {
+        validationService.validateUser(username);
+
+        if (!userRepository.existsByUsername(username)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+        }
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Study> studyPage = studyRepository.findByUsers_Username(username, pageRequest);
+
+        List<GetAllEnrolledUSerStudyResponse> allEnrolledUSerStudyList = studyPage.getContent().stream()
+            .map(studyMapper::toGetEnrolledUserStudyResponse)
+            .collect(Collectors.toList());
+
+        log.info("Success to get all user enrolled study!");
+
+        return new PageImpl<>(allEnrolledUSerStudyList, pageRequest, studyPage.getTotalElements());
     }
 
     private void updateUserProperties(User user, UpdateUserProfileRequest request) {
