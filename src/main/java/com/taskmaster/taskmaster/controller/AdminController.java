@@ -74,7 +74,7 @@ public class AdminController {
         @PathVariable("username") String username,
         @Valid @RequestBody UpdateUserProfileRequest request
     ) {
-        UpdateUserProfileResponse userResponse = userService.updateUser(username, request);
+        UpdateUserProfileResponse userResponse = userService.updateUserProfile(username, request);
 
         return WebResponse.<UpdateUserProfileResponse>builder()
             .code(HttpStatus.OK.value())

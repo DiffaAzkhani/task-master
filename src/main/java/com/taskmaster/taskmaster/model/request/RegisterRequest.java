@@ -24,7 +24,7 @@ public class RegisterRequest {
     private String password;
 
     @NotBlank(message = "First name is required")
-    @Size(max = 25, message = "Last name should not be more than 25 characters")
+    @Size(max = 25, message = "First name should not be more than 25 characters")
     private String firstName;
 
     @NotBlank(message = "Last name is required")
