@@ -8,6 +8,7 @@ import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionExplanationResponse;
 import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
+import com.taskmaster.taskmaster.model.response.PagingWebResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.QuestionService;
 import lombok.AllArgsConstructor;
@@ -51,7 +52,7 @@ public class QuestionAndAnswerController {
     @GetMapping(
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<List<GetAllQuestionResponse>> getQuestionAndAnswer(
+    public PagingWebResponse<List<GetAllQuestionResponse>> getQuestionAndAnswer(
         @RequestParam(name = "studyId") Long studyId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "1") int size
@@ -59,7 +60,7 @@ public class QuestionAndAnswerController {
         Page<GetAllQuestionResponse> questionResponsePage = questionService.getQuestionForStudy(studyId, page, size);
         List<GetAllQuestionResponse> questionResponses = questionResponsePage.getContent();
 
-        return WebResponse.<List<GetAllQuestionResponse>>builder()
+        return PagingWebResponse.<List<GetAllQuestionResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(questionResponses)
