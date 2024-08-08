@@ -12,6 +12,7 @@ import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
 import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
 import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
+import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
@@ -105,6 +106,22 @@ public class AdminController {
                 .first(allUsersResponsePage.isFirst())
                 .last(allUsersResponsePage.isLast())
                 .build())
+            .build();
+    }
+
+    @GetMapping(
+        path = "/users/{username}",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<GetUserForAdminResponse> getUser(
+        @PathVariable(name = "username") String username
+    ) {
+        GetUserForAdminResponse getUserForAdminResponse = userService.getUser(username);
+
+        return WebResponse.<GetUserForAdminResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(getUserForAdminResponse)
             .build();
     }
 
