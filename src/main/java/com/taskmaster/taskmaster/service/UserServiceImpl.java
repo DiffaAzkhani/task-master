@@ -7,12 +7,16 @@ import com.taskmaster.taskmaster.mapper.UserMapper;
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
+import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
 import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
 import com.taskmaster.taskmaster.repository.RoleRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,8 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -103,6 +109,20 @@ public class UserServiceImpl implements UserService {
         log.info("Success to update user!");
 
         return userMapper.toUpdateUserResponse(user);
+    }
+
+    @Override
+    public Page<GetAllUsersResponse> getAllUsers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<User> userPage = userRepository.findAll(pageRequest);
+
+        List<GetAllUsersResponse> getAllUsersResponses = userPage.getContent().stream()
+            .map(userMapper::toGetAllUsersResponse)
+            .collect(Collectors.toList());
+
+        log.info("Success to get all users!");
+
+        return new PageImpl<>(getAllUsersResponses, pageRequest, userPage.getTotalElements());
     }
 
     private void updateUserProperties(User user, UpdateUserProfileRequest request) {
