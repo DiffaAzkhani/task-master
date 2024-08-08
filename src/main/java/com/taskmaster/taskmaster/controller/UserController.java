@@ -5,6 +5,7 @@ import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
 import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
+import com.taskmaster.taskmaster.model.response.PagingWebResponse;
 import com.taskmaster.taskmaster.model.response.RegisterResponse;
 import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
@@ -89,7 +90,7 @@ public class UserController {
         path = "/my-studies",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<List<GetAllEnrolledUSerStudyResponse>> getAllEnrolledUserStudy(
+    public PagingWebResponse<List<GetAllEnrolledUSerStudyResponse>> getAllEnrolledUserStudy(
         @RequestParam String username,
         @RequestParam(name = "page") int page,
         @RequestParam(name = "size") int size
@@ -97,7 +98,7 @@ public class UserController {
         Page<GetAllEnrolledUSerStudyResponse> responsePage = userService.getEnrolledUserStudy(username, page, size);
         List<GetAllEnrolledUSerStudyResponse> allEnrolledUSerStudyResponses = responsePage.getContent();
 
-        return WebResponse.<List<GetAllEnrolledUSerStudyResponse>>builder()
+        return PagingWebResponse.<List<GetAllEnrolledUSerStudyResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(allEnrolledUSerStudyResponses)

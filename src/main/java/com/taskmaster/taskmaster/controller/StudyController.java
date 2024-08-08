@@ -7,6 +7,7 @@ import com.taskmaster.taskmaster.enums.StudyType;
 import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
 import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
+import com.taskmaster.taskmaster.model.response.PagingWebResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.StudyService;
 import lombok.AllArgsConstructor;
@@ -49,7 +50,7 @@ public class StudyController {
         path = "/all-study",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<List<GetAllStudiesResponse>> getAllStudy(
+    public PagingWebResponse<List<GetAllStudiesResponse>> getAllStudy(
         @RequestParam(name = "type", required = false) StudyType studyType,
         @RequestParam(name = "categories", required = false) Set<StudyCategory> categories,
         @RequestParam(name = "levels", required = false) Set<StudyLevel> levels,
@@ -62,7 +63,7 @@ public class StudyController {
         Page<GetAllStudiesResponse> studyResponsePage = studyService.getAllStudies(studyType, categories, levels, studyFilters, minPrice, maxPrice, page, size);
         List<GetAllStudiesResponse> studyResponses = studyResponsePage.getContent();
 
-        return WebResponse.<List<GetAllStudiesResponse>>builder()
+        return PagingWebResponse.<List<GetAllStudiesResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(studyResponses)
