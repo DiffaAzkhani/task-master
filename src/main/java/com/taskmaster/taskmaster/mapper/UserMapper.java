@@ -2,11 +2,7 @@ package com.taskmaster.taskmaster.mapper;
 
 import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.User;
-import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
-import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
-import com.taskmaster.taskmaster.model.response.LoginResponse;
-import com.taskmaster.taskmaster.model.response.RegisterResponse;
-import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
+import com.taskmaster.taskmaster.model.response.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -56,6 +52,17 @@ public class UserMapper {
             .phone(user.getPhone())
             .createdAt(TimeUtil.formatToString(user.getCreatedAt()))
             .updatedAt(TimeUtil.formatToString(user.getUpdatedAt()))
+            .build();
+    }
+
+    public GetUserProfileResponse toGetUserProfile(User user) {
+        return GetUserProfileResponse.builder()
+            .username(user.getUsername())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .email(user.getEmail())
+            .phone(user.getPhone())
+            .profileImage(user.getProfileImage())
             .build();
     }
 
