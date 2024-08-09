@@ -18,8 +18,4 @@ public class CancelOrderRequest {
     @Size(max = 100, message = "Username should not be more than 100 characters")
     private String username;
 
-    @NotBlank(message = "Code is required")
-    @Size(max = 19, message = "Order Code should be 19 characters")
-    private String orderCode;
-
 }

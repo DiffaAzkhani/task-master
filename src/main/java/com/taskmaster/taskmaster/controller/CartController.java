@@ -24,16 +24,16 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/cart")
+@RequestMapping("/api/v1/carts")
 public class CartController {
 
     private CartService cartService;
 
     @PostMapping(
-        path = "/add-cart",
+        path = "/items",
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<String> addCart(
+    public WebResponse<String> addCartItem(
         @Valid @RequestBody AddCartRequest request
     ) {
         cartService.addCart(request);
@@ -45,14 +45,13 @@ public class CartController {
     }
 
     @DeleteMapping(
-        path = "/{username}/{studyCode}",
-        produces = MediaType.APPLICATION_JSON_VALUE
+        path = "/items/{cartItemId}"
     )
-    public WebResponse<String> deleteCartItem(
-        @PathVariable(name = "username") String username,
-        @PathVariable(name = "studyCode") String studyCode
+    public WebResponse<String> deleteCartItemByIdAndUsername(
+        @PathVariable(name = "cartItemId") Long cartItemId,
+        @RequestParam(name = "username") String username
     ) {
-        cartService.deleteCartItem(username, studyCode);
+        cartService.deleteCartItem(cartItemId, username);
 
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
@@ -61,15 +60,14 @@ public class CartController {
     }
 
     @GetMapping(
-        path = "/users",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public PagingWebResponse<List<GetCartItemsResponse>> getAllCartItems(
-        @RequestParam(name = "username") String username,
+    public PagingWebResponse<List<GetCartItemsResponse>> getUserCartItems(
+        @RequestParam(name = "userId") Long userId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetCartItemsResponse> cartItemsResponsePage = cartService.getAllCartItems(username, page, size);
+        Page<GetCartItemsResponse> cartItemsResponsePage = cartService.getUserCartItems(userId, page, size);
         List<GetCartItemsResponse> itemsResponses = cartItemsResponsePage.getContent();
 
         return PagingWebResponse.<List<GetCartItemsResponse>>builder()

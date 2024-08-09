@@ -1,8 +1,7 @@
 package com.taskmaster.taskmaster.service;
 
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
-import com.taskmaster.taskmaster.model.request.GradeSubmissionRequest;
-import com.taskmaster.taskmaster.model.request.answerSubmissionRequest;
+import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionExplanationResponse;
@@ -15,14 +14,14 @@ import java.util.List;
 @Service
 public interface QuestionService {
 
-    List<AddQuestionResponse> addQuestionAndAnswer(AddQuestionRequest request);
+    List<AddQuestionResponse> createQuestionAndAnswer(AddQuestionRequest request);
 
     Page<GetAllQuestionResponse> getQuestionForStudy(Long studyId, int page, int size);
 
-    void answerSubmission(answerSubmissionRequest request);
+    void answerSubmission(Long studyId, AnswerSubmissionRequest request);
 
-    GradeSubmissionResponse gradeSubmission(GradeSubmissionRequest request);
+    GradeSubmissionResponse gradeSubmission(Long studyId, String username);
 
-    GetQuestionExplanationResponse getExplanationAndUserAnswer(String username, String studyCode);
+    GetQuestionExplanationResponse getExplanationAndUserAnswer(String username, Long studyId);
 
 }

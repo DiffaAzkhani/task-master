@@ -15,7 +15,6 @@ import com.taskmaster.taskmaster.enums.OrderStatus;
 import com.taskmaster.taskmaster.enums.StudyType;
 import com.taskmaster.taskmaster.mapper.OrderMapper;
 import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
-import com.taskmaster.taskmaster.model.request.CancelOrderRequest;
 import com.taskmaster.taskmaster.model.request.EnrollFreeStudiesRequest;
 import com.taskmaster.taskmaster.model.request.FreeItemsDetailRequest;
 import com.taskmaster.taskmaster.model.request.ItemDetailsRequest;
@@ -131,18 +130,18 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public void cancelOrder(CancelOrderRequest request) {
-        validationService.validateUser(request.getUsername());
+    public void cancelOrder(Long orderId, String username) {
+        validationService.validateUser(username);
 
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByUsername(username)
             .orElseThrow(() -> {
-               log.info("User with username:{}, not found!", request.getUsername());
+               log.info("User with username:{}, not found!", username);
                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found!");
             });
 
-        Order userOrder = orderRepository.findByUserAndId(user, request.getOrderCode())
+        Order userOrder = orderRepository.findByUserAndId(user, orderId)
             .orElseThrow(() -> {
-                log.info("Order with code:{} in user with username:{}, not found!", request.getOrderCode(), request.getUsername());
+                log.info("Order with id:{} in user with username:{}, not found!", orderId, username);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Order in user not found!");
             });
 
@@ -161,15 +160,16 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    @Transactional
-    public Page<GetAllOrderResponse> getAllOrders(String username, int page, int size) {
-        validationService.validateUser(username);
+    @Transactional(readOnly = true)
+    public Page<GetAllOrderResponse> getAllUserOrders(Long userId, int page, int size) {
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> {
-               log.info("User with username:{}, not found!", username);
+               log.info("User with id:{}, not found!", userId);
                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
+
+        validationService.validateUser(user.getUsername());
 
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Order> orderPage = orderRepository.findByUser(user, pageRequest);

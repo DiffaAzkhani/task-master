@@ -11,8 +11,7 @@ import com.taskmaster.taskmaster.mapper.QuestionMapper;
 import com.taskmaster.taskmaster.mapper.UserGradeMapper;
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AnswerSubmission;
-import com.taskmaster.taskmaster.model.request.GradeSubmissionRequest;
-import com.taskmaster.taskmaster.model.request.answerSubmissionRequest;
+import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionExplanationResponse;
@@ -61,7 +60,8 @@ public class QuestionServiceImpl implements QuestionService{
     private final ValidationService validationService;
 
     @Override
-    public List<AddQuestionResponse> addQuestionAndAnswer(AddQuestionRequest request) {
+    @Transactional
+    public List<AddQuestionResponse> createQuestionAndAnswer(AddQuestionRequest request) {
         Study study = studyRepository.findById(request.getStudyId())
             .orElseThrow(() -> {
                log.warn("Study with code : {}, not found!", request.getStudyId());
@@ -98,6 +98,7 @@ public class QuestionServiceImpl implements QuestionService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<GetAllQuestionResponse> getQuestionForStudy(Long studyId, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         List<Question> questionList = questionRepository.findByStudyId(studyId);
@@ -108,7 +109,8 @@ public class QuestionServiceImpl implements QuestionService{
     }
 
     @Override
-    public void answerSubmission(answerSubmissionRequest request) {
+    @Transactional
+    public void answerSubmission(Long studyId, AnswerSubmissionRequest request) {
         validationService.validateUser(request.getUsername());
 
         User user = userRepository.findByUsername(request.getUsername())
@@ -117,9 +119,9 @@ public class QuestionServiceImpl implements QuestionService{
                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
-        Study study = studyRepository.findById(request.getStudyId())
+        Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> {
-                log.info("Study not found!");
+                log.info("Study with id:{}, not found!", studyId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
             });
 
@@ -157,18 +159,19 @@ public class QuestionServiceImpl implements QuestionService{
     }
 
     @Override
-    public GradeSubmissionResponse gradeSubmission(GradeSubmissionRequest request) {
-        validationService.validateUser(request.getUsername());
+    @Transactional
+    public GradeSubmissionResponse gradeSubmission(Long studyId, String username) {
+        validationService.validateUser(username);
 
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByUsername(username)
             .orElseThrow(() -> {
-                log.info("User with username:{}, not found!", request.getUsername());
+                log.info("User with username:{}, not found!", username);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
-        Study study = studyRepository.findByCode(request.getStudyCode())
+        Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> {
-                log.info("Study with studyCode:{}, not found!", request.getStudyCode());
+                log.info("Study with id:{}, not found!", studyId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
             });
 
@@ -202,8 +205,8 @@ public class QuestionServiceImpl implements QuestionService{
     }
 
     @Override
-    @Transactional
-    public GetQuestionExplanationResponse getExplanationAndUserAnswer(String username, String studyCode) {
+    @Transactional(readOnly = true)
+    public GetQuestionExplanationResponse getExplanationAndUserAnswer(String username, Long studyId) {
         validationService.validateUser(username);
 
         User user = userRepository.findByUsername(username)
@@ -212,9 +215,9 @@ public class QuestionServiceImpl implements QuestionService{
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
-        Study study = studyRepository.findByCode(studyCode)
+        Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> {
-                log.info("Study with studyCode:{}, not found!", studyCode);
+                log.info("Study with id:{}, not found!", studyId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
             });
 
