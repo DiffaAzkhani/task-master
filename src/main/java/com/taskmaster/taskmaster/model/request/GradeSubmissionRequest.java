@@ -18,8 +18,4 @@ public class GradeSubmissionRequest {
     @Size(max = 100, message = "Username should not be more than 100 characters")
     private String username;
 
-    @NotBlank(message = "Study Code is required")
-    @Size(max = 13, message = "Study Code should be 13 characters")
-    private String studyCode;
-
 }

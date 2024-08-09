@@ -55,6 +55,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public String createToken(String username, String email) {
         User user = userRepository.findByUsernameOrEmail(username, email)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found!"));

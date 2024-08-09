@@ -39,7 +39,6 @@ public class StudyServiceImpl implements StudyService {
 
     private final StudyMapper studyMapper;
 
-
     @Override
     @Transactional
     public CreateNewStudyResponse createNewStudy(CreateNewStudyRequest request) {
@@ -86,21 +85,21 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
-    @Transactional
-    public GetStudyByCodeResponse getStudyByCode(String code) {
-        Study study = studyRepository.findByCode(code)
+    @Transactional(readOnly = true)
+    public GetStudyByCodeResponse getStudyById(Long studyId) {
+        Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> {
-                log.warn("Study with code : {}, not found!", code);
+                log.warn("Study with id: {}, not found!", studyId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND,"Study not found!");
             });
 
-        log.info("found study code : {}", study);
+        log.info("found study:{}", study);
 
         return studyMapper.toGetStudyResponse(study);
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<GetAllStudiesResponse> getAllStudies(StudyType studyType,
                                                      Set<StudyCategory> studyCategories,
                                                      Set<StudyLevel> studyLevels,
@@ -287,10 +286,10 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional
-    public void deleteStudy(String code) {
-        Study study = studyRepository.findByCode(code)
+    public void deleteStudy(Long studyId) {
+        Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> {
-                log.warn("Study with code : {}, not found!", code);
+                log.warn("Study with id: {}, not found!", studyId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
             });
 
@@ -303,10 +302,10 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional
-    public UpdateStudyResponse updateStudy(String code, UpdateStudyRequest request) {
-        Study study = studyRepository.findByCode(code)
+    public UpdateStudyResponse updateStudy(Long studyId, UpdateStudyRequest request) {
+        Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> {
-                log.warn("Study with code : {}, not found!", code);
+                log.warn("Study with id: {}, not found!", studyId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND,"Study not found!");
             });
 

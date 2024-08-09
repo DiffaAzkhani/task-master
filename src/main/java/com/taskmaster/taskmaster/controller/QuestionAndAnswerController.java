@@ -1,8 +1,7 @@
 package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
-import com.taskmaster.taskmaster.model.request.GradeSubmissionRequest;
-import com.taskmaster.taskmaster.model.request.answerSubmissionRequest;
+import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionExplanationResponse;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,14 +33,14 @@ public class QuestionAndAnswerController {
     private final QuestionService questionService;
 
     @PostMapping(
-        path = "/add-question",
+        path = "/questions",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
-
     )
-    public WebResponse<List<AddQuestionResponse>> addQuestionAndAnswer(
+    public WebResponse<List<AddQuestionResponse>> createQuestion(
         @Valid @RequestBody AddQuestionRequest request
     ) {
-        List<AddQuestionResponse> questionResponses = questionService.addQuestionAndAnswer(request);
+        List<AddQuestionResponse> questionResponses = questionService.createQuestionAndAnswer(request);
 
         return WebResponse.<List<AddQuestionResponse>>builder()
             .code(HttpStatus.OK.value())
@@ -50,12 +50,13 @@ public class QuestionAndAnswerController {
     }
 
     @GetMapping(
+        path = "/questions/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public PagingWebResponse<List<GetAllQuestionResponse>> getQuestionAndAnswer(
         @RequestParam(name = "studyId") Long studyId,
         @RequestParam(name = "page", defaultValue = "0") int page,
-        @RequestParam(name = "size", defaultValue = "1") int size
+        @RequestParam(name = "size", defaultValue = "10") int size
     ) {
         Page<GetAllQuestionResponse> questionResponsePage = questionService.getQuestionForStudy(studyId, page, size);
         List<GetAllQuestionResponse> questionResponses = questionResponsePage.getContent();
@@ -77,14 +78,14 @@ public class QuestionAndAnswerController {
     }
 
     @PostMapping(
-        path = "/answer-submission",
-        consumes = MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
+        path = "/studies/{studyId}/submission",
+        consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<String> answerSubmission(
-        @Valid @RequestBody answerSubmissionRequest request
+        @PathVariable(name = "studyId") Long studyId,
+        @Valid @RequestBody AnswerSubmissionRequest request
     ) {
-        questionService.answerSubmission(request);
+        questionService.answerSubmission(studyId, request);
 
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
@@ -93,14 +94,14 @@ public class QuestionAndAnswerController {
     }
 
     @PostMapping(
-        path = "/grade-submission",
-        consumes = MediaType.APPLICATION_JSON_VALUE,
+        path = "/studies/{studyId}/grade",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<GradeSubmissionResponse> gradeSubmission(
-        @Valid @RequestBody GradeSubmissionRequest request
+        @PathVariable(name = "studyId") Long studyId,
+        @RequestParam(name = "username") String username
     ) {
-        GradeSubmissionResponse gradeSubmissionResponse = questionService.gradeSubmission(request);
+        GradeSubmissionResponse gradeSubmissionResponse = questionService.gradeSubmission(studyId, username);
 
         return WebResponse.<GradeSubmissionResponse>builder()
             .code(HttpStatus.OK.value())
@@ -110,14 +111,14 @@ public class QuestionAndAnswerController {
     }
 
     @GetMapping(
-        path = "/explanation",
+        path = "/answers/study/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<GetQuestionExplanationResponse> getExplanationAndUserAnswer(
         @RequestParam(name = "username") String username,
-        @RequestParam(name = "studyCode") String studyCode
+        @RequestParam(name = "studyId") Long studyId
     ) {
-        GetQuestionExplanationResponse explanationResponses = questionService.getExplanationAndUserAnswer(username, studyCode);
+        GetQuestionExplanationResponse explanationResponses = questionService.getExplanationAndUserAnswer(username, studyId);
 
         return WebResponse.<GetQuestionExplanationResponse>builder()
             .code(HttpStatus.OK.value())

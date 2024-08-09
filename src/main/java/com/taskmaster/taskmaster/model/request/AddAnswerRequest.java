@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
@@ -14,10 +15,11 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class AddAnswerRequest {
 
-    @NotNull
+    @NotBlank(message = "Answer text is required")
+    @Size(max = 100, message = "Answer text should not be more than 100 characters")
     String answerText;
 
-    @NotBlank
+    @NotNull
     Boolean isCorrect;
 
 }

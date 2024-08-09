@@ -9,7 +9,12 @@ import com.taskmaster.taskmaster.mapper.UserMapper;
 import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
-import com.taskmaster.taskmaster.model.response.*;
+import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
+import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
+import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
+import com.taskmaster.taskmaster.model.response.GetUserProfileResponse;
+import com.taskmaster.taskmaster.model.response.RegisterResponse;
+import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
 import com.taskmaster.taskmaster.repository.RoleRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
@@ -99,14 +104,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UpdateUserProfileResponse updateUserProfile(String username, UpdateUserProfileRequest request) {
-        validationService.validateUser(username);
+    public UpdateUserProfileResponse updateUserProfile(Long userId, UpdateUserProfileRequest request) {
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> {
-                log.info("User with username: {} not found!", username);
+                log.info("User with id:{} not found!", userId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "username not found!");
             });
+
+        validationService.validateUser(user.getUsername());
 
         updateUserProperties(user, request);
 
@@ -117,6 +123,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<GetAllUsersResponse> getAllUsers(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<User> userPage = userRepository.findAll(pageRequest);
@@ -131,10 +138,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GetUserForAdminResponse getUser(String username) {
-        User user = userRepository.findByUsername(username)
+    @Transactional(readOnly = true)
+    public GetUserForAdminResponse getUser(Long userId) {
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> {
-                log.info("User with username:{}, not found!", username);
+                log.info("User with id:{}, not found!", userId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 

@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class CartServiceImpl implements CartService{
     private ValidationService validationService;
 
     @Override
+    @Transactional
     public void addCart(AddCartRequest request) {
         validationService.validateUser(request.getUsername());
 
@@ -90,46 +92,36 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    public void deleteCartItem(String username, String studyCode) {
+    @Transactional
+    public void deleteCartItem(Long cartItemId, String username) {
         validationService.validateUser(username);
 
-        User user = userRepository.findByUsername(username)
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
             .orElseThrow(() -> {
-                log.info("User with username:{}, user not found!", username);
-                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+                log.info("CartItem in id:{}, not found!", cartItemId);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart item not found!");
             });
 
-        Study study = studyRepository.findByCode(studyCode)
-            .orElseThrow(() -> {
-                log.info("Study with code:{}, not found!", studyCode);
-                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
-            });
-
-        Cart cart = cartRepository.findByUser(user)
-            .orElseThrow(() -> {
-                log.info("Cart with user:{}, not found!", user.getUsername());
-                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found in cart!");
-            });
-
-        CartItem cartItem = cartItemRepository.findByCartAndStudy(cart, study)
-            .orElseThrow(() -> {
-                log.info("Cart item with cartId:{}, and study:{}, not found!", cart.getId(), study.getCode());
-                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart items not found!");
-            });
+        if (!cartItem.getCart().getUser().getUsername().equals(username)) {
+            log.info("User with username: {} does not have the cart item with id: {}", username, cartItemId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not own this cart item!");
+        }
 
         cartItemRepository.delete(cartItem);
         log.info("Success to delete chosen study in user cart!");
     }
 
     @Override
-    public Page<GetCartItemsResponse> getAllCartItems(String username, int page, int size) {
-        validationService.validateUser(username);
+    @Transactional(readOnly = true)
+    public Page<GetCartItemsResponse> getUserCartItems(Long userId, int page, int size) {
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> {
-                log.info("User with username:{}, not found!", username);
+                log.info("User with id:{}, not found!", userId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
+
+        validationService.validateUser(user.getUsername());
 
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<CartItem> cartItemPage = cartItemRepository.findByCart_User(user, pageRequest);
