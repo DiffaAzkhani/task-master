@@ -8,8 +8,8 @@ public interface CartService {
 
     void addCart(AddCartRequest request);
 
-    void deleteCartItem(String username, String studyCode);
+    void deleteCartItem(Long cartItemId, String username);
 
-    Page<GetCartItemsResponse> getAllCartItems(String username, int page, int size);
+    Page<GetCartItemsResponse> getUserCartItems(Long userId, int page, int size);
 
 }

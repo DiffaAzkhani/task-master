@@ -22,27 +22,21 @@ public class UpdateStudyRequest {
     @Size(min = 3, max = 100, message = "Study Name should be between 3 and 100 characters")
     private String name;
 
-    @NotNull(message = "Price is required")
     @Min(value = 0, message = "price must be at least 0")
     private Integer price;
 
-    @NotNull(message = "Discount is required")
     @Min(value = 0, message = "discount must be at least 0")
     private Integer discount;
 
     private String description;
 
-    @NotBlank
     @Size(max = 200, message = "Link should be 200 characters or less")
     private String link;
 
-    @NotNull(message = "Category cannot be null")
     private StudyCategory category;
 
-    @NotNull(message = "Type cannot be null")
     private StudyType type;
 
-    @NotNull(message = "Level cannot be null")
     private StudyLevel level;
 
 }

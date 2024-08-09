@@ -17,13 +17,13 @@ import javax.validation.Valid;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/coupon")
+@RequestMapping("/api/v1/coupons")
 public class CouponController {
 
     private final CouponService couponService;
 
     @PostMapping(
-        path = "/add-coupon",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<AddCouponResponse>> addCoupon(

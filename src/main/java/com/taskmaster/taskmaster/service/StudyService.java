@@ -18,7 +18,7 @@ public interface StudyService {
 
     CreateNewStudyResponse createNewStudy(CreateNewStudyRequest request);
 
-    GetStudyByCodeResponse getStudyByCode(String code);
+    GetStudyByCodeResponse getStudyById(Long studyId);
 
     Page<GetAllStudiesResponse> getAllStudies(StudyType studyType,
                                               Set<StudyCategory> studyCategories,
@@ -29,8 +29,8 @@ public interface StudyService {
                                               int page,
                                               int size);
 
-    void deleteStudy(String code);
+    void deleteStudy(Long studyID);
 
-    UpdateStudyResponse updateStudy(String code, UpdateStudyRequest request);
+    UpdateStudyResponse updateStudy(Long studyId, UpdateStudyRequest request);
 
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -19,6 +20,7 @@ public class AddCartRequest {
     @Size(max = 100, message = "Username should not be more than 100 characters")
     private String username;
 
+    @Valid
     private List<CartItemRequest> items;
 
 }

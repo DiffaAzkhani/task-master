@@ -3,7 +3,6 @@ package com.taskmaster.taskmaster.controller;
 import com.midtrans.httpclient.error.MidtransError;
 import com.taskmaster.taskmaster.configuration.midtrans.MidtransConfiguration;
 import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
-import com.taskmaster.taskmaster.model.request.CancelOrderRequest;
 import com.taskmaster.taskmaster.model.request.EnrollFreeStudiesRequest;
 import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
 import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
@@ -19,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,12 +30,44 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/order")
+@RequestMapping("/api/v1/orders")
 public class OrderController {
 
     private final OrderService orderService;
 
     private final MidtransConfiguration midtransConfig;
+
+    // API Path for Admin Role
+
+    @GetMapping(
+        path = "/{userId}",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public PagingWebResponse<List<GetAllOrderResponse>> getAllUserOrders(
+        @RequestParam(name = "userId") Long userId,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        Page<GetAllOrderResponse> orderResponsePage = orderService.getAllUserOrders(userId, page, size);
+        List<GetAllOrderResponse> orderResponses = orderResponsePage.getContent();
+
+        return PagingWebResponse.<List<GetAllOrderResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(orderResponses)
+            .paging(PagingResponse.builder()
+                .currentPage(page)
+                .size(size)
+                .totalPage(orderResponsePage.getTotalPages())
+                .totalElement(orderResponsePage.getTotalElements())
+                .empty(orderResponsePage.isEmpty())
+                .first(orderResponsePage.isFirst())
+                .last(orderResponsePage.isLast())
+                .build())
+            .build();
+    }
+
+    // API Path for User Role
 
     @PostMapping(
         path = "/checkout",
@@ -57,32 +89,16 @@ public class OrderController {
                 .build());
     }
 
-    @PostMapping(
-        path = "/cancel-order",
-        consumes = MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public WebResponse<String> cancelOrder(
-        @Valid @RequestBody CancelOrderRequest request
-    ) {
-        orderService.cancelOrder(request);
-
-        return WebResponse.<String>builder()
-            .code(HttpStatus.OK.value())
-            .message(HttpStatus.OK.getReasonPhrase())
-            .build();
-    }
-
     @GetMapping(
-        path = "/users",
+        path = "/me",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public PagingWebResponse<List<GetAllOrderResponse>> getAllORderResponse(
-        @RequestParam(name = "username") String username,
+    public PagingWebResponse<List<GetAllOrderResponse>> getAllMyOrders(
+        @RequestParam(name = "userId") Long userId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetAllOrderResponse> orderResponsePage = orderService.getAllOrders(username, page, size);
+        Page<GetAllOrderResponse> orderResponsePage = orderService.getAllUserOrders(userId, page, size);
         List<GetAllOrderResponse> orderResponses = orderResponsePage.getContent();
 
         return PagingWebResponse.<List<GetAllOrderResponse>>builder()
@@ -98,6 +114,21 @@ public class OrderController {
                 .first(orderResponsePage.isFirst())
                 .last(orderResponsePage.isLast())
                 .build())
+            .build();
+    }
+
+    @PostMapping(
+        path = "/{orderId}/cancel"
+    )
+    public WebResponse<String> cancelOrder(
+        @PathVariable(name = "orderId") Long orderId,
+        @RequestParam(name = "username") String username
+    ) {
+        orderService.cancelOrder(orderId, username);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
             .build();
     }
 
