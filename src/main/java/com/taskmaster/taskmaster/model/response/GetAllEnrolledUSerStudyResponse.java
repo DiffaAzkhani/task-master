@@ -16,7 +16,7 @@ public class GetAllEnrolledUSerStudyResponse {
 
     private String code;
 
-    private String name;
+    private String studyName;
 
     private StudyCategory category;
 

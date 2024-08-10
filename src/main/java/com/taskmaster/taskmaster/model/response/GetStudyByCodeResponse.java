@@ -16,7 +16,7 @@ public class GetStudyByCodeResponse {
 
     private String code;
 
-    private String name;
+    private String studyName;
 
     private Integer price;
 

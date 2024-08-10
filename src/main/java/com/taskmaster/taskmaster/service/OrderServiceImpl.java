@@ -15,8 +15,6 @@ import com.taskmaster.taskmaster.enums.OrderStatus;
 import com.taskmaster.taskmaster.enums.StudyType;
 import com.taskmaster.taskmaster.mapper.OrderMapper;
 import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
-import com.taskmaster.taskmaster.model.request.EnrollFreeStudiesRequest;
-import com.taskmaster.taskmaster.model.request.FreeItemsDetailRequest;
 import com.taskmaster.taskmaster.model.request.ItemDetailsRequest;
 import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
 import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
@@ -30,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -130,18 +129,19 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public void cancelOrder(Long orderId, String username) {
-        validationService.validateUser(username);
+    public void cancelOrder(String orderId) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(currentUser)
             .orElseThrow(() -> {
-               log.info("User with username:{}, not found!", username);
+               log.info("User with username:{}, not found!", currentUser);
                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found!");
             });
 
         Order userOrder = orderRepository.findByUserAndId(user, orderId)
             .orElseThrow(() -> {
-                log.info("Order with id:{} in user with username:{}, not found!", orderId, username);
+                log.info("Order with id:{} in user with username:{}, not found!", orderId, currentUser);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Order in user not found!");
             });
 
@@ -150,7 +150,7 @@ public class OrderServiceImpl implements OrderService{
         }
 
         if (!userOrder.getStatus().equals(OrderStatus.PROCESSING)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order cannot be cancelled in current status!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order already cancelled!");
         }
 
         userOrder.setStatus(OrderStatus.CANCELED);
@@ -161,15 +161,39 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GetAllOrderResponse> getAllUserOrders(Long userId, int page, int size) {
+    public Page<GetAllOrderResponse> getAllUserOrders(int page, int size) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUsername(currentUser)
             .orElseThrow(() -> {
-               log.info("User with id:{}, not found!", userId);
+               log.info("User with username:{}, not found!", currentUser);
                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
-        validationService.validateUser(user.getUsername());
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Order> orderPage = orderRepository.findByUser(user, pageRequest);
+
+        List<GetAllOrderResponse> getAllOrderResponses = orderPage.getContent().stream()
+            .map(orderMapper::toGetAllUserOrdersResponse)
+            .collect(Collectors.toList());
+
+        log.info("Success to get all user orders!");
+
+        return new PageImpl<>(getAllOrderResponses, pageRequest, orderPage.getTotalElements());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<GetAllOrderResponse> getUserOrdersAdmin(Long userId, int page, int size) {
+        log.info("User roles: {}", SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> {
+                log.info("User with id:{}, not found!", userId);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+            });
+
 
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Order> orderPage = orderRepository.findByUser(user, pageRequest);
@@ -212,32 +236,31 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public void enrollFreeStudies(EnrollFreeStudiesRequest request) {
-        validationService.validateUser(request.getUsername());
+    public void enrollFreeStudies(String studyCode) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByUsername(currentUser)
             .orElseThrow(() -> {
-                log.info("User with username:{}, not found!", request.getUsername());
+                log.info("User with username:{}, not found!", currentUser);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
-        for (FreeItemsDetailRequest studyList : request.getFreeItemsDetailRequestList()) {
-            Study study = studyRepository.findByCode(studyList.getStudyCode())
-                .orElseThrow(() -> {
-                    log.info("Study with studyCode:{}, not found!", studyList.getStudyCode());
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
-                });
+        Study study = studyRepository.findByCode(studyCode)
+            .orElseThrow(() -> {
+                log.info("Study with studyCode:{}, not found!", studyCode);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
+            });
 
-            if (userRepository.existsByUsernameAndStudies(user.getUsername(), study)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "User has already enroll this study!");
-            }
-
-            if (!study.getType().equals(StudyType.FREE)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Study type must be Free!");
-            }
-
-            user.getStudies().add(study);
+        if (userRepository.existsByUsernameAndStudies(user.getUsername(), study)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User has already enroll this study!");
         }
+
+        if (!study.getType().equals(StudyType.FREE)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Study type must be Free!");
+        }
+
+        user.getStudies().add(study);
 
         userRepository.save(user);
     }

@@ -31,7 +31,7 @@ public class StudyMapper {
     public GetStudyByCodeResponse toGetStudyResponse(Study study) {
         return GetStudyByCodeResponse.builder()
             .code(study.getCode())
-            .name(study.getName())
+            .studyName(study.getName())
             .price(study.getPrice())
             .discount(study.getDiscount())
             .description(study.getDescription())
@@ -59,7 +59,7 @@ public class StudyMapper {
     public UpdateStudyResponse toUpdateStudyResponse(Study study) {
         return UpdateStudyResponse.builder()
             .code(study.getCode())
-            .name(study.getName())
+            .studyName(study.getName())
             .price(study.getPrice())
             .discount(study.getDiscount())
             .description(study.getDescription())
@@ -75,7 +75,7 @@ public class StudyMapper {
     public GetAllEnrolledUSerStudyResponse toGetEnrolledUserStudyResponse(Study study) {
         return GetAllEnrolledUSerStudyResponse.builder()
             .code(study.getCode())
-            .name(study.getName())
+            .studyName(study.getName())
             .type(study.getType())
             .level(study.getLevel())
             .category(study.getCategory())

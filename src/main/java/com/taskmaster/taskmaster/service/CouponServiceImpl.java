@@ -24,8 +24,6 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional
     public AddCouponResponse addCoupon(AddCouponRequest request) {
-        log.info("Recived add coupon request: {}", request);
-
         if (Boolean.TRUE.equals(couponRepository.existsByCode(request.getCode()))) {
             log.info("Coupon with code: {}, already exists!", request.getCode());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Coupon already exists");

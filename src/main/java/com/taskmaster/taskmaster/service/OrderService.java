@@ -2,7 +2,6 @@ package com.taskmaster.taskmaster.service;
 
 import com.midtrans.httpclient.error.MidtransError;
 import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
-import com.taskmaster.taskmaster.model.request.EnrollFreeStudiesRequest;
 import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
 import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
 import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
@@ -12,12 +11,14 @@ public interface OrderService {
 
     CheckoutMidtransResponse completeCheckout(MidtransTransactionRequest request) throws MidtransError;
 
-    void cancelOrder(Long orderId,  String username);
+    void cancelOrder(String orderId);
 
-    Page<GetAllOrderResponse> getAllUserOrders(Long userId, int page, int size);
+    Page<GetAllOrderResponse> getAllUserOrders(int page, int size);
+
+    Page<GetAllOrderResponse> getUserOrdersAdmin(Long userId, int page, int size);
 
     void handleAfterPayments(AfterPaymentsRequest request);
 
-    void enrollFreeStudies(EnrollFreeStudiesRequest request);
+    void enrollFreeStudies(String studyCode);
 
 }

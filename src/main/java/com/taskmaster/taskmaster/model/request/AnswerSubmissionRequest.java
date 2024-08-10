@@ -5,10 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
@@ -16,11 +13,10 @@ import java.util.List;
 @Builder
 public class AnswerSubmissionRequest {
 
-    @NotBlank(message = "Username is required")
-    @Size(max = 100, message = "Username should not be more than 100 characters")
-    private String username;
+    @NotNull(message = "Answer Option ID cannot be null")
+    private Long questionId;
 
-    @Valid
-    private List<AnswerSubmission> submissionList;
+    @NotNull(message = "Answer Option ID cannot be null")
+    private Long answerId;
 
 }
