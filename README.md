@@ -1,76 +1,57 @@
 # Task Master
-## Personal Project Portfolio
 
-Task Master is a web backend application providing services/API endpoint for practicing school subject questions and explanations
+## Overview
 
-## Features (not finish yet)
+`Task Master` is an educational platform designed to enhance students' understanding across various subjects through interactive quizzes and detailed explanations. Task Master backend project develop using `Java 8`, `Spring Boot 2.7.16`, and `PostgreSQL`, Task Master following to the `Model-View-Controller (MVC)` design pattern, ensuring a clear separation of concerns between data, user interface, and control logic.
 
-### User
-- Register User
-- Delete Account User
-- Get User Enrolled Study
-- Get User Profile
-- Update User Profile
+The platform implements `Role-Based Access Control (RBAC)` to manage user permissions effectively, allowing different levels of access and functionality depending on the user's role, such as user, or administrators. This ensures a secure and scalable system where each user interacts with the platform according to their specific permissions.
 
-### Admin
-- Get All User
-- Get User By Username
-- Delete User
-- Update User
-- Get All Study
-- Get Study By Code
-- Create New Study
-- Delete Study By Code
-- Update Study By Code
+Task Master provides a wide range of services through its `RESTful API`, which follows REST principles to enable smooth communication between the client and server. This architecture supports the platform’s ability to deliver interactive and dynamic educational content, making it a versatile tool for both students and educators.
 
-### Study for User
-- Get Study By Code
-- Get All Study
+## Configuration
 
-### Question and Answer
-- Add Question and Answer
-- Get All Question and Answer in specific study
-- Save User Submission
-- Grade User Submission
-- Get Explanation and User Answer
+### Application Configuration
 
-### Coupon
-- Add Coupon
+1. **Database Configuration**:
+    - Open `src/main/resources/application.properties`
+    - Set your PostgreSQL connection details:
 
-### Authentication
-- Login User
+   ```properties
+   spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
+   spring.datasource.username=your_username
+   spring.datasource.password=your_password
 
-### Order
-- Checkout (For premium studies)
-- Cancel Order
-- Get All Orders in specific User
-- Handle After Payments (Midtrans - Webhook) -> "Unfinished"
-- Enroll Free Study (Use this path to enroll free studies)
+2. **Build Steps**:
+    - Clone the repository:
 
-### Cart
-- Add Cart
-- Delete Cart
-- Get All User Cart Items
+    ```bash
+    git clone https://github.com/DiffaAzkhani/task-master.git
+    
+   cd task-master
+    ```
 
-  
-## Tech Stack
+    - Install dependencies and build the application:
 
-- [Java 8] - Main programming language for backend development.
-- [Spring Boot 2.7.16] - Framework for building web applications.
-- [PostgreSQL] - Relational database management system for data storage and retrieval.
+    ```bash
+    mvn clean install
+    ```
 
-## Installation
+    - Run the application:
 
-Nowadays, just believe in magic I mean 😏🌠
+    ```bash
+    mvn spring-boot:run
+    ```
+3. **Access the Application**
+   - Once the application is running, it will be accessible at http://localhost:8080. 
+   - You can interact with the API using tools like Postman or [Swagger](http://localhost:8080/swagger-ui/index.html#/)
+   - Considering that it has not been deployed on the server yet, this application can only be run locally
 
-## Development
-
-Want to contribute? lol no I'm joking, this is mine just go away, this project is already work as it is! 🤣
-
-## Swagger Documentation
-
-To provide an easy way to explore the API documentation, I have integrated Swagger. You can access the Swagger UI at the following URL:
-
-[Swagger - Local Link](http://localhost:8080/swagger-ui/index.html#/)
-
-But first, you need to run my project locally, as it has not yet been deployed to a server
+## API Documentation
+Detailed API documentation is available in the `docs/` folder. Below are the links to specific sections:
+- [Authentication Docs](docs/authentication.md)
+- [User Docs](docs/user.md)
+- [Study Docs](docs/study.md)
+- [Question and Answer Docs](docs/question-answer.md)
+- [Order Docs](docs/order.md)
+- [Coupon Docs](docs/coupon.md)
+- [Cart Docs](docs/cart.md)

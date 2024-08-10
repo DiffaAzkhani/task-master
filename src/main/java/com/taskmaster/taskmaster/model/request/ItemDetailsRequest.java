@@ -18,9 +18,8 @@ import javax.validation.constraints.Size;
 @Builder
 public class ItemDetailsRequest {
 
-    @NotBlank(message = "Study Code is required")
-    @Size(max = 13, message = "Study Code should be 13 characters")
-    private String id;
+    @NotNull(message = "Study id is required")
+    private Long id;
 
     @NotBlank(message = "Name is required")
     @Size(min = 3, max = 100, message = "Study Name should be between 3 and 100 characters")
