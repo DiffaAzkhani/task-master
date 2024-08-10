@@ -16,7 +16,7 @@ public class UpdateStudyResponse {
 
     private String code;
 
-    private String name;
+    private String studyName;
 
     private Integer price;
 

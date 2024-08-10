@@ -1,6 +1,5 @@
 package com.taskmaster.taskmaster.controller;
 
-import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
 import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
@@ -38,8 +37,6 @@ public class UserController {
 
     private final UserService userService;
 
-    // API Path for Admin Role
-
     @GetMapping(
         produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -70,10 +67,10 @@ public class UserController {
         path = "/{userId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<GetUserForAdminResponse> getUserById(
+    public WebResponse<GetUserForAdminResponse> getUserByIdForAdmin(
         @PathVariable(name = "userId") Long userId
     ) {
-        GetUserForAdminResponse getUserForAdminResponse = userService.getUser(userId);
+        GetUserForAdminResponse getUserForAdminResponse = userService.getUserForAdmin(userId);
 
         return WebResponse.<GetUserForAdminResponse>builder()
             .code(HttpStatus.OK.value())
@@ -87,11 +84,11 @@ public class UserController {
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<UpdateUserProfileResponse> updateUserById(
+    public WebResponse<UpdateUserProfileResponse> updateUserByIdForAdmin(
         @PathVariable(name = "userId") Long userId,
         @Valid @RequestBody UpdateUserProfileRequest request
     ) {
-        UpdateUserProfileResponse userResponse = userService.updateUserProfile(userId, request);
+        UpdateUserProfileResponse userResponse = userService.updateUserProfileForAdmin(userId, request);
 
         return WebResponse.<UpdateUserProfileResponse>builder()
             .code(HttpStatus.OK.value())
@@ -100,13 +97,11 @@ public class UserController {
             .build();
     }
 
-    @DeleteMapping(
-        consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    public WebResponse<String> deleteUserById(
-        @Valid @RequestBody DeleteUserRequest deleteUserRequest
+    @DeleteMapping
+    public WebResponse<String> deleteUserByIdForAdmin(
+        @RequestParam(name = "username") String username
     ) {
-        userService.deleteUserAccount(deleteUserRequest);
+        userService.deleteUserAccountForAdmin(username);
 
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
@@ -135,13 +130,12 @@ public class UserController {
     }
 
     @DeleteMapping(
-        path = "/me",
-        consumes = MediaType.APPLICATION_JSON_VALUE
+        path = "/me"
     )
     public WebResponse<String> deleteUser(
-        @Valid @RequestBody DeleteUserRequest deleteUserRequest
+        @RequestParam(name = "password") String password
     ) {
-        userService.deleteUserAccount(deleteUserRequest);
+        userService.deleteUserAccountForUser(password);
 
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
@@ -155,10 +149,9 @@ public class UserController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<UpdateUserProfileResponse> updateUserProfile(
-        @RequestParam(name = "usedId") Long userId,
         @Valid @RequestBody UpdateUserProfileRequest request
     ) {
-        UpdateUserProfileResponse userResponse = userService.updateUserProfile(userId, request);
+        UpdateUserProfileResponse userResponse = userService.updateUserProfileForUser(request);
 
         return WebResponse.<UpdateUserProfileResponse>builder()
             .code(HttpStatus.OK.value())
@@ -172,11 +165,10 @@ public class UserController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public PagingWebResponse<List<GetAllEnrolledUSerStudyResponse>> getAllEnrolledUserStudy(
-        @RequestParam(name = "username") String username,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetAllEnrolledUSerStudyResponse> responsePage = userService.getEnrolledUserStudy(username, page, size);
+        Page<GetAllEnrolledUSerStudyResponse> responsePage = userService.getEnrolledUserStudy(page, size);
         List<GetAllEnrolledUSerStudyResponse> allEnrolledUSerStudyResponses = responsePage.getContent();
 
         return PagingWebResponse.<List<GetAllEnrolledUSerStudyResponse>>builder()
@@ -200,9 +192,8 @@ public class UserController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<GetUserProfileResponse> getUserProfile(
-        @RequestParam(name = "username") String username
     ) {
-        GetUserProfileResponse userProfileResponse = userService.getUserProfile(username);
+        GetUserProfileResponse userProfileResponse = userService.getUserProfile();
 
         return WebResponse.<GetUserProfileResponse>builder()
             .code(HttpStatus.OK.value())

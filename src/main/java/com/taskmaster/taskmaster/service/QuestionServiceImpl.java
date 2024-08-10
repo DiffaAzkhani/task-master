@@ -10,11 +10,10 @@ import com.taskmaster.taskmaster.entity.UserGrade;
 import com.taskmaster.taskmaster.mapper.QuestionMapper;
 import com.taskmaster.taskmaster.mapper.UserGradeMapper;
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
-import com.taskmaster.taskmaster.model.request.AnswerSubmission;
 import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetQuestionExplanationResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
 import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.repository.AnswerRepository;
 import com.taskmaster.taskmaster.repository.QuestionRepository;
@@ -99,23 +98,57 @@ public class QuestionServiceImpl implements QuestionService{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GetAllQuestionResponse> getQuestionForStudy(Long studyId, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        List<Question> questionList = questionRepository.findByStudyId(studyId);
+    public Page<GetQuestionsResponse> getQuestionAndAnswerForUser(Long studyId, int page, int size) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!"));
+
+        User user = userRepository.findByUsername(currentUser)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+
+        if (!userRepository.existsByUsernameAndStudies(user.getUsername(), study)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User doesn't have this study!");
+        }
+
+        List<Question> questionList = questionRepository.findByStudyId(studyId);
         Collections.shuffle(questionList);
 
-        return pagingQuestion(pageRequest, questionList);
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Question> questionPage = questionRepository.findByStudy(study, pageRequest);
+
+        List<GetQuestionsResponse> getQuestionsResponses = questionPage.getContent().stream()
+            .map(questionMapper::toGetQuestionResponse)
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(getQuestionsResponses, pageRequest, questionPage.getTotalElements());
+    }
+
+    @Override
+    public Page<GetQuestionsResponse> getQuestionAndAnswerForAdmin(Long studyId, int page, int size) {
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!"));
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Question> questionPage = questionRepository.findByStudy(study, pageRequest);
+
+        List<GetQuestionsResponse> getQuestionsResponses = questionPage.getContent().stream()
+            .map(questionMapper::toGetQuestionResponse)
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(getQuestionsResponses, pageRequest, questionPage.getTotalElements());
     }
 
     @Override
     @Transactional
     public void answerSubmission(Long studyId, AnswerSubmissionRequest request) {
-        validationService.validateUser(request.getUsername());
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByUsername(currentUser)
             .orElseThrow(() -> {
-               log.info("User with username:{}, not found!", request.getUsername());
+               log.info("User with username:{}, not found!", currentUser);
                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
@@ -129,43 +162,42 @@ public class QuestionServiceImpl implements QuestionService{
             throw  new ResponseStatusException(HttpStatus.FORBIDDEN,"User didn't buy this study");
         }
 
-        for (AnswerSubmission submission : request.getSubmissionList()) {
-            Question question = questionRepository.findByIdAndStudy(submission.getQuestionId(), study)
-                .orElseThrow(() -> {
-                    log.info("Question ID not found!");
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND,"Question ID not found!");
-                });
+        Question question = questionRepository.findByIdAndStudy(request.getQuestionId(), study)
+            .orElseThrow(() -> {
+                log.info("Question ID not found!");
+                return new ResponseStatusException(HttpStatus.NOT_FOUND,"Question ID not found!");
+            });
 
-            Answer answer = answerRepository.findByIdAndQuestion(submission.getAnswerId(), question)
-                .orElseThrow(() -> {
-                    log.info("Answer ID not found!");
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND,"Answer ID not found!");
-                });
+        Answer answer = answerRepository.findByIdAndQuestion(request.getAnswerId(), question)
+            .orElseThrow(() -> {
+                log.info("Answer ID not found!");
+                return new ResponseStatusException(HttpStatus.NOT_FOUND,"Answer ID not found!");
+            });
 
-            if (userAnswerRepository.existsByUserAndQuestion(user, question)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User has already answer this question!");
-            }
-
-            UserAnswer userAnswer = UserAnswer.builder()
-                .user(user)
-                .question(question)
-                .answer(answer)
-                .answeredAt(TimeUtil.getFormattedLocalDateTimeNow())
-                .build();
-
-            userAnswerRepository.save(userAnswer);
-            log.info("Success to save user answer");
+        if (userAnswerRepository.existsByUserAndQuestion(user, question)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User has already answer this question!");
         }
+
+        UserAnswer userAnswer = UserAnswer.builder()
+            .user(user)
+            .question(question)
+            .answer(answer)
+            .answeredAt(TimeUtil.getFormattedLocalDateTimeNow())
+            .build();
+
+        userAnswerRepository.save(userAnswer);
+        log.info("Success to save user answer");
     }
 
     @Override
     @Transactional
-    public GradeSubmissionResponse gradeSubmission(Long studyId, String username) {
-        validationService.validateUser(username);
+    public GradeSubmissionResponse gradeSubmission(Long studyId) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(currentUser)
             .orElseThrow(() -> {
-                log.info("User with username:{}, not found!", username);
+                log.info("User with username:{}, not found!", currentUser);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
@@ -174,6 +206,10 @@ public class QuestionServiceImpl implements QuestionService{
                 log.info("Study with id:{}, not found!", studyId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
             });
+
+        if (userGradeRepository.existsByUserAndStudy(user, study)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User has already completed this study question and received a score!");
+        }
 
         List<Question> questionList = questionRepository.findByStudy(study);
 
@@ -206,12 +242,13 @@ public class QuestionServiceImpl implements QuestionService{
 
     @Override
     @Transactional(readOnly = true)
-    public GetQuestionExplanationResponse getExplanationAndUserAnswer(String username, Long studyId) {
-        validationService.validateUser(username);
+    public GetExplanationResponse getExplanationAndUserAnswer(Long studyId) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(currentUser)
             .orElseThrow(() -> {
-                log.info("User with username:{}, not found!", username);
+                log.info("User with username:{}, not found!", currentUser);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
@@ -224,7 +261,7 @@ public class QuestionServiceImpl implements QuestionService{
         List<UserAnswer> userAnswerList = userAnswerRepository.findByUserAndQuestionStudy(user, study);
         UserGrade userGrade = userGradeRepository.findByUserAndStudy(user, study);
 
-        return questionMapper.toGetAllQuestionExplanationResponse(userAnswerList, userGrade);
+        return questionMapper.toGetAllExplanationResponse(userAnswerList ,userGrade);
     }
 
     private int countUserSubmission(List<UserAnswer> userAnswerList, List<Question> questionList) {
@@ -241,24 +278,6 @@ public class QuestionServiceImpl implements QuestionService{
         }
 
         return (correctAnswers / totalQuestion) * 100;
-    }
-
-    private Page<GetAllQuestionResponse> pagingQuestion(PageRequest pageRequest, List<Question> question) {
-
-        List<GetAllQuestionResponse> questionResponse = paginateAndConvertToResponse(pageRequest, question);
-
-        return new PageImpl<>(questionResponse, pageRequest, questionResponse.size());
-    }
-
-    private List<GetAllQuestionResponse> paginateAndConvertToResponse(PageRequest pageRequest, List<Question> questionList) {
-        int start = (int) pageRequest.getOffset();
-        int end = Math.min(start + pageRequest.getPageSize(), questionList.size());
-
-        List<Question> pageContent = questionList.subList(start, end);
-
-        return pageContent.stream()
-            .map(questionMapper::toGetQuestionResponse)
-            .collect(Collectors.toList());
     }
 
 }

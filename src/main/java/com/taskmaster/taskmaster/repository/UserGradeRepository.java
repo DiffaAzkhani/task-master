@@ -11,4 +11,6 @@ public interface UserGradeRepository extends JpaRepository<UserGrade, Long> {
 
     UserGrade findByUserAndStudy(User user, Study study);
 
+    boolean existsByUserAndStudy(User user, Study study);
+
 }

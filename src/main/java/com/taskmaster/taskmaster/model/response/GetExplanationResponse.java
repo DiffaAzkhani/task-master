@@ -5,20 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class GetExplanationResponse {
 
-    private String questionText;
+    private String userScore;
 
-    private String explanation;
-
-    private String userAnswer;
-
-    private boolean isCorrect;
-
-    private String imageUrl;
+    private List<GetQuestionResponse> explanationList;
 
 }

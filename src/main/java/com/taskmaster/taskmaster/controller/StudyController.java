@@ -40,8 +40,6 @@ public class StudyController {
 
     private final StudyService studyService;
 
-    // API Path for Admin Role
-
     @GetMapping(
         produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -138,7 +136,5 @@ public class StudyController {
             .message(HttpStatus.OK.getReasonPhrase())
             .build();
     }
-
-    // API Path for User Role
 
 }

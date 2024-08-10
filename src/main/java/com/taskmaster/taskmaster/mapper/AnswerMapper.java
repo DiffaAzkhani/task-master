@@ -10,7 +10,7 @@ public class AnswerMapper {
 
     public AnswerResponse toAnswerResponse(Answer answer) {
         return AnswerResponse.builder()
-            .id(answer.getId())
+            .answerId(answer.getId())
             .answerText(answer.getAnswerText())
             .isCorrect(answer.getIsCorrect())
             .build();
@@ -18,7 +18,7 @@ public class AnswerMapper {
 
     public AnswerOptionResponse toAnswerOptionResponse(Answer answer) {
         return AnswerOptionResponse.builder()
-            .id(answer.getId())
+            .answerId(answer.getId())
             .answerText(answer.getAnswerText())
             .build();
     }

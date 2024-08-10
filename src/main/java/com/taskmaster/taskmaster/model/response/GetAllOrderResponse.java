@@ -17,8 +17,6 @@ public class GetAllOrderResponse {
 
     private String orderId;
 
-    private String courseName;
-
     private String completedAt;
 
     private OrderPaymentMethod paymentMethod;

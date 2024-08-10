@@ -24,7 +24,7 @@ public class AddQuestionRequest {
     @Size(max = 200, message = "Username should not be more than 200 characters")
     private String questionText;
 
-    @NotBlank(message = "Image URL Code is required")
+    @Size(max = 100, message = "Image URL should not be more than 100 characters")
     private String imageUrl;
 
     @NotBlank(message = "Explanation Code is required")

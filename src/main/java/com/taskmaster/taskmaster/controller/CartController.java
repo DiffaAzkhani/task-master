@@ -1,6 +1,6 @@
 package com.taskmaster.taskmaster.controller;
 
-import com.taskmaster.taskmaster.model.request.AddCartRequest;
+import com.taskmaster.taskmaster.model.request.AddCartItemRequest;
 import com.taskmaster.taskmaster.model.response.GetCartItemsResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.PagingWebResponse;
@@ -34,7 +34,7 @@ public class CartController {
         consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<String> addCartItem(
-        @Valid @RequestBody AddCartRequest request
+        @Valid @RequestBody AddCartItemRequest request
     ) {
         cartService.addCart(request);
 
@@ -48,10 +48,9 @@ public class CartController {
         path = "/items/{cartItemId}"
     )
     public WebResponse<String> deleteCartItemByIdAndUsername(
-        @PathVariable(name = "cartItemId") Long cartItemId,
-        @RequestParam(name = "username") String username
+        @PathVariable(name = "cartItemId") Long cartItemId
     ) {
-        cartService.deleteCartItem(cartItemId, username);
+        cartService.deleteCartItem(cartItemId);
 
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
@@ -63,11 +62,10 @@ public class CartController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public PagingWebResponse<List<GetCartItemsResponse>> getUserCartItems(
-        @RequestParam(name = "userId") Long userId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetCartItemsResponse> cartItemsResponsePage = cartService.getUserCartItems(userId, page, size);
+        Page<GetCartItemsResponse> cartItemsResponsePage = cartService.getUserCartItems(page, size);
         List<GetCartItemsResponse> itemsResponses = cartItemsResponsePage.getContent();
 
         return PagingWebResponse.<List<GetCartItemsResponse>>builder()

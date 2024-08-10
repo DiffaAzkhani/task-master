@@ -11,14 +11,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetQuestionExplanationResponse {
+public class GetQuestionsResponse {
 
-    private String username;
+    private Long studyId;
 
-    private String studyCode;
+    private Long questionId;
 
-    private List<GetExplanationResponse> explanationResponseList;
+    private String questionText;
 
-    private String userScore;
+    private String imageUrl;
+
+    private List<AnswerOptionResponse> answers;
 
 }

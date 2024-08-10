@@ -6,7 +6,6 @@ import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.enums.UserRole;
 import com.taskmaster.taskmaster.mapper.StudyMapper;
 import com.taskmaster.taskmaster.mapper.UserMapper;
-import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
 import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
@@ -85,17 +84,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUserAccount(DeleteUserRequest request) {
-        User user = userRepository.findByUsernameOrEmail(request.getUsernameOrEmail(), request.getUsernameOrEmail())
+    public void deleteUserAccountForAdmin(String username) {
+        User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User or email not found"));
 
-        validationService.validateUser(user.getUsername());
+        userRepository.delete(user);
+    }
 
-        if (!"DELETE".equals(request.getConfirmationWord())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Confirmation password is invalid");
-        }
+    @Override
+    @Transactional
+    public void deleteUserAccountForUser(String password) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        User user = userRepository.findByUsername(currentUser)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found!"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
         }
 
@@ -104,15 +109,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UpdateUserProfileResponse updateUserProfile(Long userId, UpdateUserProfileRequest request) {
-
+    public UpdateUserProfileResponse updateUserProfileForAdmin(Long userId, UpdateUserProfileRequest request) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
                 log.info("User with id:{} not found!", userId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "username not found!");
             });
 
-        validationService.validateUser(user.getUsername());
+        updateUserProperties(user, request);
+
+        userRepository.save(user);
+        log.info("Success to update user!");
+
+        return userMapper.toUpdateUserResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public UpdateUserProfileResponse updateUserProfileForUser(UpdateUserProfileRequest request) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
+
+        User user = userRepository.findByUsername(currentUser)
+            .orElseThrow(() -> {
+                log.info("User with username:{} not found!", currentUser);
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "username not found!");
+            });
 
         updateUserProperties(user, request);
 
@@ -139,7 +161,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public GetUserForAdminResponse getUser(Long userId) {
+    public GetUserForAdminResponse getUserForAdmin(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
                 log.info("User with id:{}, not found!", userId);
@@ -151,15 +173,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GetAllEnrolledUSerStudyResponse> getEnrolledUserStudy(String username, int page, int size) {
-        validationService.validateUser(username);
+    public Page<GetAllEnrolledUSerStudyResponse> getEnrolledUserStudy(int page, int size) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
-        if (!userRepository.existsByUsername(username)) {
+        if (!userRepository.existsByUsername(currentUser)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
         }
 
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Study> studyPage = studyRepository.findByUsers_Username(username, pageRequest);
+        Page<Study> studyPage = studyRepository.findByUsers_Username(currentUser, pageRequest);
 
         List<GetAllEnrolledUSerStudyResponse> allEnrolledUSerStudyList = studyPage.getContent().stream()
             .map(studyMapper::toGetEnrolledUserStudyResponse)
@@ -172,12 +195,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public GetUserProfileResponse getUserProfile(String username) {
-        validationService.validateUser(username);
+    public GetUserProfileResponse getUserProfile() {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(currentUser)
             .orElseThrow(() -> {
-                log.info("User with username:{}, not found!", username);
+                log.info("User with username:{}, not found!", currentUser);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
