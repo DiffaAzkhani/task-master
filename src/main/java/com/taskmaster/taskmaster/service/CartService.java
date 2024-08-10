@@ -1,15 +1,15 @@
 package com.taskmaster.taskmaster.service;
 
-import com.taskmaster.taskmaster.model.request.AddCartRequest;
+import com.taskmaster.taskmaster.model.request.AddCartItemRequest;
 import com.taskmaster.taskmaster.model.response.GetCartItemsResponse;
 import org.springframework.data.domain.Page;
 
 public interface CartService {
 
-    void addCart(AddCartRequest request);
+    void addCart(AddCartItemRequest request);
 
-    void deleteCartItem(Long cartItemId, String username);
+    void deleteCartItem(Long cartItemId);
 
-    Page<GetCartItemsResponse> getUserCartItems(Long userId, int page, int size);
+    Page<GetCartItemsResponse> getUserCartItems(int page, int size);
 
 }

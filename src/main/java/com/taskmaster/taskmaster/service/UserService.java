@@ -1,6 +1,5 @@
 package com.taskmaster.taskmaster.service;
 
-import com.taskmaster.taskmaster.model.request.DeleteUserRequest;
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
 import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
@@ -15,16 +14,20 @@ public interface UserService {
 
     RegisterResponse register(RegisterRequest request);
 
-    void deleteUserAccount(DeleteUserRequest request);
+    void deleteUserAccountForAdmin(String username);
 
-    UpdateUserProfileResponse updateUserProfile(Long userId, UpdateUserProfileRequest request);
+    void deleteUserAccountForUser(String password);
+
+    UpdateUserProfileResponse updateUserProfileForAdmin(Long userId, UpdateUserProfileRequest request);
+
+    UpdateUserProfileResponse updateUserProfileForUser(UpdateUserProfileRequest request);
 
     Page<GetAllUsersResponse> getAllUsers(int page, int size);
 
-    GetUserForAdminResponse getUser(Long userId);
+    GetUserForAdminResponse getUserForAdmin(Long userId);
 
-    Page<GetAllEnrolledUSerStudyResponse> getEnrolledUserStudy(String username, int page, int size);
+    Page<GetAllEnrolledUSerStudyResponse> getEnrolledUserStudy(int page, int size);
 
-    GetUserProfileResponse getUserProfile(String username);
+    GetUserProfileResponse getUserProfile();
 
 }

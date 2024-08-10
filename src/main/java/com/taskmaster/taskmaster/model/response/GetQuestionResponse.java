@@ -5,22 +5,25 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetAllQuestionResponse {
+public class GetQuestionResponse {
 
-    private Long studyId;
-
-    private Long id;
+    private String questionId;
 
     private String questionText;
 
+    private String explanation;
+
     private String imageUrl;
 
-    private List<AnswerOptionResponse> answers;
+    private Long answerId;
+
+    private String answerText;
+
+    private boolean isCorrect;
+
 
 }

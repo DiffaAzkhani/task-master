@@ -3,7 +3,6 @@ package com.taskmaster.taskmaster.controller;
 import com.midtrans.httpclient.error.MidtransError;
 import com.taskmaster.taskmaster.configuration.midtrans.MidtransConfiguration;
 import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
-import com.taskmaster.taskmaster.model.request.EnrollFreeStudiesRequest;
 import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
 import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
 import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
@@ -37,18 +36,16 @@ public class OrderController {
 
     private final MidtransConfiguration midtransConfig;
 
-    // API Path for Admin Role
-
     @GetMapping(
         path = "/{userId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public PagingWebResponse<List<GetAllOrderResponse>> getAllUserOrders(
+    public PagingWebResponse<List<GetAllOrderResponse>> getUserOrdersAdmin(
         @RequestParam(name = "userId") Long userId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetAllOrderResponse> orderResponsePage = orderService.getAllUserOrders(userId, page, size);
+        Page<GetAllOrderResponse> orderResponsePage = orderService.getUserOrdersAdmin(userId, page, size);
         List<GetAllOrderResponse> orderResponses = orderResponsePage.getContent();
 
         return PagingWebResponse.<List<GetAllOrderResponse>>builder()
@@ -66,8 +63,6 @@ public class OrderController {
                 .build())
             .build();
     }
-
-    // API Path for User Role
 
     @PostMapping(
         path = "/checkout",
@@ -94,11 +89,10 @@ public class OrderController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public PagingWebResponse<List<GetAllOrderResponse>> getAllMyOrders(
-        @RequestParam(name = "userId") Long userId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetAllOrderResponse> orderResponsePage = orderService.getAllUserOrders(userId, page, size);
+        Page<GetAllOrderResponse> orderResponsePage = orderService.getAllUserOrders(page, size);
         List<GetAllOrderResponse> orderResponses = orderResponsePage.getContent();
 
         return PagingWebResponse.<List<GetAllOrderResponse>>builder()
@@ -121,10 +115,9 @@ public class OrderController {
         path = "/{orderId}/cancel"
     )
     public WebResponse<String> cancelOrder(
-        @PathVariable(name = "orderId") Long orderId,
-        @RequestParam(name = "username") String username
+        @PathVariable(name = "orderId") String orderId
     ) {
-        orderService.cancelOrder(orderId, username);
+        orderService.cancelOrder(orderId);
 
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
@@ -152,13 +145,12 @@ public class OrderController {
     }
 
     @PostMapping(
-        path = "/enroll-free",
-        consumes = MediaType.APPLICATION_JSON_VALUE
+        path = "/enroll-free"
     )
     public WebResponse<String> enrollFreeStudies(
-        @Valid @RequestBody EnrollFreeStudiesRequest request
+        @RequestParam(name = "studyCode") String studyCode
     ) {
-        orderService.enrollFreeStudies(request);
+        orderService.enrollFreeStudies(studyCode);
 
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())

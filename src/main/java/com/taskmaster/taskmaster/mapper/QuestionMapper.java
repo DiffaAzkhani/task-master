@@ -3,10 +3,7 @@ package com.taskmaster.taskmaster.mapper;
 import com.taskmaster.taskmaster.entity.Question;
 import com.taskmaster.taskmaster.entity.UserAnswer;
 import com.taskmaster.taskmaster.entity.UserGrade;
-import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetQuestionExplanationResponse;
-import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
+import com.taskmaster.taskmaster.model.response.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -30,10 +27,10 @@ public class QuestionMapper {
             .build();
     }
 
-    public GetAllQuestionResponse toGetQuestionResponse(Question question) {
-        return GetAllQuestionResponse.builder()
+    public GetQuestionsResponse toGetQuestionResponse(Question question) {
+        return GetQuestionsResponse.builder()
             .studyId(question.getStudy().getId())
-            .id(question.getId())
+            .questionId(question.getId())
             .questionText(question.getQuestionText())
             .imageUrl(question.getImageUrl())
             .answers(question.getAnswers().stream()
@@ -42,22 +39,22 @@ public class QuestionMapper {
             .build();
     }
 
-    public GetQuestionExplanationResponse toGetAllQuestionExplanationResponse(List<UserAnswer> userAnswer, UserGrade userGrade) {
-        List<GetExplanationResponse> explanationResponseList = userAnswer.stream()
-            .map(questionExplanation -> GetExplanationResponse.builder()
-                .questionText(questionExplanation.getQuestion().getQuestionText())
-                .explanation(questionExplanation.getQuestion().getExplanation())
-                .userAnswer(questionExplanation.getAnswer().getAnswerText())
-                .isCorrect(questionExplanation.getAnswer().getIsCorrect())
-                .imageUrl(questionExplanation.getQuestion().getImageUrl())
+    public GetExplanationResponse toGetAllExplanationResponse(List<UserAnswer> userAnswerList, UserGrade userGrade) {
+        List<GetQuestionResponse> explanationList = userAnswerList.stream()
+            .map(questions -> GetQuestionResponse.builder()
+                .questionId(String.valueOf(questions.getId()))
+                .questionText(questions.getQuestion().getQuestionText())
+                .imageUrl(questions.getQuestion().getImageUrl())
+                .explanation(questions.getQuestion().getExplanation())
+                .answerId(questions.getAnswer().getId())
+                .answerText(questions.getAnswer().getAnswerText())
+                .isCorrect(questions.getAnswer().getIsCorrect())
                 .build())
             .collect(Collectors.toList());
 
-        return GetQuestionExplanationResponse.builder()
-            .username(userGrade.getUser().getUsername())
-            .studyCode(userGrade.getStudy().getCode())
-            .explanationResponseList(explanationResponseList)
+        return GetExplanationResponse.builder()
             .userScore(String.valueOf(userGrade.getScore()))
+            .explanationList(explanationList)
             .build();
     }
 

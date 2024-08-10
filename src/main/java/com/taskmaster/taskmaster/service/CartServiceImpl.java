@@ -5,8 +5,7 @@ import com.taskmaster.taskmaster.entity.CartItem;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.mapper.CartMapper;
-import com.taskmaster.taskmaster.model.request.AddCartRequest;
-import com.taskmaster.taskmaster.model.request.CartItemRequest;
+import com.taskmaster.taskmaster.model.request.AddCartItemRequest;
 import com.taskmaster.taskmaster.model.response.GetCartItemsResponse;
 import com.taskmaster.taskmaster.repository.CartItemRepository;
 import com.taskmaster.taskmaster.repository.CartRepository;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,12 +43,13 @@ public class CartServiceImpl implements CartService{
 
     @Override
     @Transactional
-    public void addCart(AddCartRequest request) {
-        validationService.validateUser(request.getUsername());
+    public void addCart(AddCartItemRequest request) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository.findByUsername(currentUser)
             .orElseThrow(() -> {
-                log.info("User with username:{}, not found!", request.getUsername());
+                log.info("User with username:{}, not found!", currentUser);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 
@@ -63,29 +62,23 @@ public class CartServiceImpl implements CartService{
                 return cartRepository.save(newCart);
             });
 
-        List<CartItem> cartItems = new ArrayList<>();
+        Study study = studyRepository.findByCode(request.getStudyCode())
+            .orElseThrow(() -> {
+                log.info("Study with code:{}, not found!", request.getStudyCode());
+                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study code not found!");
+            });
 
-        for (CartItemRequest cartItemsRequest : request.getItems()) {
-            Study study = studyRepository.findByCode(cartItemsRequest.getStudyCode())
-                .orElseThrow(() -> {
-                    log.info("Study with code:{}, not found!", cartItemsRequest.getStudyCode());
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study code not found!");
-                });
-
-            if (userRepository.existsByUsernameAndStudies(request.getUsername(), study)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "This study is already in user cart!");
-            }
-
-            CartItem cartItem = CartItem.builder()
-                .study(study)
-                .quantity(1)
-                .build();
-
-            cartItem.setCart(cart);
-            cartItems.add(cartItem);
+        if (userRepository.existsByUsernameAndStudies(currentUser, study)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This study is already in user cart!");
         }
 
-        cart.getItems().addAll(cartItems);
+        CartItem cartItem = CartItem.builder()
+            .study(study)
+            .quantity(1)
+            .cart(cart)
+            .build();
+
+        cart.getItems().add(cartItem);
 
         cartRepository.save(cart);
         log.info("Success to save cart!");
@@ -93,8 +86,9 @@ public class CartServiceImpl implements CartService{
 
     @Override
     @Transactional
-    public void deleteCartItem(Long cartItemId, String username) {
-        validationService.validateUser(username);
+    public void deleteCartItem(Long cartItemId) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
 
         CartItem cartItem = cartItemRepository.findById(cartItemId)
             .orElseThrow(() -> {
@@ -102,8 +96,8 @@ public class CartServiceImpl implements CartService{
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart item not found!");
             });
 
-        if (!cartItem.getCart().getUser().getUsername().equals(username)) {
-            log.info("User with username: {} does not have the cart item with id: {}", username, cartItemId);
+        if (!cartItem.getCart().getUser().getUsername().equals(currentUser)) {
+            log.info("User with username: {} does not have the cart item with id: {}", currentUser, cartItemId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not own this cart item!");
         }
 
@@ -113,11 +107,11 @@ public class CartServiceImpl implements CartService{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GetCartItemsResponse> getUserCartItems(Long userId, int page, int size) {
-
-        User user = userRepository.findById(userId)
+    public Page<GetCartItemsResponse> getUserCartItems(int page, int size) {
+        String currentUser = validationService.getCurrentUser();
+        User user = userRepository.findByUsername(currentUser)
             .orElseThrow(() -> {
-                log.info("User with id:{}, not found!", userId);
+                log.info("User with username:{}, not found!", currentUser);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
 

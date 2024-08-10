@@ -3,8 +3,8 @@ package com.taskmaster.taskmaster.controller;
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetAllQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetQuestionExplanationResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
 import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.PagingWebResponse;
@@ -53,15 +53,43 @@ public class QuestionAndAnswerController {
         path = "/questions/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public PagingWebResponse<List<GetAllQuestionResponse>> getQuestionAndAnswer(
+    public PagingWebResponse<List<GetQuestionsResponse>> getQuestionAndAnswerForAdmin(
         @RequestParam(name = "studyId") Long studyId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetAllQuestionResponse> questionResponsePage = questionService.getQuestionForStudy(studyId, page, size);
-        List<GetAllQuestionResponse> questionResponses = questionResponsePage.getContent();
+        Page<GetQuestionsResponse> questionResponsePage = questionService.getQuestionAndAnswerForAdmin(studyId, page, size);
+        List<GetQuestionsResponse> questionResponses = questionResponsePage.getContent();
 
-        return PagingWebResponse.<List<GetAllQuestionResponse>>builder()
+        return PagingWebResponse.<List<GetQuestionsResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(questionResponses)
+            .paging(PagingResponse.builder()
+                .currentPage(page)
+                .size(size)
+                .totalPage(questionResponsePage.getTotalPages())
+                .totalElement(questionResponsePage.getTotalElements())
+                .empty(questionResponses.isEmpty())
+                .first(questionResponsePage.isFirst())
+                .last(questionResponsePage.isLast())
+                .build())
+            .build();
+    }
+
+    @GetMapping(
+        path = "/me/questions/{studyId}",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public PagingWebResponse<List<GetQuestionsResponse>> getQuestionAndAnswerForUser(
+        @RequestParam(name = "studyId") Long studyId,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        Page<GetQuestionsResponse> questionResponsePage = questionService.getQuestionAndAnswerForUser(studyId, page, size);
+        List<GetQuestionsResponse> questionResponses = questionResponsePage.getContent();
+
+        return PagingWebResponse.<List<GetQuestionsResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(questionResponses)
@@ -98,10 +126,9 @@ public class QuestionAndAnswerController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<GradeSubmissionResponse> gradeSubmission(
-        @PathVariable(name = "studyId") Long studyId,
-        @RequestParam(name = "username") String username
+        @PathVariable(name = "studyId") Long studyId
     ) {
-        GradeSubmissionResponse gradeSubmissionResponse = questionService.gradeSubmission(studyId, username);
+        GradeSubmissionResponse gradeSubmissionResponse = questionService.gradeSubmission(studyId);
 
         return WebResponse.<GradeSubmissionResponse>builder()
             .code(HttpStatus.OK.value())
@@ -114,13 +141,12 @@ public class QuestionAndAnswerController {
         path = "/answers/study/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<GetQuestionExplanationResponse> getExplanationAndUserAnswer(
-        @RequestParam(name = "username") String username,
+    public WebResponse<GetExplanationResponse> getExplanationAndUserAnswer(
         @RequestParam(name = "studyId") Long studyId
     ) {
-        GetQuestionExplanationResponse explanationResponses = questionService.getExplanationAndUserAnswer(username, studyId);
+        GetExplanationResponse explanationResponses = questionService.getExplanationAndUserAnswer(studyId);
 
-        return WebResponse.<GetQuestionExplanationResponse>builder()
+        return WebResponse.<GetExplanationResponse>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(explanationResponses)

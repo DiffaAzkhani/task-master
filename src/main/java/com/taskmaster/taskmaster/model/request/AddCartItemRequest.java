@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CartItemRequest {
+public class AddCartItemRequest {
 
     @NotBlank(message = "Code is required")
     @Size(max = 13, message = "Study Code should be 13 characters")
