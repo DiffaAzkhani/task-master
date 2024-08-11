@@ -92,7 +92,7 @@ public class OrderServiceImpl implements OrderService{
         List<OrderItem> orderItems = new ArrayList<>();
 
         for (ItemDetailsRequest itemDetailsRequest : request.getItem_details()) {
-            Study study = studyRepository.findByCode(itemDetailsRequest.getId())
+            Study study = studyRepository.findById(itemDetailsRequest.getId())
                 .orElseThrow(() -> {
                     log.info("Study with code:{}, not found!", itemDetailsRequest.getId());
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study code not found!");

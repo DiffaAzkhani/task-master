@@ -99,9 +99,9 @@ public class UserController {
 
     @DeleteMapping
     public WebResponse<String> deleteUserByIdForAdmin(
-        @RequestParam(name = "username") String username
+        @RequestParam(name = "userId") Long userId
     ) {
-        userService.deleteUserAccountForAdmin(username);
+        userService.deleteUserAccountForAdmin(userId);
 
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())

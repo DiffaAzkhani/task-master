@@ -84,8 +84,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUserAccountForAdmin(String username) {
-        User user = userRepository.findByUsername(username)
+    public void deleteUserAccountForAdmin(Long userId) {
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User or email not found"));
 
         userRepository.delete(user);
