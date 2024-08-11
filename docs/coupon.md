@@ -8,7 +8,7 @@ The Coupon API provides endpoints for `Role_Admin` to manage coupons within the 
 
 ### POST /api/v1/coupons
 
-This endpoint is used for admin to add new discount with coupon code that user can claim.
+This endpoint allows administrators to create a new coupon in the system. The coupon can be used by users to apply discounts or special offers during their purchases.
 
 #### Request
 
@@ -16,6 +16,10 @@ This endpoint is used for admin to add new discount with coupon code that user c
 - **ROLE** `ADMIN`
 - **Method:** `POST`
 - **Content-Type:** `application/json`
+- **Request Headers:**
+    ```text
+    Authorization: Bearer {your_jwt_token}
+    ```
 - **Request Body:**
   ```json
   {

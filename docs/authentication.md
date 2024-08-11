@@ -37,6 +37,5 @@ This endpoint is used for user login. It accepts user credentials and returns a 
     "errors": null
   }
 - **Response Headers:**
-  - Authorization Header
-  ```text
-  authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaWZmYWF6a2hhbmkiLCJpYXQiOjE3MjMxOTA4MDgsImV4cCI6MTcyMzIxOTYwOH0.ymrGQcUpySMdbbvQfIeOkzTK17Qz2RXCskXwiIP-aP4
+    ```text
+    authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaWZmYWF6a2hhbmkiLCJpYXQiOjE3MjMxOTA4MDgsImV4cCI6MTcyMzIxOTYwOH0.ymrGQcUpySMdbbvQfIeOkzTK17Qz2RXCskXwiIP-aP4

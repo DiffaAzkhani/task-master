@@ -2,11 +2,11 @@
 
 ## Overview
 
-`Task Master` is an educational platform designed to enhance students' understanding across various subjects through interactive quizzes and detailed explanations. Task Master backend project develop using `Java 8`, `Spring Boot 2.7.16`, and `PostgreSQL`, Task Master following to the `Model-View-Controller (MVC)` design pattern, ensuring a clear separation of concerns between data, user interface, and control logic.
+`Task Master` is an educational platform designed for students who want to understand across various subjects through interactive quizzes and detailed explanations. Task Master backend project develop using `Java 8`, `Spring Boot 2.7.16`, and `PostgreSQL`, Task Master following to the `Model-View-Controller (MVC)` design pattern, ensuring a clear separation of concerns between data, user interface, and control logic.
 
-The platform implements `Role-Based Access Control (RBAC)` to manage user permissions effectively, allowing different levels of access and functionality depending on the user's role, such as user, or administrators. This ensures a secure and scalable system where each user interacts with the platform according to their specific permissions.
+The platform implements `Role-Based Access Control (RBAC)` to manage user permissions effectively, allowing different levels of access and functionality depending on the user's role, such as `USER`, or `ADMIN`. This ensures a secure and scalable system where each user interacts with the platform according to their specific permissions.
 
-Task Master provides a wide range of services through its `RESTful API`, which follows REST principles to enable smooth communication between the client and server. This architecture supports the platform’s ability to deliver interactive and dynamic educational content, making it a versatile tool for both students and educators.
+Task Master provides a wide range of services through its `RESTful API`, which follows REST principles to enable smooth communication between the client and server. This architecture supports the platform’s ability to deliver interactive and dynamic educational content.
 
 ## Configuration
 

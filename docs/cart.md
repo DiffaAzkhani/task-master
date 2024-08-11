@@ -16,6 +16,10 @@ This endpoint is used for user to add some study to their cart.
 - **ROLE** `USER`
 - **Method:** `POST`
 - **Content-Type:** `application/json`
+- **Request Headers:**
+    ```text
+    Authorization: Bearer {your_jwt_token}
+    ```
 - **Request Body:**
   ```json
   {
@@ -50,15 +54,9 @@ This endpoint is used for user to delete their specific cart items.
 - **ROLE** `USER`
 - **Method:** `DELETE`
 - **Content-Type:** `application/json`
-- **Request Param:**
-  - Path Parameter
+- **Request Path Parameter**
   ```text  
   cartItemId(int) = 10
-  ```
-  
-  - Query Parameter
-  ```text
-  username(String) = diffaazkhani
   ```
 
 #### Response
@@ -83,8 +81,7 @@ This endpoint is used for user geting all their cart items and returns a data wi
 - **ROLE** `USER`
 - **Method:** `GET`
 - **Content-Type:** `application/json`
-- **Request Param:**
-  - Query Parameter
+- **Request Query Parameter:**
   ```text
   userId(String) = 15
   page(int) = 0 | default = 0
