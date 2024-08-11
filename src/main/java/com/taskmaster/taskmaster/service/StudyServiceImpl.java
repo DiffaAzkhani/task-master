@@ -115,7 +115,7 @@ public class StudyServiceImpl implements StudyService {
             .map(studyMapper::toGetAllStudyResponse)
             .collect(Collectors.toList());
 
-        return new PageImpl<>(responses, pageRequest, filteredSudy.size());
+        return new PageImpl<>(responses, pageRequest, studyPage.getTotalElements());
     }
 
     private List<Study> applyFilterByEnum(List<Study> studies,
