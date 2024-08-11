@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -104,183 +103,55 @@ public class StudyServiceImpl implements StudyService {
                                                      Set<StudyCategory> studyCategories,
                                                      Set<StudyLevel> studyLevels,
                                                      StudyFilter studyFilters,
-                                                     Double minPrice,
-                                                     Double maxPrice,
+                                                     Integer minPrice,
+                                                     Integer maxPrice,
                                                      int page,
                                                      int size) {
-        log.info("Fetching all available study. Page: {}, Size: {}", page, size);
-
         PageRequest pageRequest = PageRequest.of(page, size);
-        List<Study> studies = studyRepository.findAll();
+        Page<Study> studyPage = studyRepository.findByFilters(studyType, studyCategories, studyLevels, minPrice, maxPrice, pageRequest);
+        List<Study> filteredSudy = applyFilterByEnum(studyPage.getContent(), studyFilters);
 
-        return filteringAndPagingStudy(studyType, studyCategories, studyLevels, pageRequest, studyFilters, minPrice, maxPrice, studies);
-    }
-
-    private Page<GetAllStudiesResponse> filteringAndPagingStudy(StudyType studyType,
-                                                                Set<StudyCategory> studyCategories,
-                                                                Set<StudyLevel> studyLevels,
-                                                                PageRequest pageRequest,
-                                                                StudyFilter studyFilters,
-                                                                Double minPrice,
-                                                                Double maxPrice,
-                                                                List<Study> studies) {
-        List<Study> filteredStudies = filterStudies(studyType, studyCategories, studyLevels, studyFilters, minPrice, maxPrice, studies);
-        List<GetAllStudiesResponse> getStudyResponse = paginateAndConvertToResponse(pageRequest, filteredStudies);
-
-        return new PageImpl<>(getStudyResponse, pageRequest, filteredStudies.size());
-    }
-
-    private List<GetAllStudiesResponse> paginateAndConvertToResponse(PageRequest pageRequest, List<Study> filteredStudies) {
-        int start = (int) pageRequest.getOffset();
-        int end = Math.min(start + pageRequest.getPageSize(), filteredStudies.size());
-
-        List<Study> pageContent = filteredStudies.subList(start, end);
-
-        return pageContent.stream()
+        List<GetAllStudiesResponse> responses = filteredSudy.stream()
             .map(studyMapper::toGetAllStudyResponse)
             .collect(Collectors.toList());
-    }
 
-    private List<Study> filterStudies(StudyType studyType,
-                                      Set<StudyCategory> studyCategories,
-                                      Set<StudyLevel> studyLevels,
-                                      StudyFilter studyFilters,
-                                      Double maxPrice,
-                                      Double minPrice,
-                                      List<Study> studies) {
-
-        log.info("Applying filters: studyTypes={}, studyFilters={}, studyCategories={}, studyLevels={}, maxPrice={}, minPrice={}",
-            studyType, studyFilters, studyCategories, studyLevels, maxPrice, minPrice);
-
-        if (studyType == null && studyFilters == null && studyCategories == null && studyLevels == null && maxPrice == null && minPrice == null) {
-            log.info("No filter applied, returning all studies");
-            return studies;
-        }
-
-        List<Study> filteredStudy = new ArrayList<>();
-
-        filteredStudy = applyFilterByType(studyType, studies, filteredStudy);
-        filteredStudy = applyFilterByCategory(studyCategories, studies, filteredStudy);
-        filteredStudy = applyFilterByLevel(studyLevels, studies, filteredStudy);
-        filteredStudy = applyFilterByEnum(studies, filteredStudy, studyFilters);
-        filteredStudy = applyFilterByRangePrice(filteredStudy, minPrice, maxPrice);
-
-        log.info("filtered study count: {}", filteredStudy.size());
-
-        return filteredStudy;
-    }
-
-    private List<Study> applyFilterByLevel(Set<StudyLevel> levels,
-                                           List<Study> studies,
-                                           List<Study> filteredStudy) {
-        if (levels == null || levels.isEmpty() ) {
-            log.info("No level filter applied");
-            return filteredStudy;
-        }
-
-        log.info("Applying level filter: {}", levels);
-        List<Study> studyList = filteredStudy.isEmpty() ? studies : filteredStudy;
-        return studyList.stream()
-            .filter(study -> levels.contains(study.getLevel()))
-            .collect(Collectors.toList());
-    }
-
-    private List<Study> applyFilterByCategory(Set<StudyCategory> categories,
-                                              List<Study> studies,
-                                              List<Study> filteredStudy) {
-        if (categories == null || categories.isEmpty()) {
-            log.info("No category filter applied");
-            return filteredStudy;
-        }
-
-        log.info("Applying categories filter: {}", categories);
-        List<Study> studyList = filteredStudy.isEmpty() ? studies : filteredStudy;
-        return studyList.stream()
-            .filter(category -> categories.contains(category.getCategory()))
-            .collect(Collectors.toList());
-    }
-
-    private List<Study> applyFilterByType(StudyType types,
-                                          List<Study> studies,
-                                          List<Study> filteredStudy) {
-        if (types == null) {
-            log.info("No type filter applied");
-            return filteredStudy;
-        }
-
-        log.info("Applying types filter: {}", types);
-        List<Study> studyList = filteredStudy.isEmpty() ? studies : filteredStudy;
-        return studyList.stream()
-            .filter(study -> types.equals(study.getType()))
-            .collect(Collectors.toList());
+        return new PageImpl<>(responses, pageRequest, filteredSudy.size());
     }
 
     private List<Study> applyFilterByEnum(List<Study> studies,
-                                          List<Study> filteredStudy,
                                           StudyFilter studyFilters) {
         if (studyFilters == null) {
-            log.info("No enum filter applied");
-            return filteredStudy;
+            return studies;
         }
 
         switch (studyFilters) {
             case POPULAR:
-                return applyFilterByPopular(studies, filteredStudy);
+                return applyFilterByPopular(studies);
             case RECENTLY_ADDED :
-                return applyFilterByRecentlyAdded(studies, filteredStudy);
+                return applyFilterByRecentlyAdded(studies);
             case DISCOUNT:
-                return applyFilterByDiscount(studies, filteredStudy);
+                return applyFilterByDiscount(studies);
             default:
-                return filteredStudy;
+                return studies;
         }
     }
 
-    private List<Study> applyFilterByDiscount(List<Study> studies, List<Study> filteredStudy) {
-        List<Study> studyList = filteredStudy.isEmpty() ? studies : filteredStudy;
-
-        log.info("Applying discount filter");
-        return studyList.stream()
+    private List<Study> applyFilterByDiscount(List<Study> studies) {
+        return studies.stream()
             .filter(study -> study.getDiscount() != null && study.getDiscount() > 0)
             .collect(Collectors.toList());
     }
 
-    private List<Study> applyFilterByPopular(List<Study> studies,
-                                             List<Study> filteredStudy) {
-        List<Study> studyList = filteredStudy.isEmpty() ? studies : filteredStudy;
-
-        log.info("Applying popular filter");
-        return studyList.stream()
+    private List<Study> applyFilterByPopular(List<Study> studies) {
+        return studies.stream()
             .filter(study -> !study.getUsers().isEmpty())
             .sorted((study1, study2) -> Integer.compare(study2.getUsers().size(), study1.getUsers().size()))
             .collect(Collectors.toList());
     }
 
-    private List<Study> applyFilterByRecentlyAdded(List<Study> studies,
-                                                   List<Study> filteredStudy) {
-        List<Study> studyList = filteredStudy.isEmpty() ? studies : filteredStudy;
-
-        log.info("Applying recently added filter");
-        return studyList.stream()
-            .sorted(Comparator.comparing((Study::getCreatedAt)).reversed())
-            .collect(Collectors.toList());
-    }
-
-    private List<Study> applyFilterByRangePrice(List<Study> studies,
-                                                Double minPrice,
-                                                Double maxPrice) {
-        if (minPrice == null && maxPrice == null) {
-            log.info("No price range filter applied");
-            return studies;
-        }
-
-        log.info("Applying price range filter, maxPrice: {} and minPrice: {}", maxPrice, minPrice);
+    private List<Study> applyFilterByRecentlyAdded(List<Study> studies) {
         return studies.stream()
-            .filter(study -> {
-                Integer price = study.getPrice();
-                boolean min = (minPrice == null) || price >= minPrice;
-                boolean max = (maxPrice == null) || price <= maxPrice;
-                return min && max;
-            })
+            .sorted(Comparator.comparing((Study::getCreatedAt)).reversed())
             .collect(Collectors.toList());
     }
 

@@ -48,8 +48,8 @@ public class StudyController {
         @RequestParam(name = "categories", required = false) Set<StudyCategory> categories,
         @RequestParam(name = "levels", required = false) Set<StudyLevel> levels,
         @RequestParam(name = "study-filter", required = false) StudyFilter studyFilters,
-        @RequestParam(name = "min-price", required = false) Double minPrice,
-        @RequestParam(name = "max-price", required = false) Double maxPrice,
+        @RequestParam(name = "min-price", required = false) Integer minPrice,
+        @RequestParam(name = "max-price", required = false) Integer maxPrice,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {

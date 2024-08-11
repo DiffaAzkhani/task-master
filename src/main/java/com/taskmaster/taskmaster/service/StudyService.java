@@ -24,8 +24,8 @@ public interface StudyService {
                                               Set<StudyCategory> studyCategories,
                                               Set<StudyLevel> studyLevels,
                                               StudyFilter studyFilters,
-                                              Double minPrice,
-                                              Double maxPrice,
+                                              Integer minPrice,
+                                              Integer maxPrice,
                                               int page,
                                               int size);
 
