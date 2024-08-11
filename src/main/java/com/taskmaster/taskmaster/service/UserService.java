@@ -14,7 +14,7 @@ public interface UserService {
 
     RegisterResponse register(RegisterRequest request);
 
-    void deleteUserAccountForAdmin(String username);
+    void deleteUserAccountForAdmin(Long userId);
 
     void deleteUserAccountForUser(String password);
 
