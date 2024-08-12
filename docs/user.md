@@ -222,43 +222,49 @@ This endpoint allows an admin to retrieve a list of all users in the system. The
 - **Status Code: `200 OK`**
 - **Content-Type:** `application/json`
 - **Response Body:**
-    ```json
-    {
-      "code": 200,
-      "message": "OK",
-      "data": [
-        {
-          "id": 9,
-          "username": "diffaadmin",
-          "firstName": "diffa",
-          "lastName": "admin",
-          "email": "diffaazkhani1@gmail.com",
-          "phone": "0237949273",
-          "createdAt": "2024-07-06 07:39:15",
-          "updatedAt": "2024-07-06 07:39:15"
-        },
-        {
-          "id": 12,
-          "username": "gatotuser",
-          "firstName": "rickk",
-          "lastName": "morty",
-          "email": "rickmortyy@gmail.com",
-          "phone": "081327465925",
-          "createdAt": "2024-07-15 05:43:58",
-          "updatedAt": "2024-08-08 20:12:16"
-        }
-      ],
-      "errors": null,
-      "paging": {
-        "currentPage": 0,
-        "totalPage": 3,
-        "totalElement": 5,
-        "size": 2,
-        "empty": false,
-        "first": true,
-        "last": false
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": [
+      {
+        "id": 9,
+        "username": "diffaadmin",
+        "firstName": "diffa",
+        "lastName": "admin",
+        "email": "diffaazkhani1@gmail.com",
+        "phone": "0237949273",
+        "userRole": [
+          "ADMIN"
+        ],
+        "createdAt": "2024-07-06 07:39:15",
+        "updatedAt": "2024-07-06 07:39:15"
+      },
+      {
+        "id": 15,
+        "username": "diffaazkhani",
+        "firstName": "diffa",
+        "lastName": "azkhani",
+        "email": "diffaazkhani@example.com",
+        "phone": "082764837501",
+        "userRole": [
+          "USER"
+        ],
+        "createdAt": "2024-07-31 07:23:31",
+        "updatedAt": "2024-08-10 17:18:48"
       }
+    ],
+    "errors": null,
+    "paging": {
+      "currentPage": 0,
+      "totalPage": 2,
+      "totalElement": 3,
+      "size": 2,
+      "empty": false,
+      "first": true,
+      "last": false
     }
+  }
 
 ### DELETE /api/v1/users
 
