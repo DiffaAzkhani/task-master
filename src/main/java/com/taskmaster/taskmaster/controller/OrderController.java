@@ -5,7 +5,7 @@ import com.taskmaster.taskmaster.configuration.midtrans.MidtransConfiguration;
 import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
 import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
 import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
-import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
+import com.taskmaster.taskmaster.model.response.GetOrdersResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.PagingWebResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
@@ -40,15 +40,15 @@ public class OrderController {
         path = "/{userId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public PagingWebResponse<List<GetAllOrderResponse>> getUserOrdersAdmin(
+    public PagingWebResponse<List<GetOrdersResponse>> getUserOrdersAdmin(
         @RequestParam(name = "userId") Long userId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetAllOrderResponse> orderResponsePage = orderService.getUserOrdersAdmin(userId, page, size);
-        List<GetAllOrderResponse> orderResponses = orderResponsePage.getContent();
+        Page<GetOrdersResponse> orderResponsePage = orderService.getUserOrdersAdmin(userId, page, size);
+        List<GetOrdersResponse> orderResponses = orderResponsePage.getContent();
 
-        return PagingWebResponse.<List<GetAllOrderResponse>>builder()
+        return PagingWebResponse.<List<GetOrdersResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(orderResponses)
@@ -88,14 +88,14 @@ public class OrderController {
         path = "/me",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public PagingWebResponse<List<GetAllOrderResponse>> getAllMyOrders(
+    public PagingWebResponse<List<GetOrdersResponse>> getAllMyOrders(
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetAllOrderResponse> orderResponsePage = orderService.getAllUserOrders(page, size);
-        List<GetAllOrderResponse> orderResponses = orderResponsePage.getContent();
+        Page<GetOrdersResponse> orderResponsePage = orderService.getAllUserOrders(page, size);
+        List<GetOrdersResponse> orderResponses = orderResponsePage.getContent();
 
-        return PagingWebResponse.<List<GetAllOrderResponse>>builder()
+        return PagingWebResponse.<List<GetOrdersResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(orderResponses)
@@ -155,6 +155,32 @@ public class OrderController {
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
+            .build();
+    }
+
+    @GetMapping(
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public PagingWebResponse<List<GetOrdersResponse>> getOrdersForAdmin(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        Page<GetOrdersResponse> orderResponsePage = orderService.getOrdersForAdmin(page, size);
+        List<GetOrdersResponse> orderResponses = orderResponsePage.getContent();
+
+        return PagingWebResponse.<List<GetOrdersResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(orderResponses)
+            .paging(PagingResponse.builder()
+                .currentPage(page)
+                .size(size)
+                .totalPage(orderResponsePage.getTotalPages())
+                .totalElement(orderResponsePage.getTotalElements())
+                .empty(orderResponsePage.isEmpty())
+                .first(orderResponsePage.isFirst())
+                .last(orderResponsePage.isLast())
+                .build())
             .build();
     }
 

@@ -13,21 +13,21 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetAllOrderResponse {
+public class GetOrdersResponse {
 
     private String orderId;
 
-    private String completedAt;
+    private OrderStatus status;
 
     private OrderPaymentMethod paymentMethod;
-
-    private OrderStatus status;
 
     private int totalPrice;
 
     private Double ppn;
 
     private int totalTransfer;
+
+    private String completedAt;
 
     private List<OrderItemResponse> orderItems;
 
