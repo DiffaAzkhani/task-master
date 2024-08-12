@@ -418,3 +418,34 @@ This endpoint allows users to cancel an existing order. The order can only be ca
     "data": null
     "errors": null
   }
+
+### DELETE /api/v1/orders/{orderId}
+
+This endpoint allows admin to delete an existing order.
+
+#### Request
+
+- **URL:** `/api/v1/orders/{orderId}`
+- **ROLE** `ADMIN`
+- **Method:** `DELETE`
+- **Content-Type:** `application/json`
+- **Request Headers:**
+  ```text
+  authorization : Bearer {your_jwt_token}
+  ```
+- **Request Path Parameter**
+  ```text
+  studyId(int) = 14
+  ```
+
+#### Response
+- **Status Code: `200 OK`**
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": null
+    "errors": null
+  }
