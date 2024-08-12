@@ -30,6 +30,7 @@ public class StudyMapper {
 
     public GetStudyByIdResponse toGetStudyResponse(Study study) {
         return GetStudyByIdResponse.builder()
+            .studyId(study.getId())
             .code(study.getCode())
             .studyName(study.getName())
             .price(study.getPrice())
