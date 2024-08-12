@@ -144,12 +144,12 @@ This endpoint allows an admin to create a new study. The admin can provide detai
 
 ### GET /api/v1/studies/{studyId}
 
-This endpoint allows an admin to retrieve studies data. The admin can view details. Access to this endpoint is restricted to users with admin privileges.
+This endpoint allows all user types to retrieve studies data. all users can view study details.
 
 #### Request
 
 - **URL:** `/api/v1/studies/{studyId}`
-- **ROLE** `ADMIN`
+- **ROLE** `PERMIT ALL`
 - **Method:** `GET`
 - **Content-Type:** `application/json`
 - **Request Headers:**
@@ -170,6 +170,7 @@ This endpoint allows an admin to retrieve studies data. The admin can view detai
     "code": 200,
     "message": "OK",
     "data": {
+      "studyId": 14,
       "code": "MATH.10.00002",
       "studyName": "Matematika deret",
       "price": 0,
