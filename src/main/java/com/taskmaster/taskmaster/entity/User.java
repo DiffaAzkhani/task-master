@@ -99,7 +99,7 @@ public class User implements UserDetails, CreatedAtAware, UpdatedAtAware {
     )
     private Set<Study> studies = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new LinkedList<>();
 
     @Override
