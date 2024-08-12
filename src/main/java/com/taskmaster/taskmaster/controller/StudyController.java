@@ -8,7 +8,7 @@ import com.taskmaster.taskmaster.model.request.CreateNewStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
 import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
-import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
+import com.taskmaster.taskmaster.model.response.GetStudyByIdResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.PagingWebResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
@@ -93,12 +93,12 @@ public class StudyController {
         path = "/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<GetStudyByCodeResponse> getStudy(
+    public WebResponse<GetStudyByIdResponse> getStudy(
         @PathVariable(name = "studyId") Long studyId
     ){
-        GetStudyByCodeResponse studyResponse = studyService.getStudyById(studyId);
+        GetStudyByIdResponse studyResponse = studyService.getStudyById(studyId);
 
-        return WebResponse.<GetStudyByCodeResponse>builder()
+        return WebResponse.<GetStudyByIdResponse>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(studyResponse)
