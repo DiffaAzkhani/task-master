@@ -1,6 +1,7 @@
 package com.taskmaster.taskmaster.service;
 
 import com.taskmaster.taskmaster.entity.Study;
+import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.enums.StudyCategory;
 import com.taskmaster.taskmaster.enums.StudyFilter;
 import com.taskmaster.taskmaster.enums.StudyLevel;
@@ -9,10 +10,11 @@ import com.taskmaster.taskmaster.mapper.StudyMapper;
 import com.taskmaster.taskmaster.model.request.CreateNewStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
 import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
-import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
+import com.taskmaster.taskmaster.model.response.GetStudiesResponse;
 import com.taskmaster.taskmaster.model.response.GetStudyByIdResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import com.taskmaster.taskmaster.repository.StudyRepository;
+import com.taskmaster.taskmaster.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -36,7 +38,11 @@ public class StudyServiceImpl implements StudyService {
 
     private final StudyRepository studyRepository;
 
+    private final UserRepository userRepository;
+
     private final StudyMapper studyMapper;
+
+    private final ValidationService validationService;
 
     @Override
     @Transactional
@@ -99,19 +105,19 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GetAllStudiesResponse> getAllStudies(StudyType studyType,
-                                                     Set<StudyCategory> studyCategories,
-                                                     Set<StudyLevel> studyLevels,
-                                                     StudyFilter studyFilters,
-                                                     Integer minPrice,
-                                                     Integer maxPrice,
-                                                     int page,
-                                                     int size) {
+    public Page<GetStudiesResponse> getAllStudies(StudyType studyType,
+                                                  Set<StudyCategory> studyCategories,
+                                                  Set<StudyLevel> studyLevels,
+                                                  StudyFilter studyFilters,
+                                                  Integer minPrice,
+                                                  Integer maxPrice,
+                                                  int page,
+                                                  int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Study> studyPage = studyRepository.findByFilters(studyType, studyCategories, studyLevels, minPrice, maxPrice, pageRequest);
         List<Study> filteredSudy = applyFilterByEnum(studyPage.getContent(), studyFilters);
 
-        List<GetAllStudiesResponse> responses = filteredSudy.stream()
+        List<GetStudiesResponse> responses = filteredSudy.stream()
             .map(studyMapper::toGetAllStudyResponse)
             .collect(Collectors.toList());
 
@@ -186,6 +192,21 @@ public class StudyServiceImpl implements StudyService {
         log.info("Study successfully updated!");
 
         return studyMapper.toUpdateStudyResponse(study);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<GetStudiesResponse> getMyStudies(int page, int size) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Study> studyPage = studyRepository.findByUsers_Username(currentUser, pageRequest);
+        List<GetStudiesResponse> getMyStudiesResponses = studyPage.getContent().stream()
+            .map(studyMapper::toGetAllStudyResponse)
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(getMyStudiesResponses ,pageRequest, studyPage.getTotalElements());
     }
 
     private void updateStudyProperties(Study study, UpdateStudyRequest request) {

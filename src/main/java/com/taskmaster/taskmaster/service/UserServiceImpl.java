@@ -173,28 +173,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GetAllEnrolledUSerStudyResponse> getEnrolledUserStudy(int page, int size) {
-        String currentUser = validationService.getCurrentUser();
-        validationService.validateUser(currentUser);
-
-        if (!userRepository.existsByUsername(currentUser)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
-        }
-
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Study> studyPage = studyRepository.findByUsers_Username(currentUser, pageRequest);
-
-        List<GetAllEnrolledUSerStudyResponse> allEnrolledUSerStudyList = studyPage.getContent().stream()
-            .map(studyMapper::toGetEnrolledUserStudyResponse)
-            .collect(Collectors.toList());
-
-        log.info("Success to get all user enrolled study!");
-
-        return new PageImpl<>(allEnrolledUSerStudyList, pageRequest, studyPage.getTotalElements());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public GetUserProfileResponse getUserProfile() {
         String currentUser = validationService.getCurrentUser();
         validationService.validateUser(currentUser);

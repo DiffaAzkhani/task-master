@@ -2,7 +2,6 @@ package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.RegisterRequest;
 import com.taskmaster.taskmaster.model.request.UpdateUserProfileRequest;
-import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
 import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
 import com.taskmaster.taskmaster.model.response.GetUserProfileResponse;
@@ -157,33 +156,6 @@ public class UserController {
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(userResponse)
-            .build();
-    }
-
-    @GetMapping(
-        path = "/my-studies",
-        produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public PagingWebResponse<List<GetAllEnrolledUSerStudyResponse>> getAllEnrolledUserStudy(
-        @RequestParam(name = "page", defaultValue = "0") int page,
-        @RequestParam(name = "size", defaultValue = "10") int size
-    ) {
-        Page<GetAllEnrolledUSerStudyResponse> responsePage = userService.getEnrolledUserStudy(page, size);
-        List<GetAllEnrolledUSerStudyResponse> allEnrolledUSerStudyResponses = responsePage.getContent();
-
-        return PagingWebResponse.<List<GetAllEnrolledUSerStudyResponse>>builder()
-            .code(HttpStatus.OK.value())
-            .message(HttpStatus.OK.getReasonPhrase())
-            .data(allEnrolledUSerStudyResponses)
-            .paging(PagingResponse.builder()
-                .currentPage(page)
-                .size(size)
-                .totalPage(responsePage.getTotalPages())
-                .totalElement(responsePage.getTotalElements())
-                .empty(responsePage.isEmpty())
-                .first(responsePage.isFirst())
-                .last(responsePage.isLast())
-                .build())
             .build();
     }
 

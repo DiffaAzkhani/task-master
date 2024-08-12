@@ -26,8 +26,6 @@ public interface UserService {
 
     GetUserForAdminResponse getUserForAdmin(Long userId);
 
-    Page<GetAllEnrolledUSerStudyResponse> getEnrolledUserStudy(int page, int size);
-
     GetUserProfileResponse getUserProfile();
 
 }
