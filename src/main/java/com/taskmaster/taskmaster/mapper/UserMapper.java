@@ -1,9 +1,19 @@
 package com.taskmaster.taskmaster.mapper;
 
 import com.taskmaster.taskmaster.Util.TimeUtil;
+import com.taskmaster.taskmaster.entity.Role;
 import com.taskmaster.taskmaster.entity.User;
-import com.taskmaster.taskmaster.model.response.*;
+import com.taskmaster.taskmaster.enums.UserRole;
+import com.taskmaster.taskmaster.model.response.GetAllUsersResponse;
+import com.taskmaster.taskmaster.model.response.GetUserForAdminResponse;
+import com.taskmaster.taskmaster.model.response.GetUserProfileResponse;
+import com.taskmaster.taskmaster.model.response.LoginResponse;
+import com.taskmaster.taskmaster.model.response.RegisterResponse;
+import com.taskmaster.taskmaster.model.response.UpdateUserProfileResponse;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserMapper {
@@ -34,6 +44,10 @@ public class UserMapper {
     }
 
     public GetAllUsersResponse toGetAllUsersResponse(User user){
+        List<UserRole> roles = user.getRoles().stream()
+            .map(Role::getName)
+            .collect(Collectors.toList());
+
         return GetAllUsersResponse.builder()
             .id(user.getId())
             .username(user.getUsername())
@@ -41,6 +55,7 @@ public class UserMapper {
             .lastName(user.getLastName())
             .email(user.getEmail())
             .phone(user.getPhone())
+            .userRole(roles)
             .createdAt(TimeUtil.formatToString(user.getCreatedAt()))
             .updatedAt(TimeUtil.formatToString(user.getUpdatedAt()))
             .build();
