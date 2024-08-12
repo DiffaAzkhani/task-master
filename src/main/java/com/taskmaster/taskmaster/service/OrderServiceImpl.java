@@ -18,7 +18,7 @@ import com.taskmaster.taskmaster.model.request.AfterPaymentsRequest;
 import com.taskmaster.taskmaster.model.request.ItemDetailsRequest;
 import com.taskmaster.taskmaster.model.request.MidtransTransactionRequest;
 import com.taskmaster.taskmaster.model.response.CheckoutMidtransResponse;
-import com.taskmaster.taskmaster.model.response.GetAllOrderResponse;
+import com.taskmaster.taskmaster.model.response.GetOrdersResponse;
 import com.taskmaster.taskmaster.repository.OrderRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import com.taskmaster.taskmaster.repository.UserRepository;
@@ -161,7 +161,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GetAllOrderResponse> getAllUserOrders(int page, int size) {
+    public Page<GetOrdersResponse> getAllUserOrders(int page, int size) {
         String currentUser = validationService.getCurrentUser();
         validationService.validateUser(currentUser);
 
@@ -175,18 +175,18 @@ public class OrderServiceImpl implements OrderService{
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Order> orderPage = orderRepository.findByUser(user, pageRequest);
 
-        List<GetAllOrderResponse> getAllOrderResponses = orderPage.getContent().stream()
+        List<GetOrdersResponse> getOrdersRespons = orderPage.getContent().stream()
             .map(orderMapper::toGetAllUserOrdersResponse)
             .collect(Collectors.toList());
 
         log.info("Success to get all user orders!");
 
-        return new PageImpl<>(getAllOrderResponses, pageRequest, orderPage.getTotalElements());
+        return new PageImpl<>(getOrdersRespons, pageRequest, orderPage.getTotalElements());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GetAllOrderResponse> getUserOrdersAdmin(Long userId, int page, int size) {
+    public Page<GetOrdersResponse> getUserOrdersAdmin(Long userId, int page, int size) {
         log.info("User roles: {}", SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
@@ -198,13 +198,13 @@ public class OrderServiceImpl implements OrderService{
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Order> orderPage = orderRepository.findByUser(user, pageRequest);
 
-        List<GetAllOrderResponse> getAllOrderResponses = orderPage.getContent().stream()
+        List<GetOrdersResponse> getOrdersRespons = orderPage.getContent().stream()
             .map(orderMapper::toGetAllUserOrdersResponse)
             .collect(Collectors.toList());
 
         log.info("Success to get all user orders!");
 
-        return new PageImpl<>(getAllOrderResponses, pageRequest, orderPage.getTotalElements());
+        return new PageImpl<>(getOrdersRespons, pageRequest, orderPage.getTotalElements());
     }
 
     @Override
@@ -263,6 +263,18 @@ public class OrderServiceImpl implements OrderService{
         user.getStudies().add(study);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public Page<GetOrdersResponse> getOrdersForAdmin(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Order> orderPage = orderRepository.findAll(pageRequest);
+
+        List<GetOrdersResponse> ordersResponseList = orderPage.stream()
+            .map(orderMapper::toGetOrdersResponse)
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(ordersResponseList, pageRequest, orderPage.getTotalElements());
     }
 
 }
