@@ -52,6 +52,7 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.GET,"/api/v1/orders/me").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.GET,"/api/v1/orders/{userId}").hasRole(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.GET,"/api/v1/orders").hasRole(UserRole.ADMIN.name())
+                .antMatchers(HttpMethod.DELETE,"/api/v1/orders/{orderId}").hasRole(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/orders/**").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/carts/items").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.GET,"/api/v1/carts").hasRole(UserRole.USER.name())

@@ -266,6 +266,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<GetOrdersResponse> getOrdersForAdmin(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Order> orderPage = orderRepository.findAll(pageRequest);
@@ -275,6 +276,15 @@ public class OrderServiceImpl implements OrderService{
             .collect(Collectors.toList());
 
         return new PageImpl<>(ordersResponseList, pageRequest, orderPage.getTotalElements());
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrderById(String orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found!"));
+
+        orderRepository.delete(order);
     }
 
 }

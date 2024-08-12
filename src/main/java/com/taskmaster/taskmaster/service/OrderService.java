@@ -23,4 +23,6 @@ public interface OrderService {
 
     Page<GetOrdersResponse> getOrdersForAdmin(int page, int size);
 
+    void deleteOrderById(String orderId);
+
 }
