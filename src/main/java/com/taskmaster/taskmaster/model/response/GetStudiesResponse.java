@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class GetStudiesResponse {
 
+    private Long studyId;
+
     private String code;
 
     private String name;
