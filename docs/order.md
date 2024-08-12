@@ -70,6 +70,81 @@ This endpoint allows an administrator to retrieve a list of orders associated wi
       }
     }
 
+### GET /api/v1/orders
+
+This endpoint allows an administrator to retrieve a list of orders. It provides detailed information about all orders made by the user, including order status, items purchased, and payment method.
+
+#### Request
+
+- **URL:** `/api/v1/orders`
+- **ROLE** `ADMIN`
+- **Method:** `GET`
+- **Content-Type:** `application/json`
+- **Request Query Parameter:**
+  ```text
+  userId(String) = 9
+  page(int) = 0 | default = 0
+  size(int) = 2 | default = 10
+  ```
+- **Request Headers:**
+  ```text
+  Authorization : Bearer {your_jwt_token}
+  ```
+
+#### Response
+- **Status Code: `200 OK`**
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": [
+      {
+        "orderId": "INV-20240810-00002",
+        "status": "PROCESSING",
+        "paymentMethod": null,
+        "totalPrice": 50000,
+        "ppn": 5500,
+        "totalTransfer": 55500,
+        "completedAt": null,
+        "orderItems": [
+          {
+            "studyName": "Kata Baku",
+            "quantity": 1,
+            "price": 50000
+          }
+        ]
+      },
+      {
+        "orderId": "INV-20240812-00001",
+        "status": "PROCESSING",
+        "paymentMethod": null,
+        "totalPrice": 50000,
+        "ppn": 5500,
+        "totalTransfer": 55500,
+        "completedAt": null,
+        "orderItems": [
+          {
+            "studyName": "Struktur Tulang Manusia",
+            "quantity": 1,
+            "price": 50000
+          }
+        ]
+      }
+    ],
+    "errors": null,
+    "paging": {
+      "currentPage": 0,
+      "totalPage": 2,
+      "totalElement": 4,
+      "size": 2,
+      "empty": false,
+      "first": true,
+      "last": false
+    }
+  }
+
 ### GET /api/v1/orders/me
 
 This endpoint allows the authenticated user to retrieve a list of their orders. It returns detailed information about all orders associated with the user's account, including order status, and items purchased, and payment method.
@@ -96,72 +171,72 @@ This endpoint allows the authenticated user to retrieve a list of their orders. 
 
 #### Response
 - **Status Code: `200 OK`**
-  - **Content-Type:** `application/json`
-    - **Response Body:**
-      ```json
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": [
       {
-        "code": 200,
-        "message": "OK",
-        "data": [
+        "orderId": "INV-20240810-00002",
+        "completedAt": 2024-08-10 00:00:00,
+        "paymentMethod": CREDIT_CARD,
+        "status": "PROCESSING",
+        "totalPrice": 50000,
+        "ppn": 5500,
+        "totalTransfer": 55500,
+        "orderItems": [
           {
-            "orderId": "INV-20240810-00002",
-            "completedAt": 2024-08-10 00:00:00,
-            "paymentMethod": CREDIT_CARD,
-            "status": "PROCESSING",
-            "totalPrice": 50000,
-            "ppn": 5500,
-            "totalTransfer": 55500,
-            "orderItems": [
-              {
-                "studyName": "Kata Baku",
-                "quantity": 1,
-                "price": 50000
-              }
-            ]
+            "studyName": "Kata Baku",
+            "quantity": 1,
+            "price": 50000
+          }
+        ]
+      },
+      {
+        "orderId": "INV-20240810-00001",
+        "completedAt": null,
+        "paymentMethod": null,
+        "status": "CANCELED",
+        "totalPrice": 340000,
+        "ppn": 37400,
+        "totalTransfer": 127650,
+        "orderItems": [
+          {
+            "studyName": "Kalkulus Lanjut",
+            "quantity": 1,
+            "price": 80000
           },
           {
-            "orderId": "INV-20240810-00001",
-            "completedAt": null,
-            "paymentMethod": null,
-            "status": "CANCELED",
-            "totalPrice": 340000,
-            "ppn": 37400,
-            "totalTransfer": 127650,
-            "orderItems": [
-              {
-                "studyName": "Kalkulus Lanjut",
-                "quantity": 1,
-                "price": 80000
-              },
-              {
-                "studyName": "Mekanika Newton",
-                "quantity": 1,
-                "price": 80000
-              },
-              {
-                "studyName": "Trigonometri",
-                "quantity": 1,
-                "price": 65000
-              },
-              {
-                "studyName": "Termodinamika",
-                "quantity": 1,
-                "price": 115000
-              }
-            ]
+            "studyName": "Mekanika Newton",
+            "quantity": 1,
+            "price": 80000
+          },
+          {
+            "studyName": "Trigonometri",
+            "quantity": 1,
+            "price": 65000
+          },
+          {
+            "studyName": "Termodinamika",
+            "quantity": 1,
+            "price": 115000
           }
-        ],
-        "errors": null,
-        "paging": {
-          "currentPage": 0,
-          "totalPage": 1,
-          "totalElement": 2,
-          "size": 2,
-          "empty": false,
-          "first": true,
-          "last": true
-        }
+        ]
       }
+    ],
+    "errors": null,
+    "paging": {
+      "currentPage": 0,
+      "totalPage": 1,
+      "totalElement": 2,
+      "size": 2,
+      "empty": false,
+      "first": true,
+      "last": true
+    }
+  }
 
 ### POST /api/v1/orders/checkout
 
@@ -200,22 +275,22 @@ This endpoint is used by users to finalize their order by initiating the payment
 
 #### Response
 - **Status Code: `200 OK`**
-  - **Content-Type:** `application/json`
-  - **Response Headers:**
-    ```text
-    authorization: Basic {your_encoded_server_key} 
-    ```
-  - **Response Body:**
-    ```json
-    {
-      "code": 201,
-      "message": "Created",
-      "data": {
-        "token": "53ee12ef-e663-44ad-a1e1-df6d22127977",
-        "redirectUrl": "https://app.sandbox.midtrans.com/snap/v4/redirection/53ee12ef-e663-44ad-a1e1-df6d22127977"
-      },
-      "errors": null
-    }
+- **Content-Type:** `application/json`
+- **Response Headers:**
+  ```text
+  authorization: Basic {your_encoded_server_key} 
+  ```
+- **Response Body:**
+  ```json
+  {
+    "code": 201,
+    "message": "Created",
+    "data": {
+      "token": "53ee12ef-e663-44ad-a1e1-df6d22127977",
+      "redirectUrl": "https://app.sandbox.midtrans.com/snap/v4/redirection/53ee12ef-e663-44ad-a1e1-df6d22127977"
+    },
+    "errors": null
+  }
 
 ### POST /api/v1/orders/enroll-free
 
@@ -238,15 +313,15 @@ This endpoint allows users to enroll in a study that is offered for free. The us
 
 #### Response
 - **Status Code: `200 OK`**
-  - **Content-Type:** `application/json`
-  - **Response Body:**
-    ```json
-    {
-      "code": 200,
-      "message": "OK",
-      "data": null
-      "errors": null
-    }
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": null
+    "errors": null
+  }
 
 ### POST /api/v1/orders/midtrans-callback (Unfinished)
 
@@ -288,30 +363,30 @@ This endpoint is not finished yet, because this app doesn't deploy on the server
 
 #### Response
 - **Status Code: `200 OK`**
-  - **Content-Type:** `application/json`
-  - **Response Body:**
-    ```json
-    {
-      "transaction_time": "string",
-      "transaction_status": "string",
-      "transaction_id": "string",
-      "status_message": "string",
-      "status_code": "string",
-      "signature_key": "string",
-      "payment_type": "string",
-      "order_id": "string",
-      "merchant_id": "string",
-      "masked_card": "string",
-      "gross_amount": "string",
-      "fraud_status": "string",
-      "eci": "string",
-      "currency": "string",
-      "channel_response_message": "string",
-      "channel_response_code": "string",
-      "card_type": "string",
-      "bank": "string",
-      "approval_code": "string"
-    }
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "transaction_time": "string",
+    "transaction_status": "string",
+    "transaction_id": "string",
+    "status_message": "string",
+    "status_code": "string",
+    "signature_key": "string",
+    "payment_type": "string",
+    "order_id": "string",
+    "merchant_id": "string",
+    "masked_card": "string",
+    "gross_amount": "string",
+    "fraud_status": "string",
+    "eci": "string",
+    "currency": "string",
+    "channel_response_message": "string",
+    "channel_response_code": "string",
+    "card_type": "string",
+    "bank": "string",
+    "approval_code": "string"
+  }
 
 ### POST /api/v1/orders/{orderId}/cancel
 
@@ -334,12 +409,12 @@ This endpoint allows users to cancel an existing order. The order can only be ca
 
 #### Response
 - **Status Code: `200 OK`**
-  - **Content-Type:** `application/json`
-  - **Response Body:**
-    ```json
-    {
-      "code": 200,
-      "message": "OK",
-      "data": null
-      "errors": null
-    }
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": null
+    "errors": null
+  }
