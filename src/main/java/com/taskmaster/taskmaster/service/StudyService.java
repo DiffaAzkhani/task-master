@@ -8,7 +8,7 @@ import com.taskmaster.taskmaster.model.request.CreateNewStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
 import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
-import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
+import com.taskmaster.taskmaster.model.response.GetStudyByIdResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import org.springframework.data.domain.Page;
 
@@ -18,7 +18,7 @@ public interface StudyService {
 
     CreateNewStudyResponse createNewStudy(CreateNewStudyRequest request);
 
-    GetStudyByCodeResponse getStudyById(Long studyId);
+    GetStudyByIdResponse getStudyById(Long studyId);
 
     Page<GetAllStudiesResponse> getAllStudies(StudyType studyType,
                                               Set<StudyCategory> studyCategories,
