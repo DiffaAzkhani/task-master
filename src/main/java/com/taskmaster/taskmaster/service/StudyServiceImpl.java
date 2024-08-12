@@ -10,7 +10,7 @@ import com.taskmaster.taskmaster.model.request.CreateNewStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
 import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
-import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
+import com.taskmaster.taskmaster.model.response.GetStudyByIdResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import com.taskmaster.taskmaster.repository.StudyRepository;
 import lombok.AllArgsConstructor;
@@ -85,7 +85,7 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional(readOnly = true)
-    public GetStudyByCodeResponse getStudyById(Long studyId) {
+    public GetStudyByIdResponse getStudyById(Long studyId) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> {
                 log.warn("Study with id: {}, not found!", studyId);

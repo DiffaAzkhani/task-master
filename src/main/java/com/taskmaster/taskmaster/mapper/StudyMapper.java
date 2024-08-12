@@ -5,7 +5,7 @@ import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
-import com.taskmaster.taskmaster.model.response.GetStudyByCodeResponse;
+import com.taskmaster.taskmaster.model.response.GetStudyByIdResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import org.springframework.stereotype.Component;
 
@@ -28,8 +28,8 @@ public class StudyMapper {
             .build();
     }
 
-    public GetStudyByCodeResponse toGetStudyResponse(Study study) {
-        return GetStudyByCodeResponse.builder()
+    public GetStudyByIdResponse toGetStudyResponse(Study study) {
+        return GetStudyByIdResponse.builder()
             .code(study.getCode())
             .studyName(study.getName())
             .price(study.getPrice())
