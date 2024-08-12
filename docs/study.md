@@ -29,7 +29,7 @@ This endpoint allows all users, whether authenticated or not, to retrieve a list
   min-price(int) = 50000 
   max-price(int) = 100000
   page(int) = 0 | default = 0 
-  size(int) = 5 | default = 10 
+  size(int) = 2 | default = 10 
   ```
 
 #### Response
@@ -42,6 +42,7 @@ This endpoint allows all users, whether authenticated or not, to retrieve a list
     "message": "OK",
     "data": [
       {
+        "studyId": 26,
         "code": "BLGY.11.00005",
         "name": "Epidermis 5",
         "price": 0,
@@ -53,6 +54,7 @@ This endpoint allows all users, whether authenticated or not, to retrieve a list
         "level": "GRADE_11"
       },
       {
+        "studyId": 25,
         "code": "BLGY.11.00001",
         "name": "Epidermis",
         "price": 0,
@@ -62,14 +64,26 @@ This endpoint allows all users, whether authenticated or not, to retrieve a list
         "category": "BIOLOGY",
         "type": "FREE",
         "level": "GRADE_11"
+      },
+      {
+        "studyId": 30,
+        "code": "BLGY.12.00002",
+        "name": "Struktur Tulang Manusia",
+        "price": 50000,
+        "discount": 0,
+        "description": "belajar struktur tulang manusia kelas 12",
+        "link": "struktur-tulang.mp4",
+        "category": "BIOLOGY",
+        "type": "PREMIUM",
+        "level": "GRADE_12"
       }
     ],
     "errors": null,
     "paging": {
       "currentPage": 0,
       "totalPage": 1,
-      "totalElement": 2,
-      "size": 5,
+      "totalElement": 3,
+      "size": 10,
       "empty": false,
       "first": true,
       "last": true
@@ -272,7 +286,7 @@ This endpoint allows the authenticated user to retrieve a list of studies that t
 - **Request Query Parameter:**
     ```text
     page(int) = 0 | default = 0
-    size(int) = 3 | default = 10
+    size(int) = 2 | default = 10
     ```
 
 #### Response
@@ -285,22 +299,25 @@ This endpoint allows the authenticated user to retrieve a list of studies that t
     "message": "OK",
     "data": [
       {
+        "studyId": 24,
         "code": "INDO.10.00001",
-        "studyName": "Kata Baku",
+        "name": "Kata Baku",
+        "price": 50000,
+        "discount": 30,
+        "description": "Pelajaran kata baku tingkat 11",
+        "link": "https://example.com/kata-baku",
         "category": "INDONESIAN",
         "type": "PREMIUM",
         "level": "GRADE_10"
       },
       {
+        "studyId": 14,
         "code": "MATH.10.00002",
-        "studyName": "Matematika deret",
-        "category": "MATHEMATICS",
-        "type": "FREE",
-        "level": "GRADE_10"
-      },
-      {
-        "code": "MATH.10.00003",
-        "studyName": "Geometri analitik",
+        "name": "Matematika deret",
+        "price": 0,
+        "discount": 0,
+        "description": "belajar deret dasar kelas 10",
+        "link": "https://example.com/deret-dasar",
         "category": "MATHEMATICS",
         "type": "FREE",
         "level": "GRADE_10"
@@ -309,9 +326,9 @@ This endpoint allows the authenticated user to retrieve a list of studies that t
     "errors": null,
     "paging": {
       "currentPage": 0,
-      "totalPage": 2,
+      "totalPage": 3,
       "totalElement": 5,
-      "size": 3,
+      "size": 2,
       "empty": false,
       "first": true,
       "last": false
