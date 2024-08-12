@@ -4,7 +4,7 @@ import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
 import com.taskmaster.taskmaster.model.response.GetAllEnrolledUSerStudyResponse;
-import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
+import com.taskmaster.taskmaster.model.response.GetStudiesResponse;
 import com.taskmaster.taskmaster.model.response.GetStudyByIdResponse;
 import com.taskmaster.taskmaster.model.response.UpdateStudyResponse;
 import org.springframework.stereotype.Component;
@@ -42,8 +42,8 @@ public class StudyMapper {
             .build();
     }
 
-    public GetAllStudiesResponse toGetAllStudyResponse(Study study) {
-        return GetAllStudiesResponse.builder()
+    public GetStudiesResponse toGetAllStudyResponse(Study study) {
+        return GetStudiesResponse.builder()
             .code(study.getCode())
             .name(study.getName())
             .price(study.getPrice())

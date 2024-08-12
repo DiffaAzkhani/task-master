@@ -7,7 +7,7 @@ import com.taskmaster.taskmaster.enums.StudyType;
 import com.taskmaster.taskmaster.model.request.CreateNewStudyRequest;
 import com.taskmaster.taskmaster.model.request.UpdateStudyRequest;
 import com.taskmaster.taskmaster.model.response.CreateNewStudyResponse;
-import com.taskmaster.taskmaster.model.response.GetAllStudiesResponse;
+import com.taskmaster.taskmaster.model.response.GetStudiesResponse;
 import com.taskmaster.taskmaster.model.response.GetStudyByIdResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.PagingWebResponse;
@@ -43,7 +43,7 @@ public class StudyController {
     @GetMapping(
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public PagingWebResponse<List<GetAllStudiesResponse>> getAllStudies(
+    public PagingWebResponse<List<GetStudiesResponse>> getAllStudies(
         @RequestParam(name = "type", required = false) StudyType studyType,
         @RequestParam(name = "categories", required = false) Set<StudyCategory> categories,
         @RequestParam(name = "levels", required = false) Set<StudyLevel> levels,
@@ -53,10 +53,10 @@ public class StudyController {
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetAllStudiesResponse> studyResponsePage = studyService.getAllStudies(studyType, categories, levels, studyFilters, minPrice, maxPrice, page, size);
-        List<GetAllStudiesResponse> studyResponses = studyResponsePage.getContent();
+        Page<GetStudiesResponse> studyResponsePage = studyService.getAllStudies(studyType, categories, levels, studyFilters, minPrice, maxPrice, page, size);
+        List<GetStudiesResponse> studyResponses = studyResponsePage.getContent();
 
-        return PagingWebResponse.<List<GetAllStudiesResponse>>builder()
+        return PagingWebResponse.<List<GetStudiesResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(studyResponses)
@@ -134,6 +134,33 @@ public class StudyController {
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
+            .build();
+    }
+
+    @GetMapping(
+        path = "/me",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public PagingWebResponse<List<GetStudiesResponse>> getUserStudies(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        Page<GetStudiesResponse> myStudiesPage = studyService.getMyStudies(page, size);
+        List<GetStudiesResponse> responseList = myStudiesPage.getContent();
+
+        return PagingWebResponse.<List<GetStudiesResponse>>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(responseList)
+            .paging(PagingResponse.builder()
+                .currentPage(page)
+                .size(size)
+                .totalPage(myStudiesPage.getTotalPages())
+                .totalElement(myStudiesPage.getTotalElements())
+                .empty(myStudiesPage.isEmpty())
+                .first(myStudiesPage.isFirst())
+                .last(myStudiesPage.isLast())
+                .build())
             .build();
     }
 
