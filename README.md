@@ -15,13 +15,26 @@ Task Master provides a wide range of services through its `RESTful API`, which f
 1. **Database Configuration**:
     - Open `src/main/resources/application.properties`
     - Set your PostgreSQL connection details:
-
    ```properties
    spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
    spring.datasource.username=your_username
    spring.datasource.password=your_password
 
-2. **Build Steps**:
+2. **JWT Secret Key**:
+   - Make sure your secret key is at least `32 bytes` long for security and compatible with the `HS256 algorithm`.
+   - Set your JWT Secret Key detail:
+   ```properties
+   jwt.secret-key=your_jwt_secret_key
+
+3. **Midtrans Server Key**:
+   - You can obtain this server key once you have an account with Midtrans as a merchant.
+   - Go to `Midtrans web app` > `login as merchant` > `sandbox environment` > `setting` > `access key`
+   - Set your Midtrans Server Key detail:
+   ```properties
+   midtrans.server-key=your_midtrans_server_key
+   midtrans.is-production=false
+
+4. **Build Steps**:
     - Clone the repository:
 
     ```bash
@@ -41,7 +54,7 @@ Task Master provides a wide range of services through its `RESTful API`, which f
     ```bash
     mvn spring-boot:run
     ```
-3. **Access the Application**
+5.**Access the Application**
    - Once the application is running, it will be accessible at http://localhost:8080. 
    - You can interact with the API using tools like Postman or [Swagger](http://localhost:8080/swagger-ui/index.html#/)
    - Considering that it has not been deployed on the server yet, this application can only be run locally
