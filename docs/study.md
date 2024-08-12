@@ -128,13 +128,13 @@ This endpoint allows an admin to create a new study. The admin can provide detai
     "errors": null
   }
 
-### GET /api/v1/studies
+### GET /api/v1/studies/{studyId}
 
-This endpoint allows an admin to retrieve a list of all studies. The admin can view details. Access to this endpoint is restricted to users with admin privileges.
+This endpoint allows an admin to retrieve studies data. The admin can view details. Access to this endpoint is restricted to users with admin privileges.
 
 #### Request
 
-- **URL:** `/api/v1/studies`
+- **URL:** `/api/v1/studies/{studyId}`
 - **ROLE** `ADMIN`
 - **Method:** `GET`
 - **Content-Type:** `application/json`
@@ -142,7 +142,7 @@ This endpoint allows an admin to retrieve a list of all studies. The admin can v
     ```text
     Authorization: Bearer {your_jwt_token}
     ```
-- **Request Query Parameter:**
+- **Request Path Parameter:**
   ```text
   studyId(int) = 14
   ```
