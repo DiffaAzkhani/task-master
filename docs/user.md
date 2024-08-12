@@ -266,13 +266,13 @@ This endpoint allows an admin to retrieve a list of all users in the system. The
     }
   }
 
-### DELETE /api/v1/users
+### DELETE /api/v1/users/{userId}
 
 This endpoint allows an admin to delete a user account. The admin must provide the userId to identify which account to delete. This operation is irreversible, and all data associated with the user will be permanently removed.
 
 #### Request
 
-- **URL:** `/api/v1/users`
+- **URL:** `/api/v1/users/{userId}`
 - **ROLE** `ADMIN`
 - **Method:** `DELETE`
 - **Content-Type:** `application/json`
@@ -280,7 +280,7 @@ This endpoint allows an admin to delete a user account. The admin must provide t
     ```text
     Authorization: Bearer {your_jwt_token}
     ```
-- **Request Query Parameter:**
+- **Request Path Parameter:**
     ```text
     userId(int) = 20
     ```

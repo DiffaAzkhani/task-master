@@ -97,9 +97,11 @@ public class UserController {
             .build();
     }
 
-    @DeleteMapping
+    @DeleteMapping(
+        path = "/{userId}"
+    )
     public WebResponse<String> deleteUserByIdForAdmin(
-        @RequestParam(name = "userId") Long userId
+        @PathVariable(name = "userId") Long userId
     ) {
         userService.deleteUserAccountForAdmin(userId);
 
@@ -108,8 +110,6 @@ public class UserController {
             .message(HttpStatus.OK.getReasonPhrase())
             .build();
     }
-
-    // API Path for USER Role
 
     @PostMapping(
         path = "/register",
