@@ -297,69 +297,6 @@ This endpoint allows an admin to delete a user account. The admin must provide t
     "errors": null
   }
 
-### GET /api/v1/users/my-studies
-
-This endpoint allows the authenticated user to retrieve a list of studies that they have enrolled in. The response includes details about each study, such as the title, description, and progress. This endpoint is accessible only to the user who is currently logged in.
-
-#### Request
-
-- **URL:** `/api/v1/users`
-- **ROLE** `USER`
-- **Method:** `GET`
-- **Content-Type:** `application/json`
-- **Request Headers:**
-    ```text
-    Authorization: Bearer {your_jwt_token}
-    ```
-- **Request Query Parameter:**
-    ```text
-    page(int) = 0 | default = 0
-    size(int) = 3 | default = 10
-    ```
-
-#### Response
-- **Status Code: `200 OK`**
-- **Content-Type:** `application/json`
-- **Response Body:**
-  ```json
-  {
-    "code": 200,
-    "message": "OK",
-    "data": [
-      {
-        "code": "INDO.10.00001",
-        "studyName": "Kata Baku",
-        "category": "INDONESIAN",
-        "type": "PREMIUM",
-        "level": "GRADE_10"
-      },
-      {
-        "code": "MATH.10.00002",
-        "studyName": "Matematika deret",
-        "category": "MATHEMATICS",
-        "type": "FREE",
-        "level": "GRADE_10"
-      },
-      {
-        "code": "MATH.10.00003",
-        "studyName": "Geometri analitik",
-        "category": "MATHEMATICS",
-        "type": "FREE",
-        "level": "GRADE_10"
-      }
-    ],
-    "errors": null,
-    "paging": {
-      "currentPage": 0,
-      "totalPage": 2,
-      "totalElement": 5,
-      "size": 3,
-      "empty": false,
-      "first": true,
-      "last": false
-    }
-  }
-
 ### DELETE /api/v1/users/me
 
 This endpoint allows the authenticated user to delete their own account from the system. When this endpoint is called, the user's account and associated data will be permanently removed. Access to this endpoint is restricted to the user who owns the account.

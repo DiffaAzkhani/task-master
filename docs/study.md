@@ -254,3 +254,66 @@ This endpoint allows an admin to update the details of a specific study identifi
     },
     "errors": null
   }
+
+### GET /api/v1/studies/me
+
+This endpoint allows the authenticated user to retrieve a list of studies that they have enrolled in. The response includes details about each study, such as the title, description, and progress. This endpoint is accessible only to the user who is currently logged in.
+
+#### Request
+
+- **URL:** `/api/v1/studies/me`
+- **ROLE** `USER`
+- **Method:** `GET`
+- **Content-Type:** `application/json`
+- **Request Headers:**
+    ```text
+    Authorization: Bearer {your_jwt_token}
+    ```
+- **Request Query Parameter:**
+    ```text
+    page(int) = 0 | default = 0
+    size(int) = 3 | default = 10
+    ```
+
+#### Response
+- **Status Code: `200 OK`**
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": [
+      {
+        "code": "INDO.10.00001",
+        "studyName": "Kata Baku",
+        "category": "INDONESIAN",
+        "type": "PREMIUM",
+        "level": "GRADE_10"
+      },
+      {
+        "code": "MATH.10.00002",
+        "studyName": "Matematika deret",
+        "category": "MATHEMATICS",
+        "type": "FREE",
+        "level": "GRADE_10"
+      },
+      {
+        "code": "MATH.10.00003",
+        "studyName": "Geometri analitik",
+        "category": "MATHEMATICS",
+        "type": "FREE",
+        "level": "GRADE_10"
+      }
+    ],
+    "errors": null,
+    "paging": {
+      "currentPage": 0,
+      "totalPage": 2,
+      "totalElement": 5,
+      "size": 3,
+      "empty": false,
+      "first": true,
+      "last": false
+    }
+  }

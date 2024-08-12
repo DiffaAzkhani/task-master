@@ -41,4 +41,6 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
                               @Param("maxPrice") Integer maxPrice,
                               Pageable pageable);
 
+    Page<Study> findByUsers(User user, Pageable pageable);
+
 }
