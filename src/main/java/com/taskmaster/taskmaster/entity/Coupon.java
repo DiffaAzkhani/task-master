@@ -7,7 +7,9 @@ import com.taskmaster.taskmaster.listener.UpdatedAtListener;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,6 +35,8 @@ import java.util.Set;
     CreatedAtListener.class,
     UpdatedAtListener.class
 })
+@ToString(exclude = {"studies"})
+@EqualsAndHashCode(exclude = {"studies"})
 public class Coupon implements CreatedAtAware, UpdatedAtAware {
 
     @Id

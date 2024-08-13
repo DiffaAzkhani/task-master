@@ -348,30 +348,61 @@ This endpoint allows an Admin to update a question and linked answers identified
 
 #### Response
 - **Status Code: `200 OK`**
-  - **Content-Type:** `application/json`
-  - **Response Body:**
-    ```json
-    {
-      "code": 200,
-      "message": "OK",
-      "data": {
-        "questionText": "5 + 6 ?",
-        "imageUrl": "gambar.jpg",
-        "explanation": "karena 5 + 6 = 11",
-        "createdAt": "2024-08-13 14:51:48",
-        "updatedAt": "2024-08-13 17:25:15",
-        "answerRequests": [
-          {
-            "answerId": 55,
-            "answerText": "5",
-            "isCorrect": false
-          },
-          {
-            "answerId": 54,
-            "answerText": "11",
-            "isCorrect": true
-          }
-        ]
-      },
-      "errors": null
-    }
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": {
+      "questionText": "5 + 6 ?",
+      "imageUrl": "gambar.jpg",
+      "explanation": "karena 5 + 6 = 11",
+      "createdAt": "2024-08-13 14:51:48",
+      "updatedAt": "2024-08-13 17:25:15",
+      "answerRequests": [
+        {
+          "answerId": 55,
+          "answerText": "5",
+          "isCorrect": false
+        },
+        {
+          "answerId": 54,
+          "answerText": "11",
+          "isCorrect": true
+        }
+      ]
+    },
+    "errors": null
+  }
+
+### DELETE /api/v1/qna/questions/{questionId}
+
+This endpoint allows admins to delete questions from studies based on questionId. This deletion will be done to all derivatives of questions such as answers and also user answers.
+
+#### Request
+
+- **URL:** `/api/v1/qna/questions/{questionId}`
+- **ROLE** `ADMIN`
+- **Method:** `DELETE`
+- **Content-Type:** `application/json`
+- **Request Headers:**
+  ```text
+  authorization : Bearer {your_jwt_token}
+  ```
+- **Request Query Parameter:**
+    ```text
+    questionId(int) = 9
+    ```
+
+#### Response
+- **Status Code: `200 OK`**
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": null,
+    "errors": null
+  }

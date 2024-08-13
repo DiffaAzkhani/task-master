@@ -42,6 +42,8 @@ import java.util.Set;
     CreatedAtListener.class,
     UpdatedAtListener.class
 })
+@ToString(exclude = {"orderItems","coupons", "users"})
+@EqualsAndHashCode(exclude = {"orderItems","coupons", "users"})
 public class Study implements CreatedAtAware, UpdatedAtAware {
 
     @Id
@@ -81,8 +83,6 @@ public class Study implements CreatedAtAware, UpdatedAtAware {
     private LocalDateTime updatedAt;
 
     @ManyToMany(mappedBy = "studies")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<User> users = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.PERSIST)
@@ -94,8 +94,6 @@ public class Study implements CreatedAtAware, UpdatedAtAware {
     private Set<Coupon> coupons;
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<OrderItem> orderItems;
 
 }
