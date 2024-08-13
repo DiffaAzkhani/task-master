@@ -1,5 +1,9 @@
 package com.taskmaster.taskmaster.entity;
 
+import com.taskmaster.taskmaster.event.CreatedAtAware;
+import com.taskmaster.taskmaster.event.UpdatedAtAware;
+import com.taskmaster.taskmaster.listener.CreatedAtListener;
+import com.taskmaster.taskmaster.listener.UpdatedAtListener;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +12,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +21,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +31,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Question {
+@EntityListeners({
+    CreatedAtListener.class,
+    UpdatedAtListener.class
+})
+public class Question implements CreatedAtAware, UpdatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +49,12 @@ public class Question {
 
     @Column(nullable = false)
     private String explanation;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_id", nullable = false)
