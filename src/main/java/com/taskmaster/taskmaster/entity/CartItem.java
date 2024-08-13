@@ -3,7 +3,9 @@ package com.taskmaster.taskmaster.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,6 +21,8 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString(exclude = {"cart"})
+@EqualsAndHashCode(exclude = {"cart"})
 public class CartItem {
 
     @Id

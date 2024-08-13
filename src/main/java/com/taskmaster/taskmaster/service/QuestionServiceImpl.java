@@ -13,11 +13,7 @@ import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.request.UpdateAnswerRequest;
 import com.taskmaster.taskmaster.model.request.UpdateQuestionsRequest;
-import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
-import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
-import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
-import com.taskmaster.taskmaster.model.response.UpdateQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.*;
 import com.taskmaster.taskmaster.repository.AnswerRepository;
 import com.taskmaster.taskmaster.repository.QuestionRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
@@ -279,6 +275,15 @@ public class QuestionServiceImpl implements QuestionService{
         questionRepository.save(question);
 
         return questionMapper.toUpdateQuestionResponse(question);
+    }
+
+    @Override
+    @Transactional
+    public void deleteQuestion(Long questionId) {
+        Question question = questionRepository.findById(questionId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found!"));
+
+        questionRepository.delete(question);
     }
 
     private void updateQuestionProperties(Question question, UpdateQuestionsRequest request) {

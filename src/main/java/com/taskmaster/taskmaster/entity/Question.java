@@ -7,7 +7,9 @@ import com.taskmaster.taskmaster.listener.UpdatedAtListener;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -35,6 +37,8 @@ import java.util.List;
     CreatedAtListener.class,
     UpdatedAtListener.class
 })
+@ToString(exclude = {"answers","userAnswers"})
+@EqualsAndHashCode(exclude = {"answers","userAnswers"})
 public class Question implements CreatedAtAware, UpdatedAtAware {
 
     @Id
@@ -62,5 +66,8 @@ public class Question implements CreatedAtAware, UpdatedAtAware {
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<UserAnswer> userAnswers = new ArrayList<>();
 
 }

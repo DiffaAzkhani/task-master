@@ -28,6 +28,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -45,6 +46,8 @@ import java.util.stream.Collectors;
     CreatedAtListener.class,
     UpdatedAtListener.class
 })
+@ToString(exclude = {"studies","userAnswers","orders"})
+@EqualsAndHashCode(exclude = {"studies","userAnswers","orders"})
 public class User implements UserDetails, CreatedAtAware, UpdatedAtAware {
 
     @Id
@@ -90,8 +93,6 @@ public class User implements UserDetails, CreatedAtAware, UpdatedAtAware {
     Set<Role> roles = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.PERSIST)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @JoinTable(
         name = "user_study",
         joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
@@ -101,6 +102,9 @@ public class User implements UserDetails, CreatedAtAware, UpdatedAtAware {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new LinkedList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAnswer> userAnswers = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

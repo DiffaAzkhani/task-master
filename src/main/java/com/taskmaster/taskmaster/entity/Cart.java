@@ -1,9 +1,6 @@
 package com.taskmaster.taskmaster.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -23,6 +20,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString(exclude = {"items"})
+@EqualsAndHashCode(exclude = {"items"})
 public class Cart {
 
     @Id

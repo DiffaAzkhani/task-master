@@ -3,7 +3,9 @@ package com.taskmaster.taskmaster.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,6 +22,8 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString(exclude = {"study","order"})
+@EqualsAndHashCode(exclude = {"study", "order"})
 public class OrderItem {
 
     @Id

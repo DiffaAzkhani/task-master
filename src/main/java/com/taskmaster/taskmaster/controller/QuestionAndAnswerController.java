@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,6 +96,20 @@ public class QuestionAndAnswerController {
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(questionsResponse)
+            .build();
+    }
+
+    @DeleteMapping(
+        path = "/questions/{questionId}"
+    )
+    public WebResponse<String> deleteQuestion(
+        @PathVariable(name = "questionId") Long questionId
+    ) {
+        questionService.deleteQuestion(questionId);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
             .build();
     }
 
