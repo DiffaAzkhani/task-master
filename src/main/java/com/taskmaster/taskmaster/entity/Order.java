@@ -28,6 +28,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString(exclude = {"user","orderItems"})
+@EqualsAndHashCode(exclude = {"user","orderItems"})
 public class Order {
 
     @Id
@@ -55,8 +57,6 @@ public class Order {
     private int totalTransfer;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<OrderItem> orderItems;
 
 }

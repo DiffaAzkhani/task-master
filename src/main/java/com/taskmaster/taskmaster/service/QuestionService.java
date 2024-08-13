@@ -3,11 +3,7 @@ package com.taskmaster.taskmaster.service;
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.request.UpdateQuestionsRequest;
-import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
-import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
-import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
-import com.taskmaster.taskmaster.model.response.UpdateQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -29,5 +25,7 @@ public interface QuestionService {
     GetExplanationResponse getExplanationAndUserAnswer(Long studyId);
 
     UpdateQuestionsResponse updateQuestionsForAdmin(Long questionId, UpdateQuestionsRequest request);
+
+    void deleteQuestion(Long questionId);
 
 }
