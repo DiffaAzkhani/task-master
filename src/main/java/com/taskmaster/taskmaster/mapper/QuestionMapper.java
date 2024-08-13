@@ -1,7 +1,6 @@
 package com.taskmaster.taskmaster.mapper;
 
 import com.taskmaster.taskmaster.Util.TimeUtil;
-import com.taskmaster.taskmaster.entity.Answer;
 import com.taskmaster.taskmaster.entity.Question;
 import com.taskmaster.taskmaster.entity.UserAnswer;
 import com.taskmaster.taskmaster.entity.UserGrade;

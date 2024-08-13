@@ -1,6 +1,5 @@
 package com.taskmaster.taskmaster.model.response;
 
-import com.taskmaster.taskmaster.entity.Answer;
 import com.taskmaster.taskmaster.model.request.UpdateAnswerRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
