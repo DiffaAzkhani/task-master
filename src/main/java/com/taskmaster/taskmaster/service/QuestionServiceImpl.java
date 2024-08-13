@@ -11,10 +11,13 @@ import com.taskmaster.taskmaster.mapper.QuestionMapper;
 import com.taskmaster.taskmaster.mapper.UserGradeMapper;
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
+import com.taskmaster.taskmaster.model.request.UpdateAnswerRequest;
+import com.taskmaster.taskmaster.model.request.UpdateQuestionsRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
 import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
 import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
+import com.taskmaster.taskmaster.model.response.UpdateQuestionsResponse;
 import com.taskmaster.taskmaster.repository.AnswerRepository;
 import com.taskmaster.taskmaster.repository.QuestionRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
@@ -33,6 +36,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -262,6 +266,51 @@ public class QuestionServiceImpl implements QuestionService{
         UserGrade userGrade = userGradeRepository.findByUserAndStudy(user, study);
 
         return questionMapper.toGetAllExplanationResponse(userAnswerList ,userGrade);
+    }
+
+    @Override
+    @Transactional
+    public UpdateQuestionsResponse updateQuestionsForAdmin(Long questionId, UpdateQuestionsRequest request) {
+        Question question = questionRepository.findById(questionId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found!"));
+
+        updateQuestionProperties(question, request);
+
+        questionRepository.save(question);
+
+        return questionMapper.toUpdateQuestionResponse(question);
+    }
+
+    private void updateQuestionProperties(Question question, UpdateQuestionsRequest request) {
+        if (Objects.nonNull(request.getQuestionText())) {
+            question.setQuestionText(request.getQuestionText());
+        }
+
+        if (Objects.nonNull(request.getExplanation())) {
+            question.setExplanation(request.getExplanation());
+        }
+
+        if (Objects.nonNull(request.getImageUrl())) {
+            question.setImageUrl(request.getImageUrl());
+        }
+
+        if (Objects.nonNull(request.getAnswers())) {
+            List<UpdateAnswerRequest> updateAnswerList = request.getAnswers();
+
+            question.getAnswers().forEach(existingAnswer -> {
+                updateAnswerList.stream()
+                    .filter(answer -> answer.getAnswerId() != null && answer.getAnswerId().equals(existingAnswer.getId()))
+                    .findFirst()
+                    .ifPresent(newAnswer -> {
+                        if (Objects.nonNull(newAnswer.getAnswerText())) {
+                            existingAnswer.setAnswerText(newAnswer.getAnswerText());
+                        }
+                        if (Objects.nonNull(newAnswer.getIsCorrect())) {
+                            existingAnswer.setIsCorrect(newAnswer.getIsCorrect());
+                        }
+                    });
+            });
+        }
     }
 
     private int countUserSubmission(List<UserAnswer> userAnswerList, List<Question> questionList) {

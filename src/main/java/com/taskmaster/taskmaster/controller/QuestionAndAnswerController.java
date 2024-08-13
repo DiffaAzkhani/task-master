@@ -2,12 +2,14 @@ package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
+import com.taskmaster.taskmaster.model.request.UpdateQuestionsRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
 import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
 import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.PagingWebResponse;
+import com.taskmaster.taskmaster.model.response.UpdateQuestionsResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.QuestionService;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -74,6 +77,24 @@ public class QuestionAndAnswerController {
                 .first(questionResponsePage.isFirst())
                 .last(questionResponsePage.isLast())
                 .build())
+            .build();
+    }
+
+    @PatchMapping(
+        path = "/questions/{questionId}",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<UpdateQuestionsResponse> updateQuestionForAdmin(
+        @PathVariable(name = "questionId") Long questionId,
+        @Valid @RequestBody UpdateQuestionsRequest request
+    ) {
+        UpdateQuestionsResponse questionsResponse = questionService.updateQuestionsForAdmin(questionId, request);
+
+        return WebResponse.<UpdateQuestionsResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(questionsResponse)
             .build();
     }
 

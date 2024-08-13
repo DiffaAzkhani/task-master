@@ -319,3 +319,59 @@ This endpoint allows a user to submit their answers for a specific study identif
           "data": null,
           "errors": null
         }
+
+### PATCH /api/v1/qna/questions/{questionId}
+
+This endpoint allows an Admin to update a question and linked answers identified by the questionId. It is not necessary to update all properties, only properties that include in request will be updated.
+
+#### Request
+
+- **URL:** `/api/v1/qna/questions/{questionId}`
+- **ROLE** `ADMIN`
+- **Method:** `PATCH`
+- **Content-Type:** `application/json`
+- **Request Headers:**
+  ```text
+  authorization : Bearer {your_jwt_token}
+  ```
+- **Request Query Parameter:**
+    ```text
+    questionId(int) = 18
+    ```
+- **Request Body:**
+  ```json
+  {
+    "imageUrl": "gambar.jpg",
+    "explanation": "karena 5 + 6 = 11"
+  }
+
+
+#### Response
+- **Status Code: `200 OK`**
+  - **Content-Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "code": 200,
+      "message": "OK",
+      "data": {
+        "questionText": "5 + 6 ?",
+        "imageUrl": "gambar.jpg",
+        "explanation": "karena 5 + 6 = 11",
+        "createdAt": "2024-08-13 14:51:48",
+        "updatedAt": "2024-08-13 17:25:15",
+        "answerRequests": [
+          {
+            "answerId": 55,
+            "answerText": "5",
+            "isCorrect": false
+          },
+          {
+            "answerId": 54,
+            "answerText": "11",
+            "isCorrect": true
+          }
+        ]
+      },
+      "errors": null
+    }
