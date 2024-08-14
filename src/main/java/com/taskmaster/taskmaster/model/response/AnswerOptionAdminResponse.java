@@ -9,10 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AnswerOptionResponse {
+public class AnswerOptionAdminResponse {
 
     private Long answerId;
 
     private String answerText;
+
+    private boolean isCorrect;
 
 }

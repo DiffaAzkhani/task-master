@@ -15,7 +15,8 @@ import com.taskmaster.taskmaster.model.request.UpdateAnswerRequest;
 import com.taskmaster.taskmaster.model.request.UpdateQuestionsRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
-import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsAdminResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsUserResponse;
 import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.model.response.UpdateQuestionsResponse;
 import com.taskmaster.taskmaster.repository.AnswerRepository;
@@ -102,7 +103,7 @@ public class QuestionServiceImpl implements QuestionService{
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GetQuestionsResponse> getQuestionAndAnswerForUser(Long studyId, int page, int size) {
+    public Page<GetQuestionsUserResponse> getQuestionAndAnswerForUser(Long studyId, int page, int size) {
         String currentUser = validationService.getCurrentUser();
         validationService.validateUser(currentUser);
 
@@ -122,26 +123,27 @@ public class QuestionServiceImpl implements QuestionService{
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Question> questionPage = questionRepository.findByStudy(study, pageRequest);
 
-        List<GetQuestionsResponse> getQuestionsResponses = questionPage.getContent().stream()
-            .map(questionMapper::toGetQuestionResponse)
+        List<GetQuestionsUserResponse> getQuestionsUserResponse = questionPage.getContent().stream()
+            .map(questionMapper::toGetQuestionForUserResponse)
             .collect(Collectors.toList());
 
-        return new PageImpl<>(getQuestionsResponses, pageRequest, questionPage.getTotalElements());
+        return new PageImpl<>(getQuestionsUserResponse, pageRequest, questionPage.getTotalElements());
     }
 
     @Override
-    public Page<GetQuestionsResponse> getQuestionAndAnswerForAdmin(Long studyId, int page, int size) {
+    @Transactional(readOnly = true)
+    public Page<GetQuestionsAdminResponse> getQuestionAndAnswerForAdmin(Long studyId, int page, int size) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!"));
 
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Question> questionPage = questionRepository.findByStudy(study, pageRequest);
 
-        List<GetQuestionsResponse> getQuestionsResponses = questionPage.getContent().stream()
-            .map(questionMapper::toGetQuestionResponse)
+        List<GetQuestionsAdminResponse> getQuestionsAdminResponse = questionPage.getContent().stream()
+            .map(questionMapper::toGetQuestionForAdminResponse)
             .collect(Collectors.toList());
 
-        return new PageImpl<>(getQuestionsResponses, pageRequest, questionPage.getTotalElements());
+        return new PageImpl<>(getQuestionsAdminResponse, pageRequest, questionPage.getTotalElements());
     }
 
     @Override
@@ -259,7 +261,12 @@ public class QuestionServiceImpl implements QuestionService{
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
             });
 
-        List<UserAnswer> userAnswerList = userAnswerRepository.findByUser_UsernameAndQuestionStudy(currentUser, study);
+        List<UserAnswer> userAnswerList = userAnswerRepository.findByUser_UsernameAndStudy(currentUser, study);
+
+        if (userAnswerList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User answer is empty!");
+        }
+
         UserGrade userGrade = userGradeRepository.findByUser_UsernameAndStudy(currentUser, study);
 
         return questionMapper.toGetAllExplanationResponse(userAnswerList ,userGrade);

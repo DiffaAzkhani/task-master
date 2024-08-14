@@ -6,13 +6,13 @@ The Question and Answer API provides endpoints for managing questions and answer
 
 ## Endpoints
 
-### GET /api/v1/qna/answers/study/{studyId}
+### GET /api/v1/qna/answers/me/study/{studyId}
 
 This endpoint allows users to get their answer, question explanation, and grade. 
 
 #### Request
 
-- **URL:** `/api/v1/qna/answers/study/{studyId}`
+- **URL:** `/api/v1/qna/answers/me/study/{studyId}`
 - **ROLE** `USER`
 - **Method:** `GET`
 - **Content-Type:** `application/json`
@@ -27,54 +27,45 @@ This endpoint allows users to get their answer, question explanation, and grade.
 
 #### Response
 - **Status Code: `200 OK`**
-    - **Content-Type:** `application/json`
-    - **Response Body:**
-        ```json
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": {
+      "userScore": "50",
+      "explanationList": [
         {
-          "code": 200,
-          "message": "OK",
-          "data": {
-            "userScore": "100",
-            "explanationList": [
-              {
-                "questionId": "4",
-                "questionText": "2 + 2 ?",
-                "explanation": "karena 2 + 2 adalah 4",
-                "imageUrl": "image.jpeg",
-                "answerId": 1,
-                "answerText": "4",
-                "correct": true
-              },
-              {
-                "questionId": "5",
-                "questionText": "3 + 3 ?",
-                "explanation": "karena 3 ditambah 3 adalah 6",
-                "imageUrl": "image3.jpg",
-                "answerId": 33,
-                "answerText": "6",
-                "correct": true
-              },
-              {
-                "questionId": "6",
-                "questionText": "5 - 4 ?",
-                "explanation": "karena 5 dikurang dengan 4 adalah 1",
-                "imageUrl": "image4.jpg",
-                "answerId": 39,
-                "answerText": "1",
-                "correct": true
-              }
-            ]
-          },
-          "errors": null
+          "questionId": "20",
+          "questionText": "Diberikan deret angka berikut: 2, 5, 8, 11, __, 17. Temukan angka yang hilang pada deret tersebut.",
+          "explanation": "Pola pada deret ini adalah penambahan 3 setiap suku. Jadi, setelah 11, angka berikutnya adalah 14.",
+          "imageUrl": "deret1.jpg",
+          "answerId": 57,
+          "answerText": "11",
+          "correct": false
+        },
+        {
+          "questionId": "21",
+          "questionText": "Diberikan deret angka berikut: 3, 9, 27, __, 243. Temukan angka yang hilang pada deret tersebut.",
+          "explanation": "Pola pada deret ini adalah perkalian dengan 3. Jadi, setelah 27, angka berikutnya adalah 27 × 3 = 81.",
+          "imageUrl": "deret2.jpg",
+          "answerId": 61,
+          "answerText": "81",
+          "correct": true
         }
+      ]
+    },
+    "errors": null
+  }
 
-### GET /api/v1/qna/me/questions/{studyId}
+### GET /api/v1/qna/questions/me/{studyId}
 
 This endpoint allows the current authenticated user to get questions for a specific study identified by the studyId.
 
 #### Request
 
-- **URL:** `/api/v1/qna/answers/study/{studyId}`
+- **URL:** `/api/v1/qna/questions/me/study/{studyId}`
 - **ROLE** `USER`
 - **Method:** `GET`
 - **Content-Type:** `application/json`
@@ -85,46 +76,58 @@ This endpoint allows the current authenticated user to get questions for a speci
 - **Request Parameter:**
     - **Request Variable**
   ```text
-  studyId(int) = 24
+  studyId(int) = 14
   ```
 
 #### Response
 - **Status Code: `200 OK`**
-    - **Content-Type:** `application/json`
-    - **Response Body:**
-        ```json
-        {
-          "code": 200,
-          "message": "OK",
-          "data": [
-            {
-              "studyId": 24,
-              "questionId": 10,
-              "questionText": "Pilih lah kata yang benar antara Teknologi dengan Tekhnologi?",
-              "imageUrl": null,
-              "answers": [
-                {
-                  "answerId": 43,
-                  "answerText": "Teknologi"
-                },
-                {
-                  "answerId": 44,
-                  "answerText": "Tekhnologi"
-                }
-              ]
-            }
-          ],
-          "errors": null,
-          "paging": {
-            "currentPage": 0,
-            "totalPage": 1,
-            "totalElement": 1,
-            "size": 10,
-            "empty": false,
-            "first": true,
-            "last": true
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": [
+      {
+        "studyId": 14,
+        "questionId": 19,
+        "questionText": "Diberikan deret angka berikut: 2, 5, 8, 11, __, 17. Temukan angka yang hilang pada deret tersebut.",
+        "imageUrl": "deret1.jpg",
+        "answers": [
+          {
+            "answerId": 56,
+            "answerText": "14"
+          },
+          {
+            "answerId": 57,
+            "answerText": "11"
+          },
+          {
+            "answerId": 58,
+            "answerText": "10"
+          },
+          {
+            "answerId": 59,
+            "answerText": "13"
+          },
+          {
+            "answerId": 60,
+            "answerText": "12"
           }
-        }
+        ]
+      }
+    ],
+    "errors": null,
+    "paging": {
+      "currentPage": 0,
+      "totalPage": 2,
+      "totalElement": 2,
+      "size": 1,
+      "empty": false,
+      "first": true,
+      "last": false
+    }
+  }
 
 ### GET /api/v1/qna/questions/{studyId}
 
@@ -149,41 +152,59 @@ This endpoint allows an admin to retrieve all questions for a specific study ide
 
 #### Response
 - **Status Code: `200 OK`**
-    - **Content-Type:** `application/json`
-    - **Response Body:**
-        ```json
-        {
-          "code": 200,
-          "message": "OK",
-          "data": [
-            {
-              "studyId": 24,
-              "questionId": 10,
-              "questionText": "Pilih lah kata yang benar antara Teknologi dengan Tekhnologi?",
-              "imageUrl": null,
-              "answers": [
-                {
-                  "answerId": 43,
-                  "answerText": "Teknologi"
-                },
-                {
-                  "answerId": 44,
-                  "answerText": "Tekhnologi"
-                }
-              ]
-            }
-          ],
-          "errors": null,
-          "paging": {
-            "currentPage": 0,
-            "totalPage": 1,
-            "totalElement": 1,
-            "size": 2,
-            "empty": false,
-            "first": true,
-            "last": true
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": [
+      {
+        "studyId": 14,
+        "questionId": 19,
+        "questionText": "Diberikan deret angka berikut: 2, 5, 8, 11, __, 17. Temukan angka yang hilang pada deret tersebut.",
+        "imageUrl": "deret1.jpg",
+        "explanation": "Pola pada deret ini adalah penambahan 3 setiap suku. Jadi, setelah 11, angka berikutnya adalah 14.",
+        "answers": [
+          {
+            "answerId": 56,
+            "answerText": "14",
+            "correct": true
+          },
+          {
+            "answerId": 57,
+            "answerText": "11",
+            "correct": false
+          },
+          {
+            "answerId": 58,
+            "answerText": "10",
+            "correct": false
+          },
+          {
+            "answerId": 59,
+            "answerText": "13",
+            "correct": false
+          },
+          {
+            "answerId": 60,
+            "answerText": "12",
+            "correct": false
           }
-        }
+        ]
+      }
+    ],
+    "errors": null,
+    "paging": {
+      "currentPage": 0,
+      "totalPage": 2,
+      "totalElement": 2,
+      "size": 1,
+      "empty": false,
+      "first": true,
+      "last": false
+    }
+  }
 
 ### POST /api/v1/qna/questions
 
@@ -216,36 +237,36 @@ This endpoint allows an admin to create a new question for a specific study. The
 
 #### Response
 - **Status Code: `200 OK`**
-    - **Content-Type:** `application/json`
-    - **Response Headers:**
-    - **Response Body:**
-        ```json
+- **Content-Type:** `application/json`
+- **Response Headers:**
+- **Response Body:**
+    ```json
+    {
+      "code": 200,
+      "message": "OK",
+      "data": [
         {
-          "code": 200,
-          "message": "OK",
-          "data": [
+          "studyId": 24,
+          "id": 11,
+          "questionText": "Pilihlah kata yang benar antara Apotek dan Apotik ?",
+          "imageUrl": "string",
+          "explanation": "karena, Arti kata apotek menurut KBBI Online: apotek / apo·tek / /apoték/ n toko tempat meramu dan menjual obat berdasarkan resep dokter serta memperdagangkan barang medis",
+          "answers": [
             {
-              "studyId": 24,
-              "id": 11,
-              "questionText": "Pilihlah kata yang benar antara Apotek dan Apotik ?",
-              "imageUrl": "string",
-              "explanation": "karena, Arti kata apotek menurut KBBI Online: apotek / apo·tek / /apoték/ n toko tempat meramu dan menjual obat berdasarkan resep dokter serta memperdagangkan barang medis",
-              "answers": [
-                {
-                  "answerId": 45,
-                  "answerText": "Apotek",
-                  "correct": true
-                },
-                {
-                  "answerId": 46,
-                  "answerText": "Apotik",
-                  "correct": false
-                }
-              ]
+              "answerId": 45,
+              "answerText": "Apotek",
+              "correct": true
+            },
+            {
+              "answerId": 46,
+              "answerText": "Apotik",
+              "correct": false
             }
-          ],
-          "errors": null
+          ]
         }
+      ],
+      "errors": null
+    }
 
 ### POST /api/v1/qna/studies/{studyId}/grade
 
@@ -268,20 +289,20 @@ This endpoint allows an admin to submit the grade for a specific study identifie
 
 #### Response
 - **Status Code: `200 OK`**
-    - **Content-Type:** `application/json`
-    - **Response Body:**
-        ```json
-        {
-          "code": 200,
-          "message": "OK",
-          "data": {
-            "username": "diffaazkhani",
-            "studyCode": "INDO.10.00001",
-            "score": 0,
-            "gradedAt": "2024-08-11 00:18:14"
-          },
-          "errors": null
-        }
+- **Content-Type:** `application/json`
+- **Response Body:**
+    ```json
+    {
+      "code": 200,
+      "message": "OK",
+      "data": {
+        "username": "diffaazkhani",
+        "studyCode": "INDO.10.00001",
+        "score": 0,
+        "gradedAt": "2024-08-11 00:18:14"
+      },
+      "errors": null
+    }
 
 ### POST /api/v1/qna/studies/{studyId}/submission
 
@@ -310,15 +331,15 @@ This endpoint allows a user to submit their answers for a specific study identif
 
 #### Response
 - **Status Code: `200 OK`**
-    - **Content-Type:** `application/json`
-    - **Response Body:**
-        ```json
-        {
-          "code": 200,
-          "message": "OK",
-          "data": null,
-          "errors": null
-        }
+- **Content-Type:** `application/json`
+- **Response Body:**
+    ```json
+    {
+      "code": 200,
+      "message": "OK",
+      "data": null,
+      "errors": null
+    }
 
 ### PATCH /api/v1/qna/questions/{questionId}
 
