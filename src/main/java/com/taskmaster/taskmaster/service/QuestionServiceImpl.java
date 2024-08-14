@@ -13,7 +13,11 @@ import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.request.UpdateAnswerRequest;
 import com.taskmaster.taskmaster.model.request.UpdateQuestionsRequest;
-import com.taskmaster.taskmaster.model.response.*;
+import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
+import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
+import com.taskmaster.taskmaster.model.response.UpdateQuestionsResponse;
 import com.taskmaster.taskmaster.repository.AnswerRepository;
 import com.taskmaster.taskmaster.repository.QuestionRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
@@ -180,6 +184,7 @@ public class QuestionServiceImpl implements QuestionService{
 
         UserAnswer userAnswer = UserAnswer.builder()
             .user(user)
+            .study(study)
             .question(question)
             .answer(answer)
             .answeredAt(TimeUtil.getFormattedLocalDateTimeNow())
@@ -207,8 +212,10 @@ public class QuestionServiceImpl implements QuestionService{
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
             });
 
+        UserGrade existingUserGrade = userGradeRepository.findByUser_UsernameAndStudy(currentUser, study);
+
         if (userGradeRepository.existsByUserAndStudy(user, study)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User has already completed this study question and received a score!");
+            userGradeRepository.delete(existingUserGrade);
         }
 
         List<Question> questionList = questionRepository.findByStudy(study);
@@ -246,20 +253,14 @@ public class QuestionServiceImpl implements QuestionService{
         String currentUser = validationService.getCurrentUser();
         validationService.validateUser(currentUser);
 
-        User user = userRepository.findByUsername(currentUser)
-            .orElseThrow(() -> {
-                log.info("User with username:{}, not found!", currentUser);
-                return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
-            });
-
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> {
                 log.info("Study with id:{}, not found!", studyId);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!");
             });
 
-        List<UserAnswer> userAnswerList = userAnswerRepository.findByUserAndQuestionStudy(user, study);
-        UserGrade userGrade = userGradeRepository.findByUserAndStudy(user, study);
+        List<UserAnswer> userAnswerList = userAnswerRepository.findByUser_UsernameAndQuestionStudy(currentUser, study);
+        UserGrade userGrade = userGradeRepository.findByUser_UsernameAndStudy(currentUser, study);
 
         return questionMapper.toGetAllExplanationResponse(userAnswerList ,userGrade);
     }
@@ -284,6 +285,54 @@ public class QuestionServiceImpl implements QuestionService{
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found!"));
 
         questionRepository.delete(question);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserAnswer(Long studyId) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
+
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!"));
+
+        if (!userRepository.existsByUsernameAndStudies(currentUser, study)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This user doesn't have this study!");
+        }
+
+        List<UserAnswer> userAnswer = userAnswerRepository.findByUser_UsernameAndStudy(currentUser, study);
+
+        if (userAnswer.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User didn't have any answer!");
+        }
+
+        UserGrade userGrade = userGradeRepository.findByUser_UsernameAndStudy(currentUser, study);
+
+        userGradeRepository.delete(userGrade);
+
+        userAnswerRepository.deleteAll(userAnswer);
+
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserAnswerForAdmin(Long studyId, Long userId) {
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Study not found!"));
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+
+        List<UserAnswer> userAnswer = userAnswerRepository.findByUser_UsernameAndStudy(user.getUsername(), study);
+
+        if (userAnswer.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User didn't have any answer!");
+        }
+
+        UserGrade userGrade = userGradeRepository.findByUser_UsernameAndStudy(user.getUsername(), study);
+        userGradeRepository.delete(userGrade);
+
+        userAnswerRepository.deleteAll(userAnswer);
     }
 
     private void updateQuestionProperties(Question question, UpdateQuestionsRequest request) {
@@ -331,7 +380,9 @@ public class QuestionServiceImpl implements QuestionService{
             }
         }
 
-        return (correctAnswers / totalQuestion) * 100;
+        double score = ((double) correctAnswers / totalQuestion) * 100;
+
+        return (int) score;
     }
 
 }

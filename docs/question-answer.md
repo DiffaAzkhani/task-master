@@ -406,3 +406,66 @@ This endpoint allows admins to delete questions from studies based on questionId
     "data": null,
     "errors": null
   }
+
+### DELETE /api/v1/qna/answers/me/{studyId}
+
+This endpoint allows users to delete their answers based on studyId. This deletion will be done to all derivatives of questions such as user grade.
+
+#### Request
+
+- **URL:** `/api/v1/qna/answers/me/{studyId}`
+- **ROLE** `USER`
+- **Method:** `DELETE`
+- **Content-Type:** `application/json`
+- **Request Headers:**
+  ```text
+  authorization : Bearer {your_jwt_token}
+  ```
+- **Request Query Parameter:**
+    ```text
+    studyId(int) = 14
+    ```
+
+#### Response
+- **Status Code: `200 OK`**
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": null,
+    "errors": null
+  }
+
+### DELETE /api/v1/qna/answers/{studyId}/users/{userId}
+
+This endpoint allows admins to delete user answers based on studyId and userId. This deletion will be done to all derivatives of questions such as user grade.
+
+#### Request
+
+- **URL:** `/api/v1/qna/answers/{studyId}/users/{userId}`
+- **ROLE** `ADMIN`
+- **Method:** `DELETE`
+- **Content-Type:** `application/json`
+- **Request Headers:**
+  ```text
+  authorization : Bearer {your_jwt_token}
+  ```
+- **Request Query Parameter:**
+    ```text
+    studyId(int) = 14
+    userId(int) = 15
+    ```
+
+#### Response
+- **Status Code: `200 OK`**
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": null,
+    "errors": null
+  }

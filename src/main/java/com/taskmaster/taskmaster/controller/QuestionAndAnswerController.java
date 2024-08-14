@@ -113,6 +113,21 @@ public class QuestionAndAnswerController {
             .build();
     }
 
+    @DeleteMapping(
+        path = "/answers/study/{studyId}/users/{userId}"
+    )
+    public WebResponse<String> deleteUserAnswerForAdmin(
+        @PathVariable(name = "studyId") Long studyId,
+        @PathVariable(name = "userId") Long userId
+    ) {
+        questionService.deleteUserAnswerForAdmin(studyId, userId);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .build();
+    }
+
     @GetMapping(
         path = "/me/questions/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
@@ -186,6 +201,20 @@ public class QuestionAndAnswerController {
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(explanationResponses)
+            .build();
+    }
+
+    @DeleteMapping(
+        path = "/answers/me/studies/{studyId}"
+    )
+    public WebResponse<String> deleteUserAnswer(
+        @PathVariable(name = "studyId") Long studyId
+    ) {
+        questionService.deleteUserAnswer(studyId);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
             .build();
     }
 
