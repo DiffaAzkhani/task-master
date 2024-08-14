@@ -6,6 +6,7 @@ import com.taskmaster.taskmaster.entity.UserAnswer;
 import com.taskmaster.taskmaster.entity.UserGrade;
 import com.taskmaster.taskmaster.model.request.AnswerOptionUserResponse;
 import com.taskmaster.taskmaster.model.request.UpdateAnswerRequest;
+import com.taskmaster.taskmaster.model.request.UpdateUserAnswerRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.AnswerOptionAdminResponse;
 import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
@@ -13,6 +14,7 @@ import com.taskmaster.taskmaster.model.response.GetQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionsAdminResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionsUserResponse;
 import com.taskmaster.taskmaster.model.response.UpdateQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.UpdateUserAnswerResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -107,6 +109,23 @@ public class QuestionMapper {
             .createdAt(TimeUtil.formatToString(question.getCreatedAt()))
             .updatedAt(TimeUtil.formatToString(question.getUpdatedAt()))
             .answerRequests(answerRequestResponseList)
+            .build();
+    }
+
+    public UpdateUserAnswerResponse toUpdateUserAnswerResponse(List<UserAnswer> userAnswerList) {
+        List<UpdateUserAnswerRequest> updateUserAnswerRequests = userAnswerList.stream()
+            .map(userAnswer -> UpdateUserAnswerRequest.builder()
+                .questionId(userAnswer.getQuestion().getId())
+                .answerId(userAnswer.getAnswer().getId())
+                .build())
+            .collect(Collectors.toList());
+
+        return UpdateUserAnswerResponse.builder()
+            .studyId(userAnswerList.stream()
+                .map(userAnswer -> userAnswer.getStudy().getId())
+                .findFirst()
+                .orElse(null))
+            .userAnswerList(updateUserAnswerRequests)
             .build();
     }
 

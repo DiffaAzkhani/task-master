@@ -1,7 +1,6 @@
 package com.taskmaster.taskmaster.service;
 
 import com.taskmaster.taskmaster.entity.Study;
-import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.enums.StudyCategory;
 import com.taskmaster.taskmaster.enums.StudyFilter;
 import com.taskmaster.taskmaster.enums.StudyLevel;

@@ -1,7 +1,6 @@
 package com.taskmaster.taskmaster.service;
 
 import com.taskmaster.taskmaster.entity.Role;
-import com.taskmaster.taskmaster.entity.Study;
 import com.taskmaster.taskmaster.entity.User;
 import com.taskmaster.taskmaster.enums.UserRole;
 import com.taskmaster.taskmaster.mapper.StudyMapper;
