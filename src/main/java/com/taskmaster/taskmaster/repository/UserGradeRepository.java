@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserGradeRepository extends JpaRepository<UserGrade, Long> {
 
-    UserGrade findByUserAndStudy(User user, Study study);
+    UserGrade findByUser_UsernameAndStudy(String username, Study study);
 
     boolean existsByUserAndStudy(User user, Study study);
 
