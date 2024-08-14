@@ -29,7 +29,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -95,5 +97,8 @@ public class Study implements CreatedAtAware, UpdatedAtAware {
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderItem> orderItems;
+
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAnswer> userAnswers = new ArrayList<>();
 
 }

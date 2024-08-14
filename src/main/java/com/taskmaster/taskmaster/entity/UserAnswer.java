@@ -36,6 +36,10 @@ public class UserAnswer {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "study_id", nullable = false)
+    private Study study;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
