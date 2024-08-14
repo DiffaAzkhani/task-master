@@ -5,7 +5,8 @@ import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.request.UpdateQuestionsRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
-import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsAdminResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsUserResponse;
 import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.PagingWebResponse;
@@ -57,15 +58,15 @@ public class QuestionAndAnswerController {
         path = "/questions/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public PagingWebResponse<List<GetQuestionsResponse>> getQuestionAndAnswerForAdmin(
+    public PagingWebResponse<List<GetQuestionsAdminResponse>> getQuestionAndAnswerForAdmin(
         @RequestParam(name = "studyId") Long studyId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetQuestionsResponse> questionResponsePage = questionService.getQuestionAndAnswerForAdmin(studyId, page, size);
-        List<GetQuestionsResponse> questionResponses = questionResponsePage.getContent();
+        Page<GetQuestionsAdminResponse> questionResponsePage = questionService.getQuestionAndAnswerForAdmin(studyId, page, size);
+        List<GetQuestionsAdminResponse> questionResponses = questionResponsePage.getContent();
 
-        return PagingWebResponse.<List<GetQuestionsResponse>>builder()
+        return PagingWebResponse.<List<GetQuestionsAdminResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(questionResponses)
@@ -129,18 +130,18 @@ public class QuestionAndAnswerController {
     }
 
     @GetMapping(
-        path = "/me/questions/{studyId}",
+        path = "/questions/me/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public PagingWebResponse<List<GetQuestionsResponse>> getQuestionAndAnswerForUser(
+    public PagingWebResponse<List<GetQuestionsUserResponse>> getQuestionAndAnswerForUser(
         @RequestParam(name = "studyId") Long studyId,
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        Page<GetQuestionsResponse> questionResponsePage = questionService.getQuestionAndAnswerForUser(studyId, page, size);
-        List<GetQuestionsResponse> questionResponses = questionResponsePage.getContent();
+        Page<GetQuestionsUserResponse> questionResponsePage = questionService.getQuestionAndAnswerForUser(studyId, page, size);
+        List<GetQuestionsUserResponse> questionResponses = questionResponsePage.getContent();
 
-        return PagingWebResponse.<List<GetQuestionsResponse>>builder()
+        return PagingWebResponse.<List<GetQuestionsUserResponse>>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
             .data(questionResponses)
@@ -189,7 +190,7 @@ public class QuestionAndAnswerController {
     }
 
     @GetMapping(
-        path = "/answers/study/{studyId}",
+        path = "/answers/me/study/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<GetExplanationResponse> getExplanationAndUserAnswer(

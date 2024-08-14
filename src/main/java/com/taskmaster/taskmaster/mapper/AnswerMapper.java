@@ -1,7 +1,6 @@
 package com.taskmaster.taskmaster.mapper;
 
 import com.taskmaster.taskmaster.entity.Answer;
-import com.taskmaster.taskmaster.model.response.AnswerOptionResponse;
 import com.taskmaster.taskmaster.model.response.AnswerResponse;
 import org.springframework.stereotype.Component;
 
@@ -13,13 +12,6 @@ public class AnswerMapper {
             .answerId(answer.getId())
             .answerText(answer.getAnswerText())
             .isCorrect(answer.getIsCorrect())
-            .build();
-    }
-
-    public AnswerOptionResponse toAnswerOptionResponse(Answer answer) {
-        return AnswerOptionResponse.builder()
-            .answerId(answer.getId())
-            .answerText(answer.getAnswerText())
             .build();
     }
 
