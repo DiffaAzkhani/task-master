@@ -13,12 +13,14 @@ import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.request.UpdateAnswerRequest;
 import com.taskmaster.taskmaster.model.request.UpdateQuestionsRequest;
+import com.taskmaster.taskmaster.model.request.UpdateUserAnswerRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionsAdminResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionsUserResponse;
 import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.model.response.UpdateQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.UpdateUserAnswerResponse;
 import com.taskmaster.taskmaster.repository.AnswerRepository;
 import com.taskmaster.taskmaster.repository.QuestionRepository;
 import com.taskmaster.taskmaster.repository.StudyRepository;
@@ -189,7 +191,6 @@ public class QuestionServiceImpl implements QuestionService{
             .study(study)
             .question(question)
             .answer(answer)
-            .answeredAt(TimeUtil.getFormattedLocalDateTimeNow())
             .build();
 
         userAnswerRepository.save(userAnswer);
@@ -340,6 +341,42 @@ public class QuestionServiceImpl implements QuestionService{
         userGradeRepository.delete(userGrade);
 
         userAnswerRepository.deleteAll(userAnswer);
+    }
+
+    @Override
+    @Transactional
+    public UpdateUserAnswerResponse updateUserAnswerResponse(List<UpdateUserAnswerRequest> requestList, Long studyId) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
+
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+
+        List<UserAnswer> userAnswer = userAnswerRepository.findByUser_UsernameAndStudy(currentUser, study);
+
+        requestList.forEach(request -> updateUserAnswerProperties(request, userAnswer));
+
+        userAnswerRepository.saveAll(userAnswer);
+
+        return questionMapper.toUpdateUserAnswerResponse(userAnswer);
+    }
+
+    private void updateUserAnswerProperties(UpdateUserAnswerRequest request, List<UserAnswer> userAnswerList) {
+        userAnswerList.stream()
+            .filter(userAnswer -> Objects.equals(userAnswer.getQuestion().getId(), request.getQuestionId()))
+            .findFirst()
+            .ifPresent(userAnswer -> {
+                if (Objects.nonNull(request.getAnswerId())) {
+                    Answer answer = answerRepository.findById(request.getAnswerId())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Answer not found!"));
+
+                    if (!Objects.equals(answer.getQuestion().getId(), request.getQuestionId())) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Answer id didnt match with question!");
+                    }
+
+                    userAnswer.setAnswer(answer);
+                }
+            });
     }
 
     private void updateQuestionProperties(Question question, UpdateQuestionsRequest request) {
