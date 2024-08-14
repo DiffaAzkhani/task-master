@@ -6,13 +6,13 @@ The Question and Answer API provides endpoints for managing questions and answer
 
 ## Endpoints
 
-### GET /api/v1/qna/answers/me/study/{studyId}
+### GET /api/v1/qna/answers/me/studies/{studyId}
 
 This endpoint allows users to get their answer, question explanation, and grade. 
 
 #### Request
 
-- **URL:** `/api/v1/qna/answers/me/study/{studyId}`
+- **URL:** `/api/v1/qna/answers/me/studies/{studyId}`
 - **ROLE** `USER`
 - **Method:** `GET`
 - **Content-Type:** `application/json`
@@ -59,13 +59,13 @@ This endpoint allows users to get their answer, question explanation, and grade.
     "errors": null
   }
 
-### GET /api/v1/qna/questions/me/{studyId}
+### GET /api/v1/qna/questions/me/studies/{studyId}
 
 This endpoint allows the current authenticated user to get questions for a specific study identified by the studyId.
 
 #### Request
 
-- **URL:** `/api/v1/qna/questions/me/study/{studyId}`
+- **URL:** `/api/v1/qna/questions/me/studies/{studyId}`
 - **ROLE** `USER`
 - **Method:** `GET`
 - **Content-Type:** `application/json`
@@ -129,13 +129,13 @@ This endpoint allows the current authenticated user to get questions for a speci
     }
   }
 
-### GET /api/v1/qna/questions/{studyId}
+### GET /api/v1/qna/questions/studies/{studyId}
 
 This endpoint allows an admin to retrieve all questions for a specific study identified by the studyId. The response includes detailed information about each question, including any associated answers.
 
 #### Request
 
-- **URL:** `/api/v1/qna/questions/{studyId}`
+- **URL:** `/api/v1/qna/questions/studies/{studyId}`
 - **ROLE** `ADMIN`
 - **Method:** `GET`
 - **Content-Type:** `application/json`
@@ -428,13 +428,13 @@ This endpoint allows admins to delete questions from studies based on questionId
     "errors": null
   }
 
-### DELETE /api/v1/qna/answers/me/{studyId}
+### DELETE /api/v1/qna/answers/me/studies/{studyId}
 
 This endpoint allows users to delete their answers based on studyId. This deletion will be done to all derivatives of questions such as user grade.
 
 #### Request
 
-- **URL:** `/api/v1/qna/answers/me/{studyId}`
+- **URL:** `/api/v1/qna/answers/me/studies/{studyId}`
 - **ROLE** `USER`
 - **Method:** `DELETE`
 - **Content-Type:** `application/json`
@@ -488,5 +488,48 @@ This endpoint allows admins to delete user answers based on studyId and userId. 
     "code": 200,
     "message": "OK",
     "data": null,
+    "errors": null
+  }
+
+### PATCH /api/v1/qna/answers/me/studies/{studyId}/revision
+
+This endpoint allows users to update their answers based on the provided studyId. Only the specified answers in the request will be updated, rather than updating all user answers at once.
+
+#### Request
+
+- **URL:** `/api/v1/qna/answers/me/studies/{studyId}/revision`
+- **ROLE** `USER`
+- **Method:** `PATCH`
+- **Content-Type:** `application/json`
+- **Request Headers:**
+  ```text
+  authorization : Bearer {your_jwt_token}
+  ```
+- **Request Query Parameter:**
+    ```text
+    studyId(int) = 14
+    ```
+
+#### Response
+- **Status Code: `200 OK`**
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": {
+      "studyId": 14,
+      "userAnswerList": [
+        {
+          "questionId": 20,
+          "answerId": 61
+        },
+        {
+          "questionId": 19,
+          "answerId": 57
+        }
+      ]
+    },
     "errors": null
   }

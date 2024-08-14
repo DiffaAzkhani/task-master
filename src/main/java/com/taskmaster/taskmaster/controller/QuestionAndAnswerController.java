@@ -3,6 +3,7 @@ package com.taskmaster.taskmaster.controller;
 import com.taskmaster.taskmaster.model.request.AddQuestionRequest;
 import com.taskmaster.taskmaster.model.request.AnswerSubmissionRequest;
 import com.taskmaster.taskmaster.model.request.UpdateQuestionsRequest;
+import com.taskmaster.taskmaster.model.request.UpdateUserAnswerRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
 import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionsAdminResponse;
@@ -11,6 +12,7 @@ import com.taskmaster.taskmaster.model.response.GradeSubmissionResponse;
 import com.taskmaster.taskmaster.model.response.PagingResponse;
 import com.taskmaster.taskmaster.model.response.PagingWebResponse;
 import com.taskmaster.taskmaster.model.response.UpdateQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.UpdateUserAnswerResponse;
 import com.taskmaster.taskmaster.model.response.WebResponse;
 import com.taskmaster.taskmaster.service.QuestionService;
 import lombok.AllArgsConstructor;
@@ -115,7 +117,7 @@ public class QuestionAndAnswerController {
     }
 
     @DeleteMapping(
-        path = "/answers/study/{studyId}/users/{userId}"
+        path = "/answers/studies/{studyId}/users/{userId}"
     )
     public WebResponse<String> deleteUserAnswerForAdmin(
         @PathVariable(name = "studyId") Long studyId,
@@ -130,7 +132,7 @@ public class QuestionAndAnswerController {
     }
 
     @GetMapping(
-        path = "/questions/me/{studyId}",
+        path = "/questions/me/studies/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public PagingWebResponse<List<GetQuestionsUserResponse>> getQuestionAndAnswerForUser(
@@ -190,7 +192,7 @@ public class QuestionAndAnswerController {
     }
 
     @GetMapping(
-        path = "/answers/me/study/{studyId}",
+        path = "/answers/me/studies/{studyId}",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public WebResponse<GetExplanationResponse> getExplanationAndUserAnswer(
@@ -216,6 +218,24 @@ public class QuestionAndAnswerController {
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
             .message(HttpStatus.OK.getReasonPhrase())
+            .build();
+    }
+
+    @PatchMapping(
+        path = "/answers/me/studies/{studyId}/revision",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<UpdateUserAnswerResponse> updateUserAnswerResponseWebResponse (
+        @PathVariable(name = "studyId") Long studyId,
+        @Valid @RequestBody List<UpdateUserAnswerRequest> request
+    ) {
+        UpdateUserAnswerResponse userAnswerResponse = questionService.updateUserAnswerResponse(request, studyId);
+
+        return WebResponse.<UpdateUserAnswerResponse>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .data(userAnswerResponse)
             .build();
     }
 
