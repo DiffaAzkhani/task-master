@@ -4,11 +4,14 @@ import com.taskmaster.taskmaster.Util.TimeUtil;
 import com.taskmaster.taskmaster.entity.Question;
 import com.taskmaster.taskmaster.entity.UserAnswer;
 import com.taskmaster.taskmaster.entity.UserGrade;
+import com.taskmaster.taskmaster.model.request.AnswerOptionUserResponse;
 import com.taskmaster.taskmaster.model.request.UpdateAnswerRequest;
 import com.taskmaster.taskmaster.model.response.AddQuestionResponse;
+import com.taskmaster.taskmaster.model.response.AnswerOptionAdminResponse;
 import com.taskmaster.taskmaster.model.response.GetExplanationResponse;
 import com.taskmaster.taskmaster.model.response.GetQuestionResponse;
-import com.taskmaster.taskmaster.model.response.GetQuestionsResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsAdminResponse;
+import com.taskmaster.taskmaster.model.response.GetQuestionsUserResponse;
 import com.taskmaster.taskmaster.model.response.UpdateQuestionsResponse;
 import org.springframework.stereotype.Component;
 
@@ -33,15 +36,39 @@ public class QuestionMapper {
             .build();
     }
 
-    public GetQuestionsResponse toGetQuestionResponse(Question question) {
-        return GetQuestionsResponse.builder()
+    public GetQuestionsUserResponse toGetQuestionForUserResponse(Question question) {
+        List<AnswerOptionUserResponse> answerList = question.getAnswers().stream()
+            .map(answer -> AnswerOptionUserResponse.builder()
+                .answerId(answer.getId())
+                .answerText(answer.getAnswerText())
+                .build())
+            .collect(Collectors.toList());
+
+        return GetQuestionsUserResponse.builder()
             .studyId(question.getStudy().getId())
             .questionId(question.getId())
             .questionText(question.getQuestionText())
             .imageUrl(question.getImageUrl())
-            .answers(question.getAnswers().stream()
-                .map(answerMapper::toAnswerOptionResponse)
-                .collect(Collectors.toList()))
+            .answers(answerList)
+            .build();
+    }
+
+    public GetQuestionsAdminResponse toGetQuestionForAdminResponse(Question question) {
+        List<AnswerOptionAdminResponse> answerList = question.getAnswers().stream()
+            .map(answer -> AnswerOptionAdminResponse.builder()
+                .answerId(answer.getId())
+                .answerText(answer.getAnswerText())
+                .isCorrect(answer.getIsCorrect())
+                .build())
+            .collect(Collectors.toList());
+
+        return GetQuestionsAdminResponse.builder()
+            .studyId(question.getStudy().getId())
+            .questionId(question.getId())
+            .questionText(question.getQuestionText())
+            .imageUrl(question.getImageUrl())
+            .explanation(question.getExplanation())
+            .answers(answerList)
             .build();
     }
 
