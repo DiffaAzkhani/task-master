@@ -69,4 +69,19 @@ public class AuthController {
                 .build());
     }
 
+    @PostMapping(
+        path = "/logout"
+    )
+    public WebResponse<String> logout(
+        @CookieValue("refresh_token") String refreshToken,
+        HttpServletResponse httpServletResponse
+    ) {
+        authService.logout(refreshToken, httpServletResponse);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .build();
+    }
+
 }
