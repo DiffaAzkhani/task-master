@@ -35,6 +35,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtService jwtService;
 
+    private final ValidationService validationService;
+
     private final AuthenticationManager authenticationManager;
 
     private final UserMapper userMapper;
@@ -68,6 +70,29 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
+    public void logout(String refreshToken, HttpServletResponse httpServletResponse) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
+
+        if (!refreshTokenRepository.existsByToken(refreshToken)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid or not found refresh token!");
+        }
+
+        revokeRefreshTokenFromCookies(httpServletResponse);
+
+        refreshTokenRepository.deleteByToken(refreshToken);
+    }
+
+    private void revokeRefreshTokenFromCookies(HttpServletResponse httpServletResponse) {
+        Cookie cookie = new Cookie("refresh_token",null);
+        cookie.setPath("/api/v1/auth/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        httpServletResponse.addCookie(cookie);
+    }
+
+    @Override
+    @Transactional
     public String createToken(String username, String email) {
         User user = userRepository.findByUsernameOrEmail(username, email)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found!"));
@@ -96,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
         Cookie cookie = new Cookie("refresh_token", refreshToken);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
-        cookie.setPath("/api/v1/auth/refresh");
+        cookie.setPath("/api/v1/auth/");
         cookie.setMaxAge(7 * 24 * 60 * 60);
         httpServletResponse.addCookie(cookie);
     }
