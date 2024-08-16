@@ -8,7 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface AuthService {
 
-    LoginResponse login (LoginRequest loginRequest);
+    LoginResponse login(LoginRequest loginRequest);
+
+    void logout(String refreshToken, HttpServletResponse httpServletResponse);
 
     String createToken(String username, String email);
 
