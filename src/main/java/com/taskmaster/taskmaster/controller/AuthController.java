@@ -10,11 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -77,6 +73,34 @@ public class AuthController {
         HttpServletResponse httpServletResponse
     ) {
         authService.logout(refreshToken, httpServletResponse);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .build();
+    }
+
+    @PostMapping(
+        path = "/revoke"
+    )
+    public WebResponse<String> revokeUserInAllDevice(
+        @CookieValue("refresh_token") String refreshToken
+    ) {
+        authService.revokeUserInAllDevice(refreshToken);
+
+        return WebResponse.<String>builder()
+            .code(HttpStatus.OK.value())
+            .message(HttpStatus.OK.getReasonPhrase())
+            .build();
+    }
+
+    @PostMapping(
+        path = "/revoke/{userId}"
+    )
+    public WebResponse<String> revokeUserInAllDeviceForAdmin(
+        @PathVariable(name = "userId") Long userId
+    ) {
+        authService.revokeUserInAllDeviceForAdmin(userId);
 
         return WebResponse.<String>builder()
             .code(HttpStatus.OK.value())
