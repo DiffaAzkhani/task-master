@@ -47,6 +47,8 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.GET,"/api/v1/studies/{studyId}").permitAll()
                 .antMatchers(HttpMethod.POST,"/api/v1/auth/refresh").permitAll()
                 .antMatchers(HttpMethod.POST,"/api/v1/auth/logout").hasAnyRole(UserRole.USER.name(), UserRole.ADMIN.name())
+                .antMatchers(HttpMethod.POST,"/api/v1/auth/revoke").hasAnyRole(UserRole.USER.name())
+                .antMatchers(HttpMethod.POST,"/api/v1/auth/revoke/{userId}").hasAnyRole(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.POST,"/api/v1/studies").hasRole(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.GET,"/api/v1/studies/me").hasRole(UserRole.USER.name())
                 .antMatchers(HttpMethod.DELETE,"/api/v1/studies/{studyId}").hasRole(UserRole.ADMIN.name())

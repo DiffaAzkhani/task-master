@@ -64,11 +64,9 @@ public class JwtService {
             .compact();
     }
 
-    public boolean isRefreshTokenValid(String token) {
-        RefreshToken storedRefreshToken = refreshTokenRepository.findByToken(token)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Refresh token not found!"));
-
-        refreshTokenRepository.deleteByUserAndExpiredAtBefore(storedRefreshToken.getUser(),LocalDateTime.now());
+    public boolean isRefreshTokenValid(RefreshToken refreshToken) {
+        RefreshToken storedRefreshToken = refreshTokenRepository.findByTokenAndIsBlacklistFalse(refreshToken.getToken())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Refresh token not found or is blacklisted!"));
 
         return !storedRefreshToken.getExpiredAt().isBefore(LocalDateTime.now());
     }

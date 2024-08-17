@@ -23,6 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @AllArgsConstructor
@@ -53,6 +55,8 @@ public class AuthServiceImpl implements AuthService {
             )
         );
 
+        deleteExpiredAndBlacklistedRefreshToken();
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = userRepository.findByUsernameOrEmail(loginRequest.getUsernameOrEmail(), loginRequest.getUsernameOrEmail())
@@ -68,6 +72,11 @@ public class AuthServiceImpl implements AuthService {
         return userMapper.toLoginResponse(user);
     }
 
+    private void deleteExpiredAndBlacklistedRefreshToken() {
+        List<RefreshToken> refreshTokens = refreshTokenRepository.findByExpiredAtBeforeAndIsBlacklistTrue(LocalDateTime.now());
+        refreshTokenRepository.deleteAll(refreshTokens);
+    }
+
     @Override
     @Transactional
     public void logout(String refreshToken, HttpServletResponse httpServletResponse) {
@@ -80,7 +89,11 @@ public class AuthServiceImpl implements AuthService {
 
         revokeRefreshTokenFromCookies(httpServletResponse);
 
-        refreshTokenRepository.deleteByToken(refreshToken);
+        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Refresh token not found!"));
+
+        token.setBlacklist(true);
+        refreshTokenRepository.save(token);
     }
 
     private void revokeRefreshTokenFromCookies(HttpServletResponse httpServletResponse) {
@@ -103,7 +116,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public RefreshJwtTokenResponse refreshToken(String refreshToken) {
-        if (!jwtService.isRefreshTokenValid(refreshToken)) {
+        RefreshToken existedRefreshToken = refreshTokenRepository.findByToken(refreshToken)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Refresh token not found!"));
+
+        if (!jwtService.isRefreshTokenValid(existedRefreshToken)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Expired or Invalid refresh token!");
         }
 
@@ -111,6 +127,10 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+
+        if (!existedRefreshToken.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token does not belong to the current user!");
+        }
 
         return authMapper.toRefreshJwtTokenResponse(user);
     }
@@ -137,12 +157,58 @@ public class AuthServiceImpl implements AuthService {
             .username(user.getUsername())
             .issuedAt(TimeUtil.getFormattedLocalDateTimeNow())
             .expiredAt(TimeUtil.getFormattedLocalDateTimeNow().plusWeeks(1))
+            .isBlacklist(false)
             .user(user)
             .build();
 
         refreshTokenRepository.save(refreshToken);
 
         return refreshToken.getToken();
+    }
+
+    @Override
+    @Transactional
+    public void revokeUserInAllDevice(String refreshToken) {
+        String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
+
+        List<RefreshToken> existedRefreshToken = refreshTokenRepository.findByUser_Username(currentUser);
+
+        if (existedRefreshToken.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No refresh token found in this user!");
+        }
+
+        User user = userRepository.findByUsername(currentUser)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+
+        Long refreshTokenId = existedRefreshToken.stream()
+            .map(RefreshToken::getId)
+            .findFirst()
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found on this token!"));
+
+        if (!refreshTokenId.equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token does not belong to the current user!");
+        }
+
+        for (RefreshToken token : existedRefreshToken) {
+            token.setBlacklist(true);
+            refreshTokenRepository.save(token);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void revokeUserInAllDeviceForAdmin(Long userId) {
+        List<RefreshToken> existedRefreshToken = refreshTokenRepository.findByUser_Id(userId);
+
+        if (existedRefreshToken.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No refresh token found in this user id!");
+        }
+
+        for (RefreshToken token : existedRefreshToken) {
+            token.setBlacklist(true);
+            refreshTokenRepository.save(token);
+        }
     }
 
 }
