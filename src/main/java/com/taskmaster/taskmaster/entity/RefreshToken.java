@@ -43,6 +43,9 @@ public class RefreshToken {
     @Column(name = "issued_at", nullable = false)
     private LocalDateTime issuedAt;
 
+    @Column(name = "blacklist")
+    private boolean isBlacklist;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

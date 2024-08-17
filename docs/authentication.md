@@ -13,6 +13,7 @@ This endpoint is used for user login. It accepts user credentials and returns a 
 #### Request
 
 - **URL:** `/api/v1/auth/login`
+- **ROLE** `PERMIT ALL`
 - **Method:** `POST`
 - **Content-Type:** `application/json`
 - **Request Body:**
@@ -48,6 +49,7 @@ This endpoint allows users or admins to refresh their expired access token. It r
 #### Request
 
 - **URL:** `/api/v1/auth/refresh`
+- **ROLE** `PERMIT ALL`
 - **Method:** `POST`
 - **Content-Type:** `application/json`
 - **Request Cookie:**
@@ -77,11 +79,12 @@ This endpoint allows users or admins to refresh their expired access token. It r
 
 ### POST /api/v1/auth/logout
 
-This endpoint allows users or admins to log out of their account. It requires a valid refresh token from HTTP-only cookies and is only valid for use at the path /api/v1/auth/. This endpoint only deletes and revokes the refresh token associated with the user's cookie, which was set during the user's initial login. If the same user logs in from a different device, they will still be able to authenticate to the web app.
+This endpoint allows users or admins to log out of their account. It requires a valid refresh token from HTTP-only cookies and is only valid for use at the path `/api/v1/auth/`. This endpoint only deletes and revokes the refresh token associated with the user's cookie, which was set during the user's initial login. If the same user logs in from a different device, they will still be able to authenticate to the web app.
 
 #### Request
 
 - **URL:** `/api/v1/auth/logout`
+- **ROLE** `USER`, `ADMIN`
 - **Method:** `POST`
 - **Content-Type:** `application/json`
 - **Request Cookie:**
@@ -106,3 +109,57 @@ This endpoint allows users or admins to log out of their account. It requires a 
     ```Text
     Set-Cookie = refresh_token=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT; Path=/api/v1/auth/; HttpOnly
     ```
+
+### POST /api/v1/auth/revoke
+
+This endpoint allows users to log out of all their active sessions across all devices. This is useful for scenarios where a user wants to ensure their account is secure by ending all other active sessions.
+
+#### Request
+
+- **URL:** `/api/v1/auth/revoke`
+- **ROLE** `USER`
+- **Method:** `POST`
+- **Content-Type:** `application/json`
+- **Request Cookie:**
+  ```text
+  Cookie refresh_token={your_refresh_token}
+  ```
+
+#### Response
+- **Status Code: `200 OK`**
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": null,
+    "errors": null
+  }
+
+### POST /api/v1/auth/revoke/{userId}
+
+This endpoint allows an admin to log out a specific user from all their active sessions across all devices. Instead of deleting the refresh tokens, this endpoint marks them as blacklisted. This is useful for ensuring the security of a user's account by ending all active sessions or if an admin needs to enforce a global logout for a specific user.
+
+#### Request
+
+- **URL:** `/api/v1/auth/revoke/{userId}`
+- **ROLE** `ADMIN`
+- **Method:** `POST`
+- **Content-Type:** `application/json`
+- **Request Path Parameter:**
+  ```text
+  userId = 15
+  ```
+
+#### Response
+- **Status Code: `200 OK`**
+- **Content-Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "code": 200,
+    "message": "OK",
+    "data": null,
+    "errors": null
+  }

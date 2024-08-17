@@ -20,4 +20,8 @@ public interface AuthService {
 
     String createRefreshToken(String username);
 
+    void revokeUserInAllDevice(String refreshToken);
+
+    void revokeUserInAllDeviceForAdmin(Long userId);
+
 }
