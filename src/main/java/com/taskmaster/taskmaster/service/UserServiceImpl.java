@@ -70,7 +70,10 @@ public class UserServiceImpl implements UserService {
             .build();
 
         Set<Role> roleSet = new HashSet<>();
-        Role userRole = roleRepository.findByName(UserRole.USER);
+
+        Role userRole = roleRepository.findByName(UserRole.USER)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found!"));
+
         roleSet.add(userRole);
         user.setRoles(roleSet);
 
