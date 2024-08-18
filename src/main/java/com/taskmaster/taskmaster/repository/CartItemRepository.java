@@ -14,8 +14,6 @@ import java.util.Optional;
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
-    Optional<CartItem> findByCartAndStudy(Cart cart, Study study);
-
     Page<CartItem> findByCart_User(User user, Pageable pageable);
 
 }
