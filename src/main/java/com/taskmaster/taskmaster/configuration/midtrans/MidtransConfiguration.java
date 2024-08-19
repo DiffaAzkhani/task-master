@@ -24,7 +24,7 @@ public class MidtransConfiguration {
     @Value("${midtrans.server-key}")
     private String SERVER_KEY;
 
-    @Value("${midtrans.client-key}")
+//    @Value("${midtrans.client-key}")
     private String CLIENT_KEY;
 
     @Value("${midtrans.is-production}")
