@@ -109,13 +109,13 @@ public class CartServiceImpl implements CartService{
     @Transactional(readOnly = true)
     public Page<GetCartItemsResponse> getUserCartItems(int page, int size) {
         String currentUser = validationService.getCurrentUser();
+        validationService.validateUser(currentUser);
+
         User user = userRepository.findByUsername(currentUser)
             .orElseThrow(() -> {
                 log.info("User with username:{}, not found!", currentUser);
                 return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
             });
-
-        validationService.validateUser(user.getUsername());
 
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<CartItem> cartItemPage = cartItemRepository.findByCart_User(user, pageRequest);
