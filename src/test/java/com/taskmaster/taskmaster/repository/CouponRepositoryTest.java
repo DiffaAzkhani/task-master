@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.math.BigDecimal;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
@@ -39,6 +40,13 @@ class CouponRepositoryTest {
         Boolean existsCoupon = couponRepository.existsByCode(testCoupon.getCode());
 
         assertTrue(existsCoupon);
+    }
+
+    @Test
+    void givenCouponCode_whenFindCouponByCode_thenCouponIsNotFound() {
+        Boolean existsCoupon = couponRepository.existsByCode("WRONGCODE123");
+
+        assertFalse(existsCoupon);
     }
 
 }
