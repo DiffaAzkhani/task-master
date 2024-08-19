@@ -14,10 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 public class OrderRepositoryTest {
@@ -82,7 +79,7 @@ public class OrderRepositoryTest {
     }
 
     @Test
-    public void givenUser_whenFindOrderByUser_thenOrderIsFound() {
+    public void givenUser_whenFindOrderByUser_thenOrderIsFoundWithPagination() {
         Pageable orderPage = PageRequest.of(0,2);
         Page<Order> foundOrder = orderRepository.findByUser(testUser, orderPage);
 
@@ -93,14 +90,14 @@ public class OrderRepositoryTest {
     }
 
     @Test
-    public void givenUser_whenFindOrderByUser_thenOrderIsNotFound() {
+    public void givenUser_whenFindOrderByUser_thenOrderIsNotFoundWithPagination() {
         Pageable orderPage = PageRequest.of(0,3);
-        Page<Order> foundOrder = orderRepository.findByUser(testUser, orderPage);
+        Page<Order> foundOrder = orderRepository.findByUser(null, orderPage);
 
-        assertNotEquals(2, foundOrder.getContent().size());
-        assertNotEquals(2, foundOrder.getTotalPages());
-        assertNotEquals(4, foundOrder.getTotalElements());
-        assertNotEquals("INV-20240818-00099", foundOrder.getContent().get(0).getId());
+        assertEquals(0, foundOrder.getContent().size());
+        assertEquals(0, foundOrder.getTotalPages());
+        assertEquals(0, foundOrder.getTotalElements());
+        assertTrue(foundOrder.getContent().isEmpty());
     }
 
 }
