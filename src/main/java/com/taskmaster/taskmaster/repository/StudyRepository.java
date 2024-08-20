@@ -6,7 +6,6 @@ import com.taskmaster.taskmaster.enums.StudyCategory;
 import com.taskmaster.taskmaster.enums.StudyLevel;
 import com.taskmaster.taskmaster.enums.StudyType;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,7 +26,7 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
 
     boolean existsByUsers(User user);
 
-    Page<Study> findByUsers_Username(String username, PageRequest pageRequest);
+    Page<Study> findByUsers_Username(String username, Pageable pageable);
 
     @Query("SELECT s FROM Study s WHERE (:studyType IS NULL OR s.type = :studyType) " +
         "AND (:studyCategories IS NULL OR s.category IN :studyCategories) " +
