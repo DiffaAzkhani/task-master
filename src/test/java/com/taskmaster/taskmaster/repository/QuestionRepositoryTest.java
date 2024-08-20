@@ -37,7 +37,7 @@ public class QuestionRepositoryTest {
     private List<Question> testQuestionList;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         testQuestionList = new ArrayList<>();
 
         testStudy = Study.builder()
@@ -106,27 +106,27 @@ public class QuestionRepositoryTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         questionRepository.deleteAll();
         studyRepository.delete(testStudy);
     }
 
     @Test
-    public void givenStudyId_whenFindQuestionsByStudyId_thenQuestionsIsFound() {
+    void givenStudyId_whenFindQuestionsByStudyId_thenQuestionsIsFound() {
         List<Question> foundQuestion = questionRepository.findByStudyId(testStudy.getId());
 
         assertFalse(foundQuestion.isEmpty());
     }
 
     @Test
-    public void givenStudyId_whenFindQuestionsByStudyId_thenQuestionsNotFound() {
+    void givenStudyId_whenFindQuestionsByStudyId_thenQuestionsNotFound() {
         List<Question> foundQuestion = questionRepository.findByStudyId(5L);
 
         assertTrue(foundQuestion.isEmpty());
     }
 
     @Test
-    public void givenQuestionIdAndStudy_whenFindQuestionsByIdAndStudy_thenQuestionsIsFound() {
+    void givenQuestionIdAndStudy_whenFindQuestionsByIdAndStudy_thenQuestionsIsFound() {
         List<Question> testQuestionList = questionRepository.findAll();
 
         Question foundQuestion = questionRepository.findByIdAndStudy(testQuestionList.get(0).getId(), testStudy)
@@ -139,7 +139,7 @@ public class QuestionRepositoryTest {
     }
 
     @Test
-    public void givenQuestionIdAndStudy_whenFindQuestionsByIdAndStudy_thenQuestionsNotFound() {
+    void givenQuestionIdAndStudy_whenFindQuestionsByIdAndStudy_thenQuestionsNotFound() {
         Question foundQuestion = questionRepository.findByIdAndStudy(9L, testStudy)
             .orElse(null);
 
@@ -147,7 +147,7 @@ public class QuestionRepositoryTest {
     }
 
     @Test
-    public void givenStudy_whenFindQuestions_thenQuestionsIsFound() {
+    void givenStudy_whenFindQuestions_thenQuestionsIsFound() {
         List<Question> foundQuestion = questionRepository.findByStudy(testStudy);
 
         assertFalse(foundQuestion.isEmpty());
@@ -155,14 +155,14 @@ public class QuestionRepositoryTest {
     }
 
     @Test
-    public void givenStudy_whenFindQuestions_thenQuestionsNotFound() {
+    void givenStudy_whenFindQuestions_thenQuestionsNotFound() {
         List<Question> foundQuestion = questionRepository.findByStudy(null);
 
         assertTrue(foundQuestion.isEmpty());
     }
 
     @Test
-    public void givenStudy_whenFindQuestions_thenQuestionsIsFoundWithPagination() {
+    void givenStudy_whenFindQuestions_thenQuestionsIsFoundWithPagination() {
         Pageable questionPage = PageRequest.of(0,2);
         Page<Question> foundQuestion = questionRepository.findByStudy(testStudy, questionPage);
 
@@ -173,7 +173,7 @@ public class QuestionRepositoryTest {
     }
 
     @Test
-    public void givenStudy_whenFindQuestions_thenQuestionsNotFoundWithPagination() {
+    void givenStudy_whenFindQuestions_thenQuestionsNotFoundWithPagination() {
         Pageable questionPage = PageRequest.of(0,2);
         Page<Question> foundQuestion = questionRepository.findByStudy(null, questionPage);
 
