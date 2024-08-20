@@ -15,9 +15,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 public class OrderRepositoryTest {
@@ -33,7 +33,7 @@ public class OrderRepositoryTest {
     private Order testOrder;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         testUser = User.builder()
             .username("TestUser")
             .password("testuser123")
@@ -60,12 +60,12 @@ public class OrderRepositoryTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         orderRepository.delete(testOrder);
     }
 
     @Test
-    public void givenUserAndOrderId_whenFindOrderByUserAndOrderId_thenOrderIsFound() {
+    void givenUserAndOrderId_whenFindOrderByUserAndOrderId_thenOrderIsFound() {
         Order foundOrder = orderRepository.findByUserAndId(testUser, testOrder.getId())
             .orElse(null);
 
@@ -74,7 +74,7 @@ public class OrderRepositoryTest {
     }
 
     @Test
-    public void givenUserAndOrderId_whenFindOrderByUserAndOrderId_thenOrderIsNotFound() {
+    void givenUserAndOrderId_whenFindOrderByUserAndOrderId_thenOrderIsNotFound() {
         Order foundOrder = orderRepository.findByUserAndId(testUser, "INV-xxxxxxxx-00001")
             .orElse(null);
 
@@ -82,7 +82,7 @@ public class OrderRepositoryTest {
     }
 
     @Test
-    public void givenUser_whenFindOrderByUser_thenOrderIsFound() {
+    void givenUser_whenFindOrderByUser_thenOrderIsFoundWithPagination() {
         Pageable orderPage = PageRequest.of(0,2);
         Page<Order> foundOrder = orderRepository.findByUser(testUser, orderPage);
 
@@ -93,14 +93,14 @@ public class OrderRepositoryTest {
     }
 
     @Test
-    public void givenUser_whenFindOrderByUser_thenOrderIsNotFound() {
+    void givenUser_whenFindOrderByUser_thenOrderIsNotFoundWithPagination() {
         Pageable orderPage = PageRequest.of(0,3);
-        Page<Order> foundOrder = orderRepository.findByUser(testUser, orderPage);
+        Page<Order> foundOrder = orderRepository.findByUser(null, orderPage);
 
-        assertNotEquals(2, foundOrder.getContent().size());
-        assertNotEquals(2, foundOrder.getTotalPages());
-        assertNotEquals(4, foundOrder.getTotalElements());
-        assertNotEquals("INV-20240818-00099", foundOrder.getContent().get(0).getId());
+        assertEquals(0, foundOrder.getContent().size());
+        assertEquals(0, foundOrder.getTotalPages());
+        assertEquals(0, foundOrder.getTotalElements());
+        assertTrue(foundOrder.getContent().isEmpty());
     }
 
 }
