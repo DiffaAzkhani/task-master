@@ -82,7 +82,7 @@ public class OrderRepositoryTest {
     }
 
     @Test
-    public void givenUser_whenFindOrderByUser_thenOrderIsFoundWithPagination() {
+    public void givenUser_whenFindOrderByUser_thenOrderIsFound() {
         Pageable orderPage = PageRequest.of(0,2);
         Page<Order> foundOrder = orderRepository.findByUser(testUser, orderPage);
 
