@@ -20,7 +20,7 @@ public class RoleRepositoryTest {
     private Role  testRole;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         testRole = Role.builder()
             .name(UserRole.USER)
             .build();
@@ -29,12 +29,12 @@ public class RoleRepositoryTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         roleRepository.delete(testRole);
     }
 
     @Test
-    public void givenRoleName_WhenFindByName_thenRoleIsFound() {
+    void givenRoleName_WhenFindByName_thenRoleIsFound() {
         Role foundRole = roleRepository.findByName(UserRole.USER)
             .orElse(null);
 
