@@ -34,7 +34,7 @@ public class UserRepositoryTest {
     private Study testStudy;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         Set<Study> studySet = new HashSet<>();
 
         testStudy = Study.builder()
@@ -64,25 +64,25 @@ public class UserRepositoryTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         userRepository.delete(testUser);
         studyRepository.delete(testStudy);
     }
 
     @Test
-    public void givenUser_whenCheckingUsernameAndEmail_thenReturnTrueResponse() {
+    void givenUser_whenCheckingUsernameAndEmail_thenReturnTrueResponse() {
         boolean existsUser = userRepository.existsByUsernameAndEmail(testUser.getUsername(), testUser.getEmail());
         assertTrue(existsUser);
     }
 
     @Test
-    public void givenUser_whenCheckingUsernameAndEmail_thenReturnFalseResponse() {
+    void givenUser_whenCheckingUsernameAndEmail_thenReturnFalseResponse() {
         boolean existsUser = userRepository.existsByUsernameAndEmail("Wrong Username", "wrong.email@example.com");
         assertFalse(existsUser);
     }
 
     @Test
-    public void givenUser_whenFindByUsernameOrEmail_thenUserIsFound() {
+    void givenUser_whenFindByUsernameOrEmail_thenUserIsFound() {
         User foundUser = userRepository.findByUsernameOrEmail(testUser.getUsername(), testUser.getEmail())
             .orElse(null);
 
@@ -91,7 +91,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void givenUser_whenFindByUsernameOrEmail_thenUserIsNotFound() {
+    void givenUser_whenFindByUsernameOrEmail_thenUserIsNotFound() {
         User foundUser = userRepository.findByUsernameOrEmail("Wrong Username", "wrong.email@example.com")
             .orElse(null);
 
@@ -99,7 +99,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void givenUser_whenFindByUsername_thenUserIsFound() {
+    void givenUser_whenFindByUsername_thenUserIsFound() {
         User foundUser = userRepository.findByUsername(testUser.getUsername())
             .orElse(null);
 
@@ -108,7 +108,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void givenUser_whenFindByUsername_thenUserIsNotFound() {
+    void givenUser_whenFindByUsername_thenUserIsNotFound() {
         User foundUser = userRepository.findByUsername("Wrong Username")
             .orElse(null);
 
@@ -116,19 +116,19 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void givenUser_whenCheckingEmail_thenReturnTrueResponse() {
+    void givenUser_whenCheckingEmail_thenReturnTrueResponse() {
         boolean existsUser = userRepository.existsByEmail(testUser.getEmail());
         assertTrue(existsUser);
     }
 
     @Test
-    public void givenUser_whenCheckingEmail_thenReturnFalseResponse() {
+    void givenUser_whenCheckingEmail_thenReturnFalseResponse() {
         boolean existsUser = userRepository.existsByEmail("wrong.email@example.com");
         assertFalse(existsUser);
     }
 
     @Test
-    public void givenUser_whenFindByEmail_thenUserIsFound() {
+    void givenUser_whenFindByEmail_thenUserIsFound() {
         User foundUser = userRepository.findByEmail(testUser.getEmail())
             .orElse(null);
 
@@ -137,7 +137,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void givenUser_whenFindByEmail_thenUserIsNotFound() {
+    void givenUser_whenFindByEmail_thenUserIsNotFound() {
         User foundUser = userRepository.findByEmail("wrong.username@example.com")
             .orElse(null);
 
@@ -145,25 +145,25 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void givenUsernameAndStudies_whenCheckingUsernameAndStudies_thenReturnTrueResponse() {
+    void givenUsernameAndStudies_whenCheckingUsernameAndStudies_thenReturnTrueResponse() {
         boolean existsUser = userRepository.existsByUsernameAndStudies(testUser.getUsername(), testStudy);
         assertTrue(existsUser);
     }
 
     @Test
-    public void givenUsernameAndStudies_whenCheckingUsernameAndStudies_thenReturnFalseResponse() {
+    void givenUsernameAndStudies_whenCheckingUsernameAndStudies_thenReturnFalseResponse() {
         boolean existsUser = userRepository.existsByUsernameAndStudies("Wrong username" ,testStudy);
         assertFalse(existsUser);
     }
 
     @Test
-    public void givenUserPhone_whenCheckingPhone_thenReturnTrueResponse() {
+    void givenUserPhone_whenCheckingPhone_thenReturnTrueResponse() {
         boolean existsUser = userRepository.existsByPhone(testUser.getPhone());
         assertTrue(existsUser);
     }
 
     @Test
-    public void givenUserPhone_whenCheckingPhone_thenReturnFalseResponse() {
+    void givenUserPhone_whenCheckingPhone_thenReturnFalseResponse() {
         boolean existsUser = userRepository.existsByEmail("54321");
         assertFalse(existsUser);
     }
