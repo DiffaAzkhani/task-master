@@ -26,7 +26,7 @@ class CartRepositoryTest {
     private User testUser;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         testUser = User.builder()
             .username("TestUser")
             .password("testuser123")
@@ -46,13 +46,13 @@ class CartRepositoryTest {
     }
 
     @AfterEach
-    void tearDown() {
+    public void tearDown() {
         userRepository.delete(testUser);
         cartRepository.delete(testCart);
     }
 
     @Test
-    void givenUser_whenFindCartByUser_thenUserIsFound() {
+    public void givenUser_whenFindCartByUser_thenUserIsFound() {
         Cart foundCart = cartRepository.findByUser(testUser)
             .orElse(null);
 
@@ -61,7 +61,7 @@ class CartRepositoryTest {
     }
 
     @Test
-    void givenUser_whenFindCartByUser_thenUserIsNotFound() {
+    public void givenUser_whenFindCartByUser_thenUserIsNotFound() {
         Cart foundCart = cartRepository.findByUser(null)
             .orElse(null);
 
